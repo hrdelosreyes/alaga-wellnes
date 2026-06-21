@@ -42,10 +42,21 @@ export default function SchedulePage() {
   const [startIdx, setStartIdx] = useState(0)
   const [slotCounts, setSlotCounts] = useState<Record<string, number>>({})
   const [countsLoading, setCountsLoading] = useState(false)
+  const [isHuc, setIsHuc] = useState(false)
 
   useEffect(() => {
     if (!draft.serviceId) router.replace('/book')
   }, [draft.serviceId, router])
+
+  useEffect(() => {
+    if (!draft.cityId) return
+    createClient()
+      .from('cities')
+      .select('is_huc')
+      .eq('id', draft.cityId)
+      .single()
+      .then(({ data }) => setIsHuc(data?.is_huc ?? false))
+  }, [draft.cityId])
 
   useEffect(() => {
     if (!selectedDate) return
@@ -108,7 +119,7 @@ export default function SchedulePage() {
     const requestedDuration = SERVICES.find(s => s.id === draft.serviceId)?.duration ?? 60
 
     const counts: Record<string, number> = {}
-    for (const slot of TIME_SLOTS) {
+    for (const slot of allowedSlots) {
       const slotStart = toMins(slot)
       const slotEnd   = slotStart + requestedDuration
       counts[slot] = eligibleIds.filter(id => {
@@ -125,6 +136,11 @@ export default function SchedulePage() {
   }
 
   const visibleDays = days.slice(startIdx, startIdx + 7)
+
+  // HUC: last slot 22:00 (sessions end by 11:30PM)
+  // Non-HUC: last slot 20:30 (sessions end by 10PM for 90-min)
+  const lastSlot = isHuc ? '22:00' : '20:30'
+  const allowedSlots = TIME_SLOTS.filter(s => s <= lastSlot)
 
   function pickDate(day: Date) {
     setSelectedDate(day)
@@ -214,7 +230,7 @@ export default function SchedulePage() {
               Available times for {format(selectedDate, 'EEEE, MMM d')}
             </p>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {TIME_SLOTS.map((slot) => {
+              {allowedSlots.map((slot) => {
                 const minHour    = earliestHour(selectedDate)
                 const isPast     = minHour !== null && slotHour(slot) < minHour
                 const count      = slotCounts[slot] ?? null
