@@ -267,7 +267,7 @@ export default async function HomePage() {
               Ready for your alaga moment?
             </h2>
             <p className="text-[#C4A899] mb-8 max-w-md mx-auto">
-              Book a verified wellness professional today. Available in BGC and Makati, 9AM–10PM daily.
+              Book a verified wellness professional today. Available in select cities, 9AM–10PM daily.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/book">

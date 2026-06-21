@@ -11,8 +11,8 @@ const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin']
 export const metadata: Metadata = {
   title: 'Alaga Wellness — Wellness, delivered with care.',
   description:
-    'Book verified wellness professionals for premium massage and home spa rituals. Safe, convenient, and designed for Filipino families in BGC and Makati.',
-  keywords: 'home massage BGC, home massage Makati, wellness at home Philippines, hilot at home, mobile massage Metro Manila',
+    'Book verified wellness professionals for premium massage and home spa rituals. Safe, convenient, and designed for Filipino families.',
+  keywords: 'home massage Philippines, wellness at home Philippines, hilot at home, mobile massage Metro Manila, home spa',
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
