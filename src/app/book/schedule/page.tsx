@@ -10,6 +10,7 @@ import { TIME_SLOTS, SERVICES } from '@/lib/constants'
 import { formatTime, cn } from '@/lib/utils'
 import { addDays, format, startOfToday, isToday } from 'date-fns'
 import { createClient } from '@/lib/supabase/client'
+import { useGeoCity } from '@/components/geo/city-context'
 
 const DAYS_SHOWN = 14
 const LEAD_HOURS  = 2  // must be at least this many hours ahead
@@ -33,6 +34,7 @@ function slotHour(slot: string): number {
 export default function SchedulePage() {
   const router  = useRouter()
   const { draft, update } = useBooking()
+  const { city: geoCity } = useGeoCity()
 
   const days = buildDays()
   const [selectedDate, setSelectedDate] = useState<Date | null>(
@@ -49,14 +51,16 @@ export default function SchedulePage() {
   }, [draft.serviceId, router])
 
   useEffect(() => {
-    if (!draft.cityId) return
+    // Use draft.cityId if already set (returning to this step), else fall back to geo-detected city
+    const cityId = draft.cityId ?? geoCity?.id
+    if (!cityId) return
     createClient()
       .from('cities')
       .select('is_huc')
-      .eq('id', draft.cityId)
+      .eq('id', cityId)
       .single()
       .then(({ data }) => setIsHuc(data?.is_huc ?? false))
-  }, [draft.cityId])
+  }, [draft.cityId, geoCity])
 
   useEffect(() => {
     if (!selectedDate) return
