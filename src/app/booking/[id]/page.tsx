@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle, Clock, MapPin, Calendar, User, AlertCircle, Loader2 } from 'lucide-react'
@@ -48,7 +48,7 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled:       'text-red-600 bg-red-50 border-red-200',
 }
 
-export default function BookingConfirmationPage() {
+function BookingConfirmationPage() {
   const { id }          = useParams<{ id: string }>()
   const searchParams    = useSearchParams()
   const justPaid        = searchParams.get('payment') === 'success'
@@ -273,3 +273,5 @@ export default function BookingConfirmationPage() {
     </div>
   )
 }
+
+export default function BookingPageWrapper() { return <Suspense><BookingConfirmationPage /></Suspense> }

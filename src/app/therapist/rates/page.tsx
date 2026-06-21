@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronLeft, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -17,7 +17,7 @@ const SERVICES: { id: ServiceId; label: string; duration: string; description: s
 
 type Band = { min_rate: number; base_rate: number; max_rate: number }
 
-export default function TherapistRatesPage() {
+function TherapistRatesPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const nextUrl = searchParams.get('next')
@@ -194,3 +194,5 @@ export default function TherapistRatesPage() {
     </div>
   )
 }
+
+export default function TherapistRatesPageWrapper() { return <Suspense><TherapistRatesPage /></Suspense> }

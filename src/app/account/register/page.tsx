@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff } from 'lucide-react'
 
-export default function RegisterPage() {
+function RegisterPage() {
   const router     = useRouter()
   const params     = useSearchParams()
   const redirectTo = params.get('next') ?? '/account'
@@ -169,3 +169,5 @@ export default function RegisterPage() {
     </div>
   )
 }
+
+export default function RegisterPageWrapper() { return <Suspense><RegisterPage /></Suspense> }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronLeft, Search, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 
 type Barangay = { psgc_code: string; name: string }
 
-export default function ServiceAreaPage() {
+function ServiceAreaPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const nextUrl = searchParams.get('next')
@@ -184,3 +184,5 @@ export default function ServiceAreaPage() {
     </div>
   )
 }
+
+export default function ServiceAreaPageWrapper() { return <Suspense><ServiceAreaPage /></Suspense> }
