@@ -56,26 +56,49 @@ export default function SchedulePage() {
     setCountsLoading(true)
     setSlotCounts({})
     const supabase = createClient()
-    const { data } = await supabase
-      .from('therapist_availability')
-      .select('therapist_id')
-      .eq('date', date)
-      .eq('is_blocked', false)
 
-    const availableIds = (data ?? []).map(a => a.therapist_id)
-    if (availableIds.length === 0) { setCountsLoading(false); return }
+    // Get therapists marked available for this date
+    const [{ data: avail }, { data: therapists }, { data: bookings }] = await Promise.all([
+      supabase
+        .from('therapist_availability')
+        .select('therapist_id')
+        .eq('date', date)
+        .eq('is_blocked', false),
+      supabase
+        .from('therapists')
+        .select('id')
+        .eq('is_active', true),
+      // Existing confirmed bookings on this date (to exclude booked slots)
+      supabase
+        .from('bookings')
+        .select('therapist_id, time_slot')
+        .eq('booking_date', date)
+        .in('status', ['confirmed', 'assigned', 'en_route', 'checked_in']),
+    ])
 
-    // Count active therapists available on this date
-    const { data: therapists } = await supabase
-      .from('therapists')
-      .select('id')
-      .eq('is_active', true)
-      .in('id', availableIds)
+    const availableIds = new Set((avail ?? []).map(a => a.therapist_id))
+    const activeIds    = new Set((therapists ?? []).map(t => t.id))
 
-    const count = (therapists ?? []).length
-    // All time slots get the same count (availability is per-day, not per-slot yet)
+    // Therapists available today and active
+    const eligibleIds = [...availableIds].filter(id => activeIds.has(id))
+
+    if (eligibleIds.length === 0) { setCountsLoading(false); return }
+
+    // Build a map of slot → set of booked therapist IDs
+    const bookedPerSlot: Record<string, Set<string>> = {}
+    for (const b of bookings ?? []) {
+      if (!b.therapist_id || !b.time_slot) continue
+      if (!bookedPerSlot[b.time_slot]) bookedPerSlot[b.time_slot] = new Set()
+      bookedPerSlot[b.time_slot].add(b.therapist_id)
+    }
+
+    // Per slot: count eligible therapists not already booked at that slot
     const counts: Record<string, number> = {}
-    for (const slot of TIME_SLOTS) counts[slot] = count
+    for (const slot of TIME_SLOTS) {
+      const booked = bookedPerSlot[slot] ?? new Set()
+      counts[slot] = eligibleIds.filter(id => !booked.has(id)).length
+    }
+
     setSlotCounts(counts)
     setCountsLoading(false)
   }
