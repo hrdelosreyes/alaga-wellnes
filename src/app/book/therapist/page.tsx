@@ -121,7 +121,7 @@ export default function TherapistPage() {
 
   return (
     <>
-      <ProgressBar current={3} />
+      <ProgressBar current={2} />
 
       <div className="container-alaga py-12 max-w-2xl">
         <button

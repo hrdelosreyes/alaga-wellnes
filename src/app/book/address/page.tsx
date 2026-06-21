@@ -97,7 +97,7 @@ export default function AddressPage() {
       address:      fullAddress,
       unitNotes:    unitNotes.trim() || null,
     })
-    router.push('/book/therapist')
+    router.push('/book/schedule')
   }
 
   // Group live cities by region
@@ -111,7 +111,7 @@ export default function AddressPage() {
 
   return (
     <>
-      <ProgressBar current={2} />
+      <ProgressBar current={1} />
 
       <div className="container-alaga py-12 max-w-2xl">
         <button

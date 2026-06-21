@@ -19,7 +19,7 @@ export default function BookServicePage() {
 
   function next() {
     if (!draft.serviceId) return
-    router.push('/book/schedule')
+    router.push('/book/address')
   }
 
   return (

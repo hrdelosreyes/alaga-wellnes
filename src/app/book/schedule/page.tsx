@@ -10,7 +10,6 @@ import { TIME_SLOTS, SERVICES } from '@/lib/constants'
 import { formatTime, cn } from '@/lib/utils'
 import { addDays, format, startOfToday, isToday } from 'date-fns'
 import { createClient } from '@/lib/supabase/client'
-import { useGeoCity } from '@/components/geo/city-context'
 
 const DAYS_SHOWN = 14
 const LEAD_HOURS  = 2  // must be at least this many hours ahead
@@ -34,7 +33,6 @@ function slotHour(slot: string): number {
 export default function SchedulePage() {
   const router  = useRouter()
   const { draft, update } = useBooking()
-  const { city: geoCity } = useGeoCity()
 
   const days = buildDays()
   const [selectedDate, setSelectedDate] = useState<Date | null>(
@@ -51,16 +49,14 @@ export default function SchedulePage() {
   }, [draft.serviceId, router])
 
   useEffect(() => {
-    // Use draft.cityId if already set (returning to this step), else fall back to geo-detected city
-    const cityId = draft.cityId ?? geoCity?.id
-    if (!cityId) return
+    if (!draft.cityId) return
     createClient()
       .from('cities')
       .select('is_huc')
-      .eq('id', cityId)
+      .eq('id', draft.cityId)
       .single()
       .then(({ data }) => setIsHuc(data?.is_huc ?? false))
-  }, [draft.cityId, geoCity])
+  }, [draft.cityId])
 
   useEffect(() => {
     if (!selectedDate) return
@@ -169,12 +165,12 @@ export default function SchedulePage() {
       date:     format(selectedDate, 'yyyy-MM-dd'),
       timeSlot: selectedSlot,
     })
-    router.push('/book/address')
+    router.push('/book/therapist')
   }
 
   return (
     <>
-      <ProgressBar current={1} />
+      <ProgressBar current={2} />
 
       <div className="container-alaga py-12 max-w-2xl">
         <button
