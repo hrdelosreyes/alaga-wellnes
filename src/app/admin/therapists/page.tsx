@@ -123,7 +123,7 @@ export default function AdminTherapistsPage() {
     // Refresh this therapist's data
     const { data } = await supabase
       .from('therapists')
-      .select('*, cities(id, name, region), referred_by:therapists!therapists_referred_by_id_fkey(name)')
+      .select('*, cities(id, name, region)')
       .eq('id', therapistId)
       .single()
 
