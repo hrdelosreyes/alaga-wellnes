@@ -1,26 +1,88 @@
 @import "tailwindcss";
 
+/* ============================================================
+   ALAGA WELLNESS — Brand Design Tokens
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Colors */
+  --alaga-terracotta:   #C4714A;  /* primary CTA, buttons */
+  --alaga-terracotta-dark: #A05938;
+  --alaga-terracotta-light: #F2D9CC;
+  --alaga-cream:        #FBF6F0;  /* page background */
+  --alaga-warm-white:   #FFFFFF;
+  --alaga-stone:        #8C7B70;  /* secondary text */
+  --alaga-charcoal:     #2C2420;  /* headings */
+  --alaga-sage:         #6B8C6E;  /* accent, verified badges */
+  --alaga-gold:         #C9A84C;  /* star ratings */
+
+  /* Spacing */
+  --section-padding: 5rem 1.5rem;
+
+  /* Legacy (Next.js default — keep for compatibility) */
+  --background: #FBF6F0;
+  --foreground: #2C2420;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ============================================================
+   BASE
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--alaga-cream);
+  color: var(--alaga-charcoal);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+h1, h2, h3, h4 {
+  color: var(--alaga-charcoal);
+  line-height: 1.2;
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+
+.container-alaga {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.badge-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #EBF3EC;
+  color: var(--alaga-sage);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid #B8D9BB;
+}
+
+.badge-tag {
+  display: inline-flex;
+  background-color: var(--alaga-terracotta-light);
+  color: var(--alaga-terracotta-dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
