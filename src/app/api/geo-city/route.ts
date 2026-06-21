@@ -55,13 +55,27 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ city: null, isLive: false, pricing: null })
   }
 
+  // Normalize: remove accents, strip "City of"/"City", lowercase
+  function normalize(s: string) {
+    return s
+      .normalize('NFD').replace(/[̀-ͯ]/g, '') // ñ → n, etc.
+      .replace(/\bcity\b/gi, '')
+      .replace(/\bof\b/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase()
+  }
+
+  const normalizedDetected = detectedCity ? normalize(detectedCity) : null
+
   // Try to match detected city to a live city
-  let matchedCity = detectedCity
-    ? cities.find(c =>
-        c.name.toLowerCase() === detectedCity!.toLowerCase() ||
-        c.name.toLowerCase().includes(detectedCity!.toLowerCase()) ||
-        detectedCity!.toLowerCase().includes(c.name.toLowerCase())
-      )
+  let matchedCity = normalizedDetected
+    ? cities.find(c => {
+        const n = normalize(c.name)
+        return n === normalizedDetected ||
+          n.includes(normalizedDetected!) ||
+          normalizedDetected!.includes(n)
+      })
     : null
 
   // Fall back to first live city if no match
@@ -73,10 +87,13 @@ export async function GET(req: NextRequest) {
     .select('service_id, price_min, price_max')
     .eq('city_id', matchedCity.id)
 
+  const debug = searchParams.get('debug') === '1'
+
   return NextResponse.json({
     city: { id: matchedCity.id, name: matchedCity.name, region: matchedCity.region },
     isLive: true,
     pricing: pricing ?? [],
     allLiveCities: cities.map(c => c.name),
+    ...(debug && { _debug: { detectedCity, normalizedDetected, liveCities: cities.map(c => c.name) } }),
   })
 }
