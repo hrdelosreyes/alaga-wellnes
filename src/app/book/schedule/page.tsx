@@ -9,6 +9,7 @@ import { useBooking } from '@/lib/booking-context'
 import { TIME_SLOTS } from '@/lib/constants'
 import { formatTime, cn } from '@/lib/utils'
 import { addDays, format, startOfToday, isToday } from 'date-fns'
+import { createClient } from '@/lib/supabase/client'
 
 const DAYS_SHOWN = 14
 const LEAD_HOURS  = 2  // must be at least this many hours ahead
@@ -39,16 +40,52 @@ export default function SchedulePage() {
   )
   const [selectedSlot, setSelectedSlot] = useState<string | null>(draft.timeSlot)
   const [startIdx, setStartIdx] = useState(0)
+  const [slotCounts, setSlotCounts] = useState<Record<string, number>>({})
+  const [countsLoading, setCountsLoading] = useState(false)
 
   useEffect(() => {
     if (!draft.serviceId) router.replace('/book')
   }, [draft.serviceId, router])
+
+  useEffect(() => {
+    if (!selectedDate) return
+    fetchSlotCounts(format(selectedDate, 'yyyy-MM-dd'))
+  }, [selectedDate])
+
+  async function fetchSlotCounts(date: string) {
+    setCountsLoading(true)
+    setSlotCounts({})
+    const supabase = createClient()
+    const { data } = await supabase
+      .from('therapist_availability')
+      .select('therapist_id')
+      .eq('date', date)
+      .eq('is_blocked', false)
+
+    const availableIds = (data ?? []).map(a => a.therapist_id)
+    if (availableIds.length === 0) { setCountsLoading(false); return }
+
+    // Count active therapists available on this date
+    const { data: therapists } = await supabase
+      .from('therapists')
+      .select('id')
+      .eq('is_active', true)
+      .in('id', availableIds)
+
+    const count = (therapists ?? []).length
+    // All time slots get the same count (availability is per-day, not per-slot yet)
+    const counts: Record<string, number> = {}
+    for (const slot of TIME_SLOTS) counts[slot] = count
+    setSlotCounts(counts)
+    setCountsLoading(false)
+  }
 
   const visibleDays = days.slice(startIdx, startIdx + 7)
 
   function pickDate(day: Date) {
     setSelectedDate(day)
     setSelectedSlot(null)
+    setSlotCounts({})
   }
 
   function next() {
@@ -134,25 +171,36 @@ export default function SchedulePage() {
             </p>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
               {TIME_SLOTS.map((slot) => {
-                const minHour   = earliestHour(selectedDate)
-                const isPast    = minHour !== null && slotHour(slot) < minHour
-                const isSelected = selectedSlot === slot && !isPast
+                const minHour    = earliestHour(selectedDate)
+                const isPast     = minHour !== null && slotHour(slot) < minHour
+                const count      = slotCounts[slot] ?? null
+                const noOne      = !countsLoading && count !== null && count === 0
+                const isDisabled = isPast || noOne
+                const isSelected = selectedSlot === slot && !isDisabled
 
                 return (
                   <button
                     key={slot}
-                    disabled={isPast}
-                    onClick={() => !isPast && setSelectedSlot(slot)}
+                    disabled={isDisabled}
+                    onClick={() => !isDisabled && setSelectedSlot(slot)}
                     className={cn(
-                      'py-2.5 rounded-xl text-sm font-medium border transition-all',
-                      isPast
-                        ? 'border-[#EDE5DF] text-[#C8BDB8] bg-[#FAFAFA] cursor-not-allowed line-through'
+                      'py-2.5 px-1 rounded-xl text-sm font-medium border transition-all flex flex-col items-center gap-0.5',
+                      isDisabled
+                        ? 'border-[#EDE5DF] text-[#C8BDB8] bg-[#FAFAFA] cursor-not-allowed'
                         : isSelected
                           ? 'bg-[#C4714A] text-white border-[#C4714A]'
                           : 'border-[#EDE5DF] text-[#2C2420] hover:border-[#C4714A] hover:text-[#C4714A]',
                     )}
                   >
-                    {formatTime(slot)}
+                    <span className={isPast ? 'line-through' : ''}>{formatTime(slot)}</span>
+                    {!isPast && (
+                      <span className={cn(
+                        'text-[10px] font-normal',
+                        isSelected ? 'text-white/80' : noOne ? 'text-[#C8BDB8]' : 'text-[#6B8C6E]',
+                      )}>
+                        {countsLoading ? '…' : noOne ? 'Full' : count !== null ? `${count} avail.` : ''}
+                      </span>
+                    )}
                   </button>
                 )
               })}
