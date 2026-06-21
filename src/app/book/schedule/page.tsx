@@ -69,7 +69,7 @@ export default function SchedulePage() {
     const supabase = createClient()
 
     // Get therapists marked available for this date
-    const [{ data: avail }, { data: therapists }, { data: bookings }] = await Promise.all([
+    const [{ data: avail }, { data: therapists }, { data: bookings }, { data: barangayTherapists }] = await Promise.all([
       supabase
         .from('therapist_availability')
         .select('therapist_id')
@@ -85,13 +85,23 @@ export default function SchedulePage() {
         .select('therapist_id, time_slot, service_id')
         .eq('booking_date', date)
         .in('status', ['confirmed', 'assigned', 'en_route', 'checked_in']),
+      // Filter by barangay service area if customer selected one
+      draft.barangayPsgc
+        ? supabase
+            .from('therapist_barangays')
+            .select('therapist_id')
+            .eq('barangay_psgc', draft.barangayPsgc)
+        : Promise.resolve({ data: null }),
     ])
 
-    const availableIds = new Set((avail ?? []).map(a => a.therapist_id))
-    const activeIds    = new Set((therapists ?? []).map(t => t.id))
+    const availableIds  = new Set((avail ?? []).map(a => a.therapist_id))
+    const activeIds     = new Set((therapists ?? []).map(t => t.id))
+    const barangayIds   = barangayTherapists ? new Set(barangayTherapists.map(b => b.therapist_id)) : null
 
-    // Therapists available today and active
-    const eligibleIds = [...availableIds].filter(id => activeIds.has(id))
+    // Therapists available today, active, and serving the customer's barangay
+    const eligibleIds = [...availableIds].filter(id =>
+      activeIds.has(id) && (barangayIds === null || barangayIds.has(id))
+    )
 
     if (eligibleIds.length === 0) { setCountsLoading(false); return }
 
