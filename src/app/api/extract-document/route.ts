@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
           },
           {
             type: 'text',
-            text: PROMPTS[documentType],
+            text: PROMPTS[documentType as keyof typeof PROMPTS],
           },
         ],
       }],
