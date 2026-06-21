@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/utils'
+import Link from 'next/link'
 import { AdminNav } from '@/components/layout/admin-nav'
 import {
   RefreshCw,
