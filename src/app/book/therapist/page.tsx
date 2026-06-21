@@ -54,6 +54,7 @@ export default function TherapistPage() {
         .from('therapist_barangays')
         .select('therapist_id')
         .eq('barangay_psgc', draft.barangayPsgc)
+        .eq('status', 'approved')
         .in('therapist_id', availableIds)
       eligibleIds = (serviceArea ?? []).map(r => r.therapist_id)
     }

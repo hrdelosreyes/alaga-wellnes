@@ -91,6 +91,7 @@ export default function SchedulePage() {
             .from('therapist_barangays')
             .select('therapist_id')
             .eq('barangay_psgc', draft.barangayPsgc)
+            .eq('status', 'approved')
         : Promise.resolve({ data: null }),
     ])
 

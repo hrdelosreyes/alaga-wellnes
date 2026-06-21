@@ -21,6 +21,7 @@ function ServiceAreaPage() {
   const [loading,      setLoading]      = useState(true)
   const [saving,       setSaving]       = useState(false)
   const [saved,        setSaved]        = useState(false)
+  const [pendingPsgcs, setPendingPsgcs] = useState<Set<string>>(new Set())
 
   useEffect(() => { init() }, [])
 
@@ -45,11 +46,12 @@ function ServiceAreaPage() {
     // Load barangays for this city + therapist's current selections in parallel
     const [{ data: bgyData }, { data: selData }] = await Promise.all([
       supabase.from('barangays').select('psgc_code, name').in('city_name', [name, `City of ${name}`]).order('name'),
-      supabase.from('therapist_barangays').select('barangay_psgc').eq('therapist_id', t.id),
+      supabase.from('therapist_barangays').select('barangay_psgc, status').eq('therapist_id', t.id),
     ])
 
     setBarangays((bgyData ?? []) as Barangay[])
-    setSelected(new Set((selData ?? []).map(r => r.barangay_psgc)))
+    setSelected(new Set((selData ?? []).map((r: any) => r.barangay_psgc)))
+    setPendingPsgcs(new Set((selData ?? []).filter((r: any) => r.status === 'pending').map((r: any) => r.barangay_psgc)))
     setLoading(false)
   }
 
@@ -65,9 +67,11 @@ function ServiceAreaPage() {
       const rows = Array.from(selected).map(psgc => ({
         therapist_id:  therapistId,
         barangay_psgc: psgc,
+        status:        'pending',
       }))
       await supabase.from('therapist_barangays').insert(rows)
     }
+    setPendingPsgcs(new Set(selected))
 
     setSaving(false)
     if (nextUrl) {
@@ -104,8 +108,14 @@ function ServiceAreaPage() {
 
       <div className="max-w-lg mx-auto px-4 py-6">
         <p className="text-sm text-[#8C7B70] mb-4">
-          Tick every barangay you're willing to travel to. Only customers in your selected barangays will see you when booking.
+          Tick every barangay you're willing to travel to. Your selection will be reviewed by our admin before going live.
         </p>
+
+        {pendingPsgcs.size > 0 && (
+          <div className="bg-[#FFF8E6] border border-[#F0D080] rounded-xl px-4 py-3 mb-4 text-xs text-[#7A5C00]">
+            ⏳ <strong>{pendingPsgcs.size} barangay{pendingPsgcs.size > 1 ? 's' : ''}</strong> pending admin approval. You won't appear in those areas until approved.
+          </div>
+        )}
 
         {barangays.length === 0 ? (
           <p className="text-sm text-[#8C7B70] text-center py-12">No barangay data available for {cityName}.</p>
@@ -162,7 +172,10 @@ function ServiceAreaPage() {
                     }}
                     className="accent-[#C4714A] w-4 h-4 flex-shrink-0"
                   />
-                  <span className="text-sm text-[#2C2420]">{b.name}</span>
+                  <span className="text-sm text-[#2C2420] flex-1">{b.name}</span>
+                  {pendingPsgcs.has(b.psgc_code) && (
+                    <span className="text-[10px] bg-[#FFF3CC] text-[#7A5C00] px-1.5 py-0.5 rounded-full flex-shrink-0">pending</span>
+                  )}
                 </label>
               ))}
               {visible.length === 0 && (

@@ -59,7 +59,9 @@ export default function AdminTherapistsPage() {
   const [editState,  setEditState]  = useState<EditState | null>(null)
   const [saving,     setSaving]     = useState(false)
   const [toggling,   setToggling]   = useState<string | null>(null)
-  const [serviceAreas, setServiceAreas] = useState<Record<string, string[]>>({})
+  type BarangayRow = { psgc_code: string; name: string; status: string }
+  const [serviceAreas, setServiceAreas] = useState<Record<string, BarangayRow[]>>({})
+  const [saUpdating, setSaUpdating] = useState<string | null>(null)
 
   useEffect(() => { fetchAll() }, [])
 
@@ -135,6 +137,42 @@ export default function AdminTherapistsPage() {
     setSaving(false)
     setEditing(null)
     setEditState(null)
+  }
+
+  async function loadServiceArea(therapistId: string) {
+    const { data } = await createClient()
+      .from('therapist_barangays')
+      .select('barangay_psgc, status, barangays(name)')
+      .eq('therapist_id', therapistId)
+      .order('barangay_psgc')
+    const rows = (data ?? []).map((r: any) => ({
+      psgc_code: r.barangay_psgc,
+      name: r.barangays?.name ?? r.barangay_psgc,
+      status: r.status,
+    }))
+    setServiceAreas(p => ({ ...p, [therapistId]: rows }))
+  }
+
+  async function updateBarangayStatus(therapistId: string, psgcCode: string, status: 'approved' | 'rejected') {
+    setSaUpdating(psgcCode)
+    await createClient()
+      .from('therapist_barangays')
+      .update({ status })
+      .eq('therapist_id', therapistId)
+      .eq('barangay_psgc', psgcCode)
+    setSaUpdating(null)
+    loadServiceArea(therapistId)
+  }
+
+  async function removeBarangay(therapistId: string, psgcCode: string) {
+    setSaUpdating(psgcCode)
+    await createClient()
+      .from('therapist_barangays')
+      .delete()
+      .eq('therapist_id', therapistId)
+      .eq('barangay_psgc', psgcCode)
+    setSaUpdating(null)
+    loadServiceArea(therapistId)
   }
 
   function toggleSpecialty(s: string) {
@@ -289,17 +327,7 @@ export default function AdminTherapistsPage() {
                           const next = isExpanded ? null : t.id
                           setExpanded(next)
                           setEditing(null)
-                          if (next && !serviceAreas[next]) {
-                            createClient()
-                              .from('therapist_barangays')
-                              .select('barangays(name)')
-                              .eq('therapist_id', next)
-                              .order('barangay_psgc')
-                              .then(({ data }) => {
-                                const names = (data ?? []).map((r: any) => r.barangays?.name).filter(Boolean)
-                                setServiceAreas(p => ({ ...p, [next]: names }))
-                              })
-                          }
+                          if (next) loadServiceArea(next)
                         }}
                         className="text-[#8C7B70] hover:text-[#2C2420] transition-colors p-1"
                       >
@@ -350,9 +378,59 @@ export default function AdminTherapistsPage() {
                             ) : serviceAreas[t.id].length === 0 ? (
                               <p className="text-xs text-[#8C7B70]">No barangays set — therapist hasn't configured their service area yet.</p>
                             ) : (
-                              <div className="flex flex-wrap gap-1.5">
+                              <div className="flex flex-col gap-1.5">
+                                {serviceAreas[t.id].some(b => b.status === 'pending') && (
+                                  <p className="text-xs text-[#7A5C00] bg-[#FFF8E6] border border-[#F0D080] rounded-lg px-3 py-2 mb-1">
+                                    ⏳ Some barangays are pending your approval.
+                                  </p>
+                                )}
                                 {serviceAreas[t.id].map(b => (
-                                  <span key={b} className="text-xs bg-[#EBF3EC] text-[#6B8C6E] px-2 py-0.5 rounded-full">{b}</span>
+                                  <div key={b.psgc_code} className={cn(
+                                    'flex items-center gap-2 px-3 py-2 rounded-xl text-xs border',
+                                    b.status === 'approved' ? 'bg-[#EBF3EC] border-[#B8D9BB] text-[#2C4A2E]' :
+                                    b.status === 'rejected' ? 'bg-[#FEF2F2] border-[#FECACA] text-[#7F1D1D]' :
+                                    'bg-[#FFFBEB] border-[#FDE68A] text-[#713F12]'
+                                  )}>
+                                    <span className="flex-1 font-medium">{b.name}</span>
+                                    <span className="capitalize opacity-70">{b.status}</span>
+                                    {b.status === 'pending' && (
+                                      <>
+                                        <button
+                                          disabled={saUpdating === b.psgc_code}
+                                          onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'approved')}
+                                          className="ml-1 bg-[#6B8C6E] text-white px-2 py-0.5 rounded-lg hover:bg-[#4A6A4D] disabled:opacity-40 transition-colors"
+                                        >
+                                          Approve
+                                        </button>
+                                        <button
+                                          disabled={saUpdating === b.psgc_code}
+                                          onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'rejected')}
+                                          className="bg-[#C4714A] text-white px-2 py-0.5 rounded-lg hover:bg-[#A0522D] disabled:opacity-40 transition-colors"
+                                        >
+                                          Reject
+                                        </button>
+                                      </>
+                                    )}
+                                    {b.status === 'approved' && (
+                                      <button
+                                        disabled={saUpdating === b.psgc_code}
+                                        onClick={() => removeBarangay(t.id, b.psgc_code)}
+                                        className="ml-1 text-[#8C7B70] hover:text-red-600 disabled:opacity-40 transition-colors px-1"
+                                        title="Remove barangay"
+                                      >
+                                        ✕
+                                      </button>
+                                    )}
+                                    {b.status === 'rejected' && (
+                                      <button
+                                        disabled={saUpdating === b.psgc_code}
+                                        onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'approved')}
+                                        className="ml-1 text-[#6B8C6E] hover:underline disabled:opacity-40 text-[10px]"
+                                      >
+                                        Re-approve
+                                      </button>
+                                    )}
+                                  </div>
                                 ))}
                               </div>
                             )}
