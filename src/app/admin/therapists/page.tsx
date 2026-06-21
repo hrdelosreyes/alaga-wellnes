@@ -68,11 +68,7 @@ export default function AdminTherapistsPage() {
     const [{ data: t }, { data: c }] = await Promise.all([
       supabase
         .from('therapists')
-        .select(`
-          *,
-          cities(id, name, region),
-          referred_by:therapists!therapists_referred_by_id_fkey(name)
-        `)
+        .select(`*, cities(id, name, region)`)
         .eq('application_status', 'approved')
         .order('name'),
       supabase
