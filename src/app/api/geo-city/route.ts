@@ -12,10 +12,11 @@ export async function GET(req: NextRequest) {
   if (lat && lng) {
     try {
       const geo = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
-        { headers: { 'User-Agent': 'AlagaWellness/1.0 (alagawellness.care)' } }
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=en`,
+        { headers: { 'User-Agent': 'AlagaWellness/1.0 (alagawellness.care)', 'Accept-Charset': 'utf-8' } }
       )
-      const data = await geo.json()
+      const text = await geo.text()
+      const data = JSON.parse(text)
       detectedCity = data.address?.city ?? data.address?.town ?? data.address?.municipality ?? null
     } catch {
       // ignore
