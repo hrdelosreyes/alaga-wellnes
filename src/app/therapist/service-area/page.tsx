@@ -44,7 +44,7 @@ function ServiceAreaPage() {
 
     // Load barangays for this city + therapist's current selections in parallel
     const [{ data: bgyData }, { data: selData }] = await Promise.all([
-      supabase.from('barangays').select('psgc_code, name').eq('city_name', name).order('name'),
+      supabase.from('barangays').select('psgc_code, name').in('city_name', [name, `City of ${name}`]).order('name'),
       supabase.from('therapist_barangays').select('barangay_psgc').eq('therapist_id', t.id),
     ])
 

@@ -60,10 +60,15 @@ export default function AddressPage() {
     if (!city) return
     setBgyLoading(true)
     setBarangay(null)
+    // Barangays are stored as "City of X" — try both formats
+    const cityNameVariants = [
+      city.name,
+      `City of ${city.name}`,
+    ]
     createClient()
       .from('barangays')
       .select('psgc_code, name')
-      .eq('city_name', city.name)
+      .in('city_name', cityNameVariants)
       .order('name')
       .then(({ data }) => {
         setBarangays((data ?? []) as Barangay[])
