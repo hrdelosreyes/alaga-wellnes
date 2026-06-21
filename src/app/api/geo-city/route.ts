@@ -8,12 +8,15 @@ export async function GET(req: NextRequest) {
 
   let detectedCity: string | null = null
 
-  // If GPS coords provided, reverse geocode via ipapi.co
+  // If GPS coords provided, reverse geocode via OpenStreetMap Nominatim
   if (lat && lng) {
     try {
-      const geo = await fetch(`https://ipapi.co/json/?lat=${lat}&lon=${lng}`)
+      const geo = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+        { headers: { 'User-Agent': 'AlagaWellness/1.0 (alagawellness.care)' } }
+      )
       const data = await geo.json()
-      detectedCity = data.city ?? null
+      detectedCity = data.address?.city ?? data.address?.town ?? data.address?.municipality ?? null
     } catch {
       // ignore
     }
