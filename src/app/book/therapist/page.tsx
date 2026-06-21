@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ChevronLeft, Star, ShieldCheck, Zap, Heart } from 'lucide-react'
+import { ChevronLeft, Star, ShieldCheck, CalendarX } from 'lucide-react'
 import { ProgressBar } from '@/components/booking/progress-bar'
 import { Button } from '@/components/ui/button'
 import { useBooking } from '@/lib/booking-context'
@@ -20,7 +20,7 @@ export default function TherapistPage() {
   const [loading,       setLoading]       = useState(true)
   const [filter,        setFilter]        = useState<GenderPreference>('any')
   const [selected,      setSelected]      = useState<string | null>(draft.therapistId)
-  const [mode,          setMode]          = useState<TherapistSelectionMode>(draft.selectionMode)
+  const [mode,          setMode]          = useState<TherapistSelectionMode>('customer_pick')
 
   useEffect(() => {
     if (!draft.serviceId) { router.replace('/book'); return }
@@ -101,31 +101,22 @@ export default function TherapistPage() {
     filter === 'any' ? true : t.gender === filter
   )
 
-  function pickBestAvailable() {
-    setMode('best_available')
-    setSelected(null)
-  }
-
   function pickTherapist(id: string) {
     setMode('customer_pick')
     setSelected(id)
   }
 
   function next() {
-    const resolvedPrice =
-      mode === 'best_available'
-        ? cityBaseRate
-        : (selected ? (therapistRates[selected] ?? cityBaseRate) : cityBaseRate)
     update({
       therapistId:      selected,
-      selectionMode:    mode,
+      selectionMode:    'customer_pick',
       genderPreference: filter,
-      resolvedPrice,
+      resolvedPrice:    selected ? (therapistRates[selected] ?? cityBaseRate) : cityBaseRate,
     })
     router.push('/book/preferences')
   }
 
-  const canContinue = mode === 'best_available' || selected !== null
+  const canContinue = selected !== null
 
   return (
     <>
@@ -162,48 +153,20 @@ export default function TherapistPage() {
 
         <div className="flex flex-col gap-4">
 
-          {/* Best Available card */}
-          <button
-            onClick={pickBestAvailable}
-            className={cn(
-              'w-full text-left rounded-2xl border-2 p-5 transition-all',
-              mode === 'best_available'
-                ? 'border-[#C4714A] bg-[#FFF7F3]'
-                : 'border-[#EDE5DF] bg-white hover:border-[#C4714A]',
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#F2D9CC] flex items-center justify-center flex-shrink-0">
-                <Zap size={18} className="text-[#C4714A]" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#2C2420]">Best Available</span>
-                  <span className="badge-tag">Recommended</span>
-                </div>
-                <p className="text-sm text-[#8C7B70] mt-0.5">
-                  We&apos;ll assign the highest-rated available therapist for your slot.
-                </p>
-              </div>
-              {cityBaseRate && (
-                <span className="text-base font-bold text-[#2C2420] flex-shrink-0">
-                  ₱{cityBaseRate.toLocaleString()}
-                </span>
-              )}
-              <div className={cn(
-                'w-5 h-5 rounded-full border-2 flex-shrink-0',
-                mode === 'best_available' ? 'border-[#C4714A] bg-[#C4714A]' : 'border-[#D1C4BC]',
-              )} />
-            </div>
-          </button>
-
           {/* Therapist list */}
           {loading ? (
-            <div className="text-center py-10 text-[#8C7B70] text-sm">Loading therapists…</div>
+            <div className="text-center py-10 text-[#8C7B70] text-sm">Finding available therapists…</div>
           ) : therapists.length === 0 ? (
-            <div className="text-center py-10 text-[#8C7B70] text-sm bg-white rounded-2xl border border-[#EDE5DF] p-8">
-              <p className="font-semibold text-[#2C2420] mb-1">No therapists available on this date</p>
-              <p className="text-sm">Try a different date, or choose <strong>Best Available</strong> above and we&apos;ll do our best to find someone.</p>
+            <div className="text-center py-10 bg-white rounded-2xl border border-[#EDE5DF] p-8">
+              <CalendarX size={36} className="text-[#C4714A] mx-auto mb-3" />
+              <p className="font-semibold text-[#2C2420] mb-1">No therapists available for this slot</p>
+              <p className="text-sm text-[#8C7B70] mb-5">All our therapists are booked for this date and time. Please try a different schedule.</p>
+              <button
+                onClick={() => router.push('/book/schedule')}
+                className="text-sm font-semibold text-[#C4714A] hover:underline"
+              >
+                ← Change date or time
+              </button>
             </div>
           ) : (
             filtered.map(t => {
@@ -288,7 +251,7 @@ export default function TherapistPage() {
           <Button size="lg" className="w-full" disabled={!canContinue} onClick={next}>
             Continue
           </Button>
-          {mode === 'customer_pick' && selected && (
+          {selected && (
             <p className="text-center text-xs text-[#8C7B70] mt-3">
               Your slot will be held for 10 minutes while you complete the booking.
             </p>
