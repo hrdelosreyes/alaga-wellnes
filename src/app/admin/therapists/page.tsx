@@ -109,7 +109,7 @@ export default function AdminTherapistsPage() {
     if (!editState) return
     setSaving(true)
     const supabase = createClient()
-    await supabase
+    const { error: updateError } = await supabase
       .from('therapists')
       .update({
         city_id:          editState.cityId || null,
@@ -120,12 +120,20 @@ export default function AdminTherapistsPage() {
       })
       .eq('id', therapistId)
 
+    if (updateError) {
+      alert('Save failed: ' + updateError.message)
+      setSaving(false)
+      return
+    }
+
     // Refresh this therapist's data
-    const { data } = await supabase
+    const { data, error: fetchError } = await supabase
       .from('therapists')
       .select('*, cities(id, name, region)')
       .eq('id', therapistId)
       .single()
+
+    if (fetchError) alert('Refresh failed: ' + fetchError.message)
 
     if (data) {
       setTherapists(prev => prev.map(t => t.id === therapistId ? data as unknown as Therapist : t))
