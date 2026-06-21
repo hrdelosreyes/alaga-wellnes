@@ -59,6 +59,7 @@ export default function AdminTherapistsPage() {
   const [editState,  setEditState]  = useState<EditState | null>(null)
   const [saving,     setSaving]     = useState(false)
   const [toggling,   setToggling]   = useState<string | null>(null)
+  const [serviceAreas, setServiceAreas] = useState<Record<string, string[]>>({})
 
   useEffect(() => { fetchAll() }, [])
 
@@ -284,7 +285,22 @@ export default function AdminTherapistsPage() {
 
                       {/* Expand */}
                       <button
-                        onClick={() => { setExpanded(isExpanded ? null : t.id); setEditing(null) }}
+                        onClick={() => {
+                          const next = isExpanded ? null : t.id
+                          setExpanded(next)
+                          setEditing(null)
+                          if (next && !serviceAreas[next]) {
+                            createClient()
+                              .from('therapist_barangays')
+                              .select('barangays(name)')
+                              .eq('therapist_id', next)
+                              .order('barangay_psgc')
+                              .then(({ data }) => {
+                                const names = (data ?? []).map((r: any) => r.barangays?.name).filter(Boolean)
+                                setServiceAreas(p => ({ ...p, [next]: names }))
+                              })
+                          }
+                        }}
                         className="text-[#8C7B70] hover:text-[#2C2420] transition-colors p-1"
                       >
                         {isExpanded ? <ChevronUp size={18}/> : <ChevronDown size={18}/>}
@@ -325,6 +341,22 @@ export default function AdminTherapistsPage() {
                               <p className="text-sm text-[#2C2420] leading-relaxed">"{t.bio}"</p>
                             </div>
                           )}
+
+                          {/* Service area */}
+                          <div>
+                            <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Service Area</p>
+                            {!serviceAreas[t.id] ? (
+                              <p className="text-xs text-[#8C7B70]">Loading…</p>
+                            ) : serviceAreas[t.id].length === 0 ? (
+                              <p className="text-xs text-[#8C7B70]">No barangays set — therapist hasn't configured their service area yet.</p>
+                            ) : (
+                              <div className="flex flex-wrap gap-1.5">
+                                {serviceAreas[t.id].map(b => (
+                                  <span key={b} className="text-xs bg-[#EBF3EC] text-[#6B8C6E] px-2 py-0.5 rounded-full">{b}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
 
                           {/* Actions */}
                           <div className="flex gap-3 pt-1 flex-wrap">
