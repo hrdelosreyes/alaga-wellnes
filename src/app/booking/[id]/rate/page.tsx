@@ -41,7 +41,7 @@ export default function RatePage() {
 
       if (!data) { router.replace('/'); return }
       if (data.status !== 'completed') { router.replace(`/booking/${id}`); return }
-      setBooking(data as BookingRow)
+      setBooking(data as unknown as BookingRow)
       setLoading(false)
     }
     load()

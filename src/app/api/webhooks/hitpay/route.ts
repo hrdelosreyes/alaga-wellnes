@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (booking?.therapist_id && booking.therapists) {
-        const therapist = booking.therapists as { name: string; phone: string }
+        const therapist = booking.therapists as unknown as { name: string; phone: string }
         const firstName = therapist.name.split(' ')[0]
         try {
           await sendSms(

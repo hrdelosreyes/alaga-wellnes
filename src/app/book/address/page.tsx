@@ -62,7 +62,7 @@ export default function AddressPage() {
 
   // Load barangays whenever city changes
   useEffect(() => {
-    if (!cityId) { setBarangays([]); setBarangay(''); return }
+    if (!cityId) { setBarangays([]); setBarangay(null); return }
     const city = cities.find(c => c.id === cityId)
     if (!city) return
     setBgyLoading(true)

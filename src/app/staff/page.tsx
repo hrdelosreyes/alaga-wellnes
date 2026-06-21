@@ -171,7 +171,7 @@ export default function StaffPage() {
       .select('id, service_id, booking_date, time_slot, address, status, total, therapists(name)')
       .order('booking_date', { ascending: false })
       .limit(100)
-    setBookings((data ?? []) as BookingRow[])
+    setBookings((data ?? []) as unknown as BookingRow[])
   }
 
   async function fetchApplicants(supabase = createClient(), status = appFilter) {
@@ -189,7 +189,7 @@ export default function StaffPage() {
       .select('id, name, phone, is_active, nbi_cleared, tesda_certified, rating_avg, total_bookings, years_experience, specialties, bio, created_at, cities(id, name, region)')
       .eq('application_status', 'approved')
       .order('name')
-    setTherapists((data ?? []) as Therapist[])
+    setTherapists((data ?? []) as unknown as Therapist[])
   }
 
   async function refresh() {
