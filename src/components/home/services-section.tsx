@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button'
 import { SERVICES } from '@/lib/constants'
 import { formatPrice } from '@/lib/utils'
 import { useGeoCity } from '@/components/geo/city-context'
-import { MapPin } from 'lucide-react'
+import { MapPin, Loader2 } from 'lucide-react'
 
 export function ServicesSection() {
-  const { city, pricing, isLive, loading } = useGeoCity()
+  const { city, pricing, isLive, loading, detectByGPS, gpsLoading } = useGeoCity()
 
   function getPricing(serviceId: string) {
     if (!pricing.length) return null
@@ -25,9 +25,22 @@ export function ServicesSection() {
             Every session includes a verified therapist, premium oils, and a safe, professional experience at home.
           </p>
           {!loading && city && (
-            <p className="text-sm text-[#8C7B70] mt-2 flex items-center gap-1.5">
+            <p className="text-sm text-[#8C7B70] mt-2 flex items-center gap-1.5 flex-wrap">
               <MapPin size={13} className="text-[#C4714A]" />
               Showing rates for <span className="font-semibold text-[#2C2420]">{city.name}</span>
+              <span className="text-[#EDE5DF]">·</span>
+              {gpsLoading ? (
+                <span className="flex items-center gap-1 text-[#C4714A]">
+                  <Loader2 size={12} className="animate-spin" /> Detecting…
+                </span>
+              ) : (
+                <button
+                  onClick={detectByGPS}
+                  className="text-[#C4714A] hover:underline underline-offset-2"
+                >
+                  Not your city? Click here.
+                </button>
+              )}
             </p>
           )}
         </div>
