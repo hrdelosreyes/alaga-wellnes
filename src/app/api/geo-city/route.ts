@@ -44,16 +44,17 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createClient()
 
-  // Fetch all live cities with their pricing
-  const { data: cities } = await supabase
+  // Fetch ALL cities (live and not live)
+  const { data: allCities } = await supabase
     .from('cities')
     .select('id, name, region, is_customer_live')
-    .eq('is_customer_live', true)
     .order('name')
 
-  if (!cities || cities.length === 0) {
-    return NextResponse.json({ city: null, isLive: false, pricing: null })
+  if (!allCities || allCities.length === 0) {
+    return NextResponse.json({ city: null, isLive: false, pricing: [] })
   }
+
+  const liveCities = allCities.filter(c => c.is_customer_live)
 
   // Normalize: remove accents, strip "City of"/"City", lowercase
   function normalize(s: string) {
@@ -68,32 +69,68 @@ export async function GET(req: NextRequest) {
 
   const normalizedDetected = detectedCity ? normalize(detectedCity) : null
 
-  // Try to match detected city to a live city
-  let matchedCity = normalizedDetected
-    ? cities.find(c => {
-        const n = normalize(c.name)
-        return n === normalizedDetected ||
-          n.includes(normalizedDetected!) ||
-          normalizedDetected!.includes(n)
-      })
-    : null
+  function matchCity<T extends { name: string }>(list: T[]) {
+    if (!normalizedDetected) return null
+    return list.find(c => {
+      const n = normalize(c.name)
+      return n === normalizedDetected || n.includes(normalizedDetected!) || normalizedDetected!.includes(n)
+    }) ?? null
+  }
 
-  // Fall back to first live city if no match
-  if (!matchedCity) matchedCity = cities[0]
+  // First try to match against a live city
+  const liveMatch = matchCity(liveCities)
+  if (liveMatch) {
+    const { data: pricing } = await supabase
+      .from('city_pricing')
+      .select('service_id, price_min, price_max')
+      .eq('city_id', liveMatch.id)
 
-  // Fetch pricing for the matched city
+    const debug = searchParams.get('debug') === '1'
+    return NextResponse.json({
+      city: { id: liveMatch.id, name: liveMatch.name, region: liveMatch.region },
+      isLive: true,
+      pricing: pricing ?? [],
+      allLiveCities: liveCities.map(c => c.name),
+      ...(debug && { _debug: { detectedCity, normalizedDetected } }),
+    })
+  }
+
+  // Try to match against any city (not live)
+  const anyMatch = matchCity(allCities)
+  if (anyMatch) {
+    const debug = searchParams.get('debug') === '1'
+    return NextResponse.json({
+      city: { id: anyMatch.id, name: anyMatch.name, region: anyMatch.region },
+      isLive: false,
+      pricing: [],
+      allLiveCities: liveCities.map(c => c.name),
+      ...(debug && { _debug: { detectedCity, normalizedDetected } }),
+    })
+  }
+
+  // City not in DB at all — show detected name as coming soon
+  if (detectedCity) {
+    const debug = searchParams.get('debug') === '1'
+    return NextResponse.json({
+      city: { id: null, name: detectedCity, region: null },
+      isLive: false,
+      pricing: [],
+      allLiveCities: liveCities.map(c => c.name),
+      ...(debug && { _debug: { detectedCity, normalizedDetected } }),
+    })
+  }
+
+  // No detection at all — fall back to first live city
+  const fallback = liveCities[0]
   const { data: pricing } = await supabase
     .from('city_pricing')
     .select('service_id, price_min, price_max')
-    .eq('city_id', matchedCity.id)
-
-  const debug = searchParams.get('debug') === '1'
+    .eq('city_id', fallback.id)
 
   return NextResponse.json({
-    city: { id: matchedCity.id, name: matchedCity.name, region: matchedCity.region },
+    city: { id: fallback.id, name: fallback.name, region: fallback.region },
     isLive: true,
     pricing: pricing ?? [],
-    allLiveCities: cities.map(c => c.name),
-    ...(debug && { _debug: { detectedCity, normalizedDetected, liveCities: cities.map(c => c.name) } }),
+    allLiveCities: liveCities.map(c => c.name),
   })
 }
