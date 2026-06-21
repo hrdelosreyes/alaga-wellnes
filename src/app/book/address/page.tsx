@@ -7,6 +7,7 @@ import { ProgressBar } from '@/components/booking/progress-bar'
 import { Button } from '@/components/ui/button'
 import { useBooking } from '@/lib/booking-context'
 import { createClient } from '@/lib/supabase/client'
+import { useGeoCity } from '@/components/geo/city-context'
 
 type City      = { id: string; name: string; region: string; province: string | null }
 type Barangay  = { psgc_code: string; name: string }
@@ -14,6 +15,7 @@ type Barangay  = { psgc_code: string; name: string }
 export default function AddressPage() {
   const router = useRouter()
   const { draft, update } = useBooking()
+  const { city: geoCity } = useGeoCity()
 
   const [cities,     setCities]     = useState<City[]>([])
   const [barangays,  setBarangays]  = useState<Barangay[]>([])
@@ -32,7 +34,7 @@ export default function AddressPage() {
     if (!draft.serviceId) router.replace('/book')
   }, [draft.serviceId, router])
 
-  // Load live cities once, then auto-detect city from IP
+  // Load live cities, then pre-select from geo context
   useEffect(() => {
     createClient()
       .from('cities')
@@ -42,23 +44,14 @@ export default function AddressPage() {
       .then(({ data }) => {
         const list = (data ?? []) as City[]
         setCities(list)
-        // Only auto-select if user hasn't already chosen one
         if (draft.cityId) return
-        fetch('https://ipapi.co/json/')
-          .then(r => r.json())
-          .then(geo => {
-            const detected = geo.city as string | undefined
-            if (!detected) return
-            // Try exact match first, then partial
-            const match =
-              list.find(c => c.name.toLowerCase() === detected.toLowerCase()) ??
-              list.find(c => c.name.toLowerCase().includes(detected.toLowerCase()) ||
-                             detected.toLowerCase().includes(c.name.toLowerCase()))
-            if (match) setCityId(match.id)
-          })
-          .catch(() => {/* silently ignore geo failures */})
+        // Use already-detected geo city (avoids extra IP call)
+        if (geoCity) {
+          const match = list.find(c => c.id === geoCity.id) ?? null
+          if (match) setCityId(match.id)
+        }
       })
-  }, [])
+  }, [geoCity])
 
   // Load barangays whenever city changes
   useEffect(() => {
