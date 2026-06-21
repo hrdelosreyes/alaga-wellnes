@@ -67,7 +67,7 @@ export default function AccountPage() {
 
     if (!profile) { router.replace('/account/login'); return }
     setCustomer(profile)
-    setBookings((bks ?? []) as Booking[])
+    setBookings((bks ?? []) as unknown as Booking[])
     setLoading(false)
   }
 
