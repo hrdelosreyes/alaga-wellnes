@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ProgressBar } from '@/components/booking/progress-bar'
 import { Button } from '@/components/ui/button'
 import { useBooking } from '@/lib/booking-context'
-import { TIME_SLOTS } from '@/lib/constants'
+import { TIME_SLOTS, SERVICES } from '@/lib/constants'
 import { formatTime, cn } from '@/lib/utils'
 import { addDays, format, startOfToday, isToday } from 'date-fns'
 import { createClient } from '@/lib/supabase/client'
@@ -71,7 +71,7 @@ export default function SchedulePage() {
       // Existing confirmed bookings on this date (to exclude booked slots)
       supabase
         .from('bookings')
-        .select('therapist_id, time_slot')
+        .select('therapist_id, time_slot, service_id')
         .eq('booking_date', date)
         .in('status', ['confirmed', 'assigned', 'en_route', 'checked_in']),
     ])
@@ -84,19 +84,40 @@ export default function SchedulePage() {
 
     if (eligibleIds.length === 0) { setCountsLoading(false); return }
 
-    // Build a map of slot → set of booked therapist IDs
-    const bookedPerSlot: Record<string, Set<string>> = {}
-    for (const b of bookings ?? []) {
-      if (!b.therapist_id || !b.time_slot) continue
-      if (!bookedPerSlot[b.time_slot]) bookedPerSlot[b.time_slot] = new Set()
-      bookedPerSlot[b.time_slot].add(b.therapist_id)
+    const TRAVEL_BUFFER = 30 // minutes before and after
+
+    // Convert 'HH:MM' to total minutes since midnight
+    function toMins(slot: string) {
+      const [h, m] = slot.split(':').map(Number)
+      return h * 60 + m
     }
 
-    // Per slot: count eligible therapists not already booked at that slot
+    // Build a map of therapist_id → list of blocked minute ranges [start, end]
+    const blockedRanges: Record<string, [number, number][]> = {}
+    for (const b of bookings ?? []) {
+      if (!b.therapist_id || !b.time_slot) continue
+      const duration = SERVICES.find(s => s.id === b.service_id)?.duration ?? 60
+      const start = toMins(b.time_slot) - TRAVEL_BUFFER
+      const end   = toMins(b.time_slot) + duration + TRAVEL_BUFFER
+      if (!blockedRanges[b.therapist_id]) blockedRanges[b.therapist_id] = []
+      blockedRanges[b.therapist_id].push([start, end])
+    }
+
+    // For a given slot, a therapist is unavailable if the slot's window overlaps any blocked range
+    // Slot window: [slotStart - TRAVEL_BUFFER, slotStart + requestedDuration + TRAVEL_BUFFER]
+    const requestedDuration = SERVICES.find(s => s.id === draft.serviceId)?.duration ?? 60
+
     const counts: Record<string, number> = {}
     for (const slot of TIME_SLOTS) {
-      const booked = bookedPerSlot[slot] ?? new Set()
-      counts[slot] = eligibleIds.filter(id => !booked.has(id)).length
+      const slotStart = toMins(slot)
+      const slotEnd   = slotStart + requestedDuration
+      counts[slot] = eligibleIds.filter(id => {
+        const ranges = blockedRanges[id] ?? []
+        return !ranges.some(([bStart, bEnd]) =>
+          // overlap: requested window (with buffers) overlaps blocked range
+          (slotStart - TRAVEL_BUFFER < bEnd) && (slotEnd + TRAVEL_BUFFER > bStart)
+        )
+      }).length
     }
 
     setSlotCounts(counts)
