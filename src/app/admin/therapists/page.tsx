@@ -62,6 +62,11 @@ export default function AdminTherapistsPage() {
   type BarangayRow = { psgc_code: string; name: string; status: string }
   const [serviceAreas, setServiceAreas] = useState<Record<string, BarangayRow[]>>({})
   const [saUpdating, setSaUpdating] = useState<string | null>(null)
+  const [saEditing, setSaEditing] = useState<string | null>(null) // therapist id being edited
+  const [saAllBarangays, setSaAllBarangays] = useState<{ psgc_code: string; name: string }[]>([])
+  const [saSelected, setSaSelected] = useState<Set<string>>(new Set())
+  const [saSaving, setSaSaving] = useState(false)
+  const [saSearch, setSaSearch] = useState('')
 
   useEffect(() => { fetchAll() }, [])
 
@@ -172,6 +177,36 @@ export default function AdminTherapistsPage() {
       .eq('therapist_id', therapistId)
       .eq('barangay_psgc', psgcCode)
     setSaUpdating(null)
+    loadServiceArea(therapistId)
+  }
+
+  async function startSaEdit(therapist: Therapist) {
+    const cityName = therapist.cities?.name ?? ''
+    const supabase = createClient()
+    const [{ data: allBgy }, { data: current }] = await Promise.all([
+      supabase.from('barangays').select('psgc_code, name')
+        .in('city_name', [cityName, `City of ${cityName}`]).order('name'),
+      supabase.from('therapist_barangays').select('barangay_psgc, status')
+        .eq('therapist_id', therapist.id),
+    ])
+    setSaAllBarangays((allBgy ?? []) as { psgc_code: string; name: string }[])
+    setSaSelected(new Set((current ?? []).filter((r: any) => r.status === 'approved').map((r: any) => r.barangay_psgc)))
+    setSaSearch('')
+    setSaEditing(therapist.id)
+  }
+
+  async function saveSaEdit(therapistId: string) {
+    setSaSaving(true)
+    const supabase = createClient()
+    // Delete all existing rows then re-insert selected as approved
+    await supabase.from('therapist_barangays').delete().eq('therapist_id', therapistId)
+    if (saSelected.size > 0) {
+      await supabase.from('therapist_barangays').insert(
+        Array.from(saSelected).map(psgc => ({ therapist_id: therapistId, barangay_psgc: psgc, status: 'approved' }))
+      )
+    }
+    setSaSaving(false)
+    setSaEditing(null)
     loadServiceArea(therapistId)
   }
 
@@ -372,8 +407,63 @@ export default function AdminTherapistsPage() {
 
                           {/* Service area */}
                           <div>
-                            <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Service Area</p>
-                            {!serviceAreas[t.id] ? (
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider">Service Area</p>
+                              {saEditing !== t.id && (
+                                <button
+                                  onClick={() => startSaEdit(t)}
+                                  className="text-xs text-[#C4714A] hover:underline font-medium"
+                                >
+                                  Edit service area
+                                </button>
+                              )}
+                            </div>
+
+                            {saEditing === t.id ? (
+                              <div className="border border-[#EDE5DF] rounded-2xl overflow-hidden">
+                                {/* Search + select all */}
+                                <div className="p-3 border-b border-[#F2EBE6] flex gap-2 items-center">
+                                  <input
+                                    type="text"
+                                    value={saSearch}
+                                    onChange={e => setSaSearch(e.target.value)}
+                                    placeholder="Search barangay…"
+                                    className="flex-1 border border-[#EDE5DF] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#C4714A]"
+                                  />
+                                  <button onClick={() => setSaSelected(new Set(saAllBarangays.map(b => b.psgc_code)))} className="text-xs text-[#C4714A] hover:underline whitespace-nowrap">All</button>
+                                  <button onClick={() => setSaSelected(new Set())} className="text-xs text-[#8C7B70] hover:underline whitespace-nowrap">Clear</button>
+                                </div>
+                                <div className="max-h-52 overflow-y-auto divide-y divide-[#F2EBE6]">
+                                  {saAllBarangays
+                                    .filter(b => !saSearch || b.name.toLowerCase().includes(saSearch.toLowerCase()))
+                                    .map(b => (
+                                      <label key={b.psgc_code} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[#FBF6F0] transition-colors">
+                                        <input
+                                          type="checkbox"
+                                          checked={saSelected.has(b.psgc_code)}
+                                          onChange={e => setSaSelected(prev => {
+                                            const next = new Set(prev)
+                                            e.target.checked ? next.add(b.psgc_code) : next.delete(b.psgc_code)
+                                            return next
+                                          })}
+                                          className="accent-[#C4714A] w-3.5 h-3.5 flex-shrink-0"
+                                        />
+                                        <span className="text-xs text-[#2C2420]">{b.name}</span>
+                                      </label>
+                                    ))}
+                                </div>
+                                <div className="p-3 border-t border-[#F2EBE6] flex gap-2 justify-end">
+                                  <button onClick={() => setSaEditing(null)} className="text-xs px-3 py-1.5 rounded-xl border border-[#EDE5DF] hover:border-[#2C2420] transition-colors">Cancel</button>
+                                  <button
+                                    disabled={saSaving}
+                                    onClick={() => saveSaEdit(t.id)}
+                                    className="text-xs px-4 py-1.5 rounded-xl bg-[#2C2420] text-white hover:bg-[#1a1210] disabled:opacity-40 transition-colors"
+                                  >
+                                    {saSaving ? 'Saving…' : `Save (${saSelected.size} barangays)`}
+                                  </button>
+                                </div>
+                              </div>
+                            ) : !serviceAreas[t.id] ? (
                               <p className="text-xs text-[#8C7B70]">Loading…</p>
                             ) : serviceAreas[t.id].length === 0 ? (
                               <p className="text-xs text-[#8C7B70]">No barangays set — therapist hasn't configured their service area yet.</p>
@@ -395,40 +485,15 @@ export default function AdminTherapistsPage() {
                                     <span className="capitalize opacity-70">{b.status}</span>
                                     {b.status === 'pending' && (
                                       <>
-                                        <button
-                                          disabled={saUpdating === b.psgc_code}
-                                          onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'approved')}
-                                          className="ml-1 bg-[#6B8C6E] text-white px-2 py-0.5 rounded-lg hover:bg-[#4A6A4D] disabled:opacity-40 transition-colors"
-                                        >
-                                          Approve
-                                        </button>
-                                        <button
-                                          disabled={saUpdating === b.psgc_code}
-                                          onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'rejected')}
-                                          className="bg-[#C4714A] text-white px-2 py-0.5 rounded-lg hover:bg-[#A0522D] disabled:opacity-40 transition-colors"
-                                        >
-                                          Reject
-                                        </button>
+                                        <button disabled={saUpdating === b.psgc_code} onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'approved')} className="ml-1 bg-[#6B8C6E] text-white px-2 py-0.5 rounded-lg hover:bg-[#4A6A4D] disabled:opacity-40 transition-colors">Approve</button>
+                                        <button disabled={saUpdating === b.psgc_code} onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'rejected')} className="bg-[#C4714A] text-white px-2 py-0.5 rounded-lg hover:bg-[#A0522D] disabled:opacity-40 transition-colors">Reject</button>
                                       </>
                                     )}
                                     {b.status === 'approved' && (
-                                      <button
-                                        disabled={saUpdating === b.psgc_code}
-                                        onClick={() => removeBarangay(t.id, b.psgc_code)}
-                                        className="ml-1 text-[#8C7B70] hover:text-red-600 disabled:opacity-40 transition-colors px-1"
-                                        title="Remove barangay"
-                                      >
-                                        ✕
-                                      </button>
+                                      <button disabled={saUpdating === b.psgc_code} onClick={() => removeBarangay(t.id, b.psgc_code)} className="ml-1 text-[#8C7B70] hover:text-red-600 disabled:opacity-40 transition-colors px-1" title="Remove">✕</button>
                                     )}
                                     {b.status === 'rejected' && (
-                                      <button
-                                        disabled={saUpdating === b.psgc_code}
-                                        onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'approved')}
-                                        className="ml-1 text-[#6B8C6E] hover:underline disabled:opacity-40 text-[10px]"
-                                      >
-                                        Re-approve
-                                      </button>
+                                      <button disabled={saUpdating === b.psgc_code} onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'approved')} className="ml-1 text-[#6B8C6E] hover:underline disabled:opacity-40 text-[10px]">Re-approve</button>
                                     )}
                                   </div>
                                 ))}
