@@ -89,7 +89,7 @@ export default function AddressPage() {
   function next() {
     if (!validate()) return
     const city = cities.find(c => c.id === cityId)
-    const fullAddress = [barangay?.name, address.trim()].filter(Boolean).join(', ')
+    const fullAddress = [address.trim(), barangay?.name, city?.name].filter(Boolean).join(', ')
     update({
       cityId,
       cityName:     city?.name ?? '',
@@ -261,7 +261,7 @@ export default function AddressPage() {
           {(barangay || address) && (
             <div className="bg-[#F7F2EE] rounded-xl px-4 py-3 text-xs text-[#5C4B45]">
               <span className="font-semibold text-[#2C2420]">Full address: </span>
-              {[barangay?.name, address.trim(), selectedCity?.name].filter(Boolean).join(', ')}
+              {[address.trim(), barangay?.name, selectedCity?.name].filter(Boolean).join(', ')}
               {unitNotes && <span className="text-[#8C7B70]"> · {unitNotes}</span>}
             </div>
           )}
