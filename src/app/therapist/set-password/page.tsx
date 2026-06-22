@@ -14,11 +14,16 @@ export default function SetPasswordPage() {
   const [ready,     setReady]     = useState(false)
 
   useEffect(() => {
-    // Supabase recovery links land here with the session in the URL hash.
-    // onAuthStateChange picks it up automatically.
     const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+
+    // The recovery session may already be set (event fired before this mounted).
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true)
+    })
+
+    // Also listen in case the event fires after mount.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
         setReady(true)
       }
     })
