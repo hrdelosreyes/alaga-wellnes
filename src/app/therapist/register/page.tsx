@@ -245,7 +245,7 @@ export default function TherapistRegisterPage() {
 
           {/* Left: solid dark text column */}
           <div className="md:w-1/2 bg-[#2C2420] flex flex-col justify-center px-6 py-12 md:px-12 md:py-16">
-            <img src="/logo-dark.png" alt="Alaga Wellness" className="h-16 w-auto mb-8" />
+            <img src="/logo-dark.png" alt="Alaga Wellness" className="h-16 w-auto self-start mb-8" />
             <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-white">
               Your skills deserve to be seen — and paid.
             </h1>
