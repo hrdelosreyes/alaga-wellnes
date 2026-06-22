@@ -240,9 +240,21 @@ export default function TherapistRegisterPage() {
     return (
       <div className="min-h-screen bg-[#2C2420] text-white">
 
-        {/* Hero */}
-        <div className="px-5 pt-14 pb-8 text-center max-w-lg mx-auto">
-          <img src="/logo-vertical-dark.png" alt="Alaga Wellness" className="h-20 w-auto mx-auto mb-6" />
+        {/* Hero image */}
+        <div className="relative h-64 md:h-80 overflow-hidden">
+          <img
+            src="/therapist-hero.png"
+            alt="Alaga Wellness therapist"
+            className="w-full h-full object-cover object-top"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#2C2420]/30 via-transparent to-[#2C2420]" />
+          <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 text-center">
+            <img src="/logo-vertical-dark.png" alt="Alaga Wellness" className="h-14 w-auto mx-auto mb-3" />
+          </div>
+        </div>
+
+        {/* Hero text */}
+        <div className="px-5 pt-4 pb-8 text-center max-w-lg mx-auto">
           <h1 className="text-3xl font-bold leading-tight mb-4">
             Your skills deserve<br />to be seen — and paid.
           </h1>

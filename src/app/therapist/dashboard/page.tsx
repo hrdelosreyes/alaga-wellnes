@@ -197,7 +197,17 @@ export default function TherapistDashboard() {
     <div className="min-h-screen bg-[#F7F2EE]">
 
       {/* Header */}
-      <div className="bg-[#2C2420] text-white px-5 py-4 flex items-center justify-between">
+      <div className="relative bg-[#2C2420] text-white overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <img
+            src="/therapist-dashboard-hero.png"
+            alt=""
+            className="w-full h-full object-cover object-top"
+          />
+          <div className="absolute inset-0 bg-[#2C2420]/75" />
+        </div>
+        <div className="relative px-5 py-6 flex items-center justify-between">
         <div>
           <h1 className="font-bold text-base">Hi, {therapist?.name?.split(' ')[0]} 👋</h1>
           <p className="text-xs text-[#C8A88A]">
@@ -220,6 +230,7 @@ export default function TherapistDashboard() {
           <button onClick={logout} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
             <LogOut size={16} />
           </button>
+        </div>
         </div>
       </div>
 
