@@ -20,6 +20,7 @@ type Extracted = {
 type Applicant = {
   id: string
   name: string
+  email: string | null
   phone: string
   gender: string
   zone: string
@@ -50,6 +51,8 @@ export default function AdminApplicantsPage() {
   const [filter,      setFilter]      = useState<'pending' | 'approved' | 'rejected'>('pending')
   const [expanded,    setExpanded]    = useState<string | null>(null)
   const [updating,    setUpdating]    = useState<string | null>(null)
+  const [inviting,    setInviting]    = useState<string | null>(null)
+  const [inviteSent,  setInviteSent]  = useState<Record<string, boolean>>({})
   const [docUrls,     setDocUrls]     = useState<Record<string, { nbi?: string; tesda?: string; photo?: string }>>({})
 
   useEffect(() => { fetchApplicants() }, [filter])
@@ -146,6 +149,18 @@ export default function AdminApplicantsPage() {
     }
   }
 
+  async function sendInvite(a: Applicant) {
+    if (!a.email) return
+    setInviting(a.id)
+    const res = await fetch('/api/admin/invite-therapist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ therapistId: a.id, email: a.email, name: a.name }),
+    })
+    if (res.ok) setInviteSent(prev => ({ ...prev, [a.id]: true }))
+    setInviting(null)
+  }
+
   return (
     <div className="min-h-screen bg-[#F7F2EE]">
       <AdminNav onRefresh={fetchApplicants} refreshing={loading} />
@@ -237,6 +252,7 @@ export default function AdminApplicantsPage() {
                         <div>
                           <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Contact</p>
                           <p className="text-sm text-[#2C2420]">{a.phone}</p>
+                          {a.email && <p className="text-sm text-[#2C2420]">{a.email}</p>}
                           {a.referral_source && (
                             <p className="text-xs text-[#8C7B70] mt-1">Referred via: {a.referral_source}</p>
                           )}
@@ -314,6 +330,28 @@ export default function AdminApplicantsPage() {
                           >
                             ✕ Reject
                           </button>
+                        </div>
+                      )}
+
+                      {/* Send portal invite — shown on approved */}
+                      {a.application_status === 'approved' && a.email && (
+                        <div className="pt-2 border-t border-[#F2EBE6]">
+                          {inviteSent[a.id] ? (
+                            <p className="text-sm text-[#6B8C6E] font-semibold text-center py-2">
+                              ✓ Invite sent to {a.email}
+                            </p>
+                          ) : (
+                            <button
+                              onClick={() => sendInvite(a)}
+                              disabled={inviting === a.id}
+                              className="w-full py-3 rounded-xl bg-[#2C2420] text-white font-semibold text-sm hover:bg-[#C4714A] transition-colors disabled:opacity-50"
+                            >
+                              {inviting === a.id ? 'Sending…' : '✉ Send portal invite'}
+                            </button>
+                          )}
+                          <p className="text-xs text-[#8C7B70] text-center mt-1.5">
+                            Emails {a.email} a link to set their password and access the therapist portal.
+                          </p>
                         </div>
                       )}
                     </div>

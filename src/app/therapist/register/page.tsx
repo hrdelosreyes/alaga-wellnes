@@ -27,6 +27,7 @@ const FORM_STEPS = ['Personal Info', 'Professional', 'Documents']
 
 type FormData = {
   name: string
+  email: string
   phone: string
   gender: string
   cityId: string
@@ -41,7 +42,7 @@ type FormData = {
 }
 
 const EMPTY: FormData = {
-  name: '', phone: '', gender: '', cityId: '',
+  name: '', email: '', phone: '', gender: '', cityId: '',
   referralCode: '',
   yearsExperience: '', specialties: [], bio: '',
   referralSource: '',
@@ -60,6 +61,7 @@ export default function TherapistRegisterPage() {
   const [referrerId,    setReferrerId]    = useState<string | null>(null)
   const [loading,       setLoading]       = useState(false)
   const [done,          setDone]          = useState(false)
+  const [submitError,   setSubmitError]   = useState<string | null>(null)
 
   useEffect(() => {
     createClient()
@@ -72,6 +74,7 @@ export default function TherapistRegisterPage() {
   function patch(updates: Partial<FormData>) {
     setForm(prev => ({ ...prev, ...updates }))
     setErrors({})
+    setSubmitError(null)
   }
 
   async function lookupReferralCode(code: string) {
@@ -100,6 +103,9 @@ export default function TherapistRegisterPage() {
     const e: typeof errors = {}
     if (step === 0) {
       if (!form.name.trim())  e.name   = 'Full name is required.'
+      if (!form.email.trim()) e.email  = 'Email address is required.'
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()))
+        e.email = 'Enter a valid email address.'
       if (!form.phone.trim()) e.phone  = 'Mobile number is required.'
       else if (!/^(09|\+639)\d{9}$/.test(form.phone.replace(/\s/g, '')))
         e.phone = 'Enter a valid PH mobile number.'
@@ -147,6 +153,7 @@ export default function TherapistRegisterPage() {
 
       const { error } = await supabase.from('therapists').insert({
         name:               form.name.trim(),
+        email:              form.email.trim().toLowerCase(),
         phone,
         gender:             form.gender,
         city_id:            form.cityId,
@@ -191,9 +198,10 @@ export default function TherapistRegisterPage() {
       }
 
       setDone(true)
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Registration error:', err)
-      setErrors({ name: 'Something went wrong. Please try again.' })
+      const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      setSubmitError(msg)
     } finally {
       setLoading(false)
     }
@@ -376,6 +384,19 @@ export default function TherapistRegisterPage() {
                   className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
                 />
                 {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#2C2420] mb-2">Email address <span className="text-red-400">*</span></label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={e => patch({ email: e.target.value })}
+                  placeholder="you@example.com"
+                  className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
+                />
+                <p className="text-xs text-[#8C7B70] mt-1">You'll use this to log in to your therapist portal once approved.</p>
+                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
               </div>
 
               <div>
@@ -565,6 +586,13 @@ export default function TherapistRegisterPage() {
             </>
           )}
         </div>
+
+        {/* Submit error */}
+        {submitError && (
+          <div className="mt-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">
+            {submitError}
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="flex gap-3 mt-6">
