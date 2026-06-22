@@ -240,27 +240,30 @@ export default function TherapistRegisterPage() {
     return (
       <div className="min-h-screen bg-[#2C2420] text-white">
 
-        {/* Hero image */}
-        <div className="relative h-64 md:h-80 overflow-hidden">
-          <img
-            src="/therapist-hero.png"
-            alt="Alaga Wellness therapist"
-            className="w-full h-full object-cover object-top"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#2C2420]/30 via-transparent to-[#2C2420]" />
-          <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 text-center">
-            <img src="/logo-vertical-dark.png" alt="Alaga Wellness" className="h-14 w-auto mx-auto mb-3" />
-          </div>
-        </div>
+        {/* Hero — split layout on md+, stacked on mobile */}
+        <div className="md:flex md:min-h-[420px]">
 
-        {/* Hero text */}
-        <div className="px-5 pt-4 pb-8 text-center max-w-lg mx-auto">
-          <h1 className="text-3xl font-bold leading-tight mb-4">
-            Your skills deserve<br />to be seen — and paid.
-          </h1>
-          <p className="text-[#C8BDB8] text-sm leading-relaxed">
-            Alaga connects certified massage therapists with clients who want quality home wellness sessions. No chasing customers, no awkward haggling — just bookings waiting for you.
-          </p>
+          {/* Left: text */}
+          <div className="flex flex-col justify-center px-6 pt-12 pb-8 md:w-1/2 md:px-12 md:pt-16">
+            <img src="/logo-vertical-dark.png" alt="Alaga Wellness" className="h-16 w-auto mb-8 mx-auto md:mx-0" />
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-center md:text-left">
+              Your skills deserve<br />to be seen — and paid.
+            </h1>
+            <p className="text-[#C8BDB8] text-sm leading-relaxed text-center md:text-left">
+              Alaga connects certified massage therapists with clients who want quality home wellness sessions. No chasing customers, no awkward haggling — just bookings waiting for you.
+            </p>
+          </div>
+
+          {/* Right: image */}
+          <div className="relative md:w-1/2 h-72 md:h-auto overflow-hidden">
+            <img
+              src="/therapist-hero.png"
+              alt="Alaga Wellness therapist"
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#2C2420] via-[#2C2420]/20 to-transparent md:bg-gradient-to-l md:from-transparent md:via-transparent md:to-[#2C2420]" />
+          </div>
+
         </div>
 
         {/* Benefit cards */}
