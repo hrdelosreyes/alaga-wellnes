@@ -31,103 +31,64 @@ export default async function HomePage() {
     <div className="bg-[#FBF6F0]">
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden">
-        <div className="container-alaga py-16 md:py-24">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <section className="relative min-h-[600px] md:min-h-[700px] overflow-hidden">
+        {/* Full-bleed background image */}
+        <div className="absolute inset-0">
+          <img
+            src="/hero-massage.png"
+            alt="Professional home massage therapy"
+            className="w-full h-full object-cover object-center"
+          />
+          {/* Gradient overlay — strong on left for text legibility, fades right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#FBF6F0] via-[#FBF6F0]/80 to-[#FBF6F0]/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#FBF6F0]/60 via-transparent to-transparent" />
+        </div>
 
-            {/* Left: copy */}
-            <div>
-              <CityBadge />
+        {/* Content */}
+        <div className="relative container-alaga py-20 md:py-32">
+          <div className="max-w-xl">
+            <CityBadge />
 
-              <h1 className="text-4xl md:text-6xl font-bold text-[#2C2420] leading-tight mb-6 mt-4">
-                Wellness,<br />
-                <span className="text-[#C4714A]">delivered</span><br />
-                with care.
-              </h1>
+            <h1 className="text-4xl md:text-6xl font-bold text-[#2C2420] leading-tight mb-6 mt-4">
+              Wellness,<br />
+              <span className="text-[#C4714A]">delivered</span><br />
+              with care.
+            </h1>
 
-              <p className="text-lg text-[#8C7B70] leading-relaxed mb-8 max-w-lg">
-                Book verified Filipino wellness professionals for premium massage and home spa rituals —
-                safely delivered to your home, condo, or hotel.
-              </p>
+            <p className="text-lg text-[#8C7B70] leading-relaxed mb-8 max-w-lg">
+              Book verified Filipino wellness professionals for premium massage and home spa rituals —
+              safely delivered to your home, condo, or hotel.
+            </p>
 
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/book">
-                  <Button size="lg" className="w-full sm:w-auto">
-                    Book a Session
-                    <ArrowRight size={18} className="ml-2" />
-                  </Button>
-                </Link>
-                <Link href="#how-it-works">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                    How It Works
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="flex flex-wrap gap-5 mt-10 text-sm text-[#8C7B70]">
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck size={16} className="text-[#6B8C6E]" />
-                  NBI &amp; TESDA verified
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Star size={16} className="text-[#C9A84C]" fill="#C9A84C" />
-                  4.8 average rating
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock size={16} className="text-[#C4714A]" />
-                  Book in under 2 minutes
-                </span>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/book">
+                <Button size="lg" className="w-full sm:w-auto shadow-lg">
+                  Book a Session
+                  <ArrowRight size={18} className="ml-2" />
+                </Button>
+              </Link>
+              <Link href="#how-it-works">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/80 backdrop-blur-sm">
+                  How It Works
+                </Button>
+              </Link>
             </div>
 
-            {/* Right: visual panel */}
-            <div className="relative hidden md:flex items-center justify-center">
-              {/* Main card */}
-              <div className="relative w-full max-w-sm">
-                {/* Background blob */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#F2D9CC] to-[#EDE5DF] rounded-[40px] rotate-3" />
-
-                {/* Hero image */}
-                <div className="relative rounded-[32px] overflow-hidden shadow-xl aspect-[4/3]">
-                  <img
-                    src="/hero-massage.png"
-                    alt="Professional home massage therapy"
-                    className="w-full h-full object-cover"
-                  />
-                  {/* Subtle overlay for contrast */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#2C2420]/30 to-transparent" />
-                </div>
-
-                {/* Floating: rating card */}
-                <div className="absolute -top-5 -right-6 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center gap-2.5 border border-[#EDE5DF]">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#C9A84C] to-[#E0C06A] flex items-center justify-center flex-shrink-0">
-                    <Star size={14} fill="white" className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#2C2420]">4.8 Rating</p>
-                    <p className="text-[10px] text-[#8C7B70]">500+ sessions done</p>
-                  </div>
-                </div>
-
-                {/* Floating: verified badge */}
-                <div className="absolute -bottom-5 -left-6 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center gap-2.5 border border-[#EDE5DF]">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6B8C6E] to-[#8AAD8D] flex items-center justify-center flex-shrink-0">
-                    <ShieldCheck size={14} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#2C2420]">NBI + TESDA</p>
-                    <p className="text-[10px] text-[#8C7B70]">Every therapist verified</p>
-                  </div>
-                </div>
-
-                {/* Floating: time card */}
-                <div className="absolute top-1/2 -right-10 -translate-y-1/2 bg-[#2C2420] rounded-2xl shadow-lg px-4 py-3 text-white">
-                  <p className="text-xs font-bold">Available</p>
-                  <p className="text-[10px] text-[#C8A88A]">9AM – 10PM daily</p>
-                </div>
-              </div>
+            {/* Trust bar */}
+            <div className="flex flex-wrap gap-5 mt-10 text-sm text-[#8C7B70]">
+              <span className="flex items-center gap-1.5 bg-white/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                <ShieldCheck size={15} className="text-[#6B8C6E]" />
+                NBI &amp; TESDA verified
+              </span>
+              <span className="flex items-center gap-1.5 bg-white/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                <Star size={15} className="text-[#C9A84C]" fill="#C9A84C" />
+                4.8 average rating
+              </span>
+              <span className="flex items-center gap-1.5 bg-white/70 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                <Clock size={15} className="text-[#C4714A]" />
+                Book in under 2 minutes
+              </span>
             </div>
-
           </div>
         </div>
       </section>
