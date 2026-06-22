@@ -39,7 +39,7 @@ export function Footer() {
           <div>
             <h4 className="text-white font-semibold text-sm mb-4">Support</h4>
             <ul className="space-y-2 text-sm">
-              <li>📧 <a href="mailto:hello@alagawellness.com" className="hover:text-white transition-colors">hello@alagawellness.com</a></li>
+              <li>📧 <a href="mailto:hello@alagawellness.care" className="hover:text-white transition-colors">hello@alagawellness.care</a></li>
               <li className="pt-1 text-xs text-[#8C7B70]">Available 8AM – 10PM daily</li>
             </ul>
           </div>

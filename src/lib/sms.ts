@@ -33,5 +33,5 @@ export function smsNewBookingAlert({
 }
 
 export function smsBookingAccepted({ firstName }: { firstName: string }): string {
-  return `Booking confirmed ${firstName}! Log in to your Alaga account at alagawellness.com/therapist/login to view client details and location. Reply IN when you arrive, OUT when done.`
+  return `Booking confirmed ${firstName}! Log in to your Alaga account at alagawellness.care/therapist/login to view client details and location. Reply IN when you arrive, OUT when done.`
 }

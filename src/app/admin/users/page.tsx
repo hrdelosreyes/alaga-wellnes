@@ -121,7 +121,7 @@ export default function AdminUsersPage() {
                   type="email"
                   value={newEmail}
                   onChange={e => setNewEmail(e.target.value)}
-                  placeholder="staff@alagawellness.com"
+                  placeholder="staff@alagawellness.care"
                   className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A]"
                 />
               </div>

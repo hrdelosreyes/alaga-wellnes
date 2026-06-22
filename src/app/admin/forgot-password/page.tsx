@@ -53,7 +53,7 @@ export default function AdminForgotPasswordPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-                placeholder="admin@alagawellness.com"
+                placeholder="admin@alagawellness.care"
                 className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
               />
 
