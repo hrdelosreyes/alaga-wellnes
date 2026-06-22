@@ -240,27 +240,29 @@ export default function TherapistRegisterPage() {
     return (
       <div className="min-h-screen bg-[#2C2420] text-white">
 
-        {/* Hero — image full bleed with text overlay on left */}
-        <div className="relative h-[480px] md:h-[520px] overflow-hidden">
-          {/* Image — right-anchored */}
-          <img
-            src="/therapist-hero.png"
-            alt="Alaga Wellness therapist"
-            className="absolute inset-0 w-full h-full object-cover object-[70%_center]"
-          />
-          {/* Solid-to-transparent gradient so left text area is fully readable */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#2C2420] from-40% via-[#2C2420]/80 via-60% to-transparent" />
+        {/* Hero — hard split: solid text column + image column */}
+        <div className="flex flex-col md:flex-row">
 
-          {/* Text content pinned to left */}
-          <div className="relative h-full flex flex-col justify-center px-6 md:px-12 max-w-sm">
-            <img src="/logo-vertical-dark.png" alt="Alaga Wellness" className="h-12 w-auto mb-6" />
-            <h1 className="text-3xl font-bold leading-tight mb-4">
-              Your skills deserve<br />to be seen — and paid.
+          {/* Left: solid dark text column */}
+          <div className="md:w-1/2 bg-[#2C2420] flex flex-col justify-center px-6 py-12 md:px-12 md:py-16">
+            <img src="/logo-vertical-dark.png" alt="Alaga Wellness" className="h-12 w-auto mb-8" />
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-white">
+              Your skills deserve to be seen — and paid.
             </h1>
             <p className="text-[#C8BDB8] text-sm leading-relaxed">
               Alaga connects certified massage therapists with clients who want quality home wellness sessions. No chasing customers, no awkward haggling — just bookings waiting for you.
             </p>
           </div>
+
+          {/* Right: image column */}
+          <div className="md:w-1/2 h-72 md:h-auto md:min-h-[480px]">
+            <img
+              src="/therapist-hero.png"
+              alt="Alaga Wellness therapist"
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+
         </div>
 
         {/* Benefit cards */}
