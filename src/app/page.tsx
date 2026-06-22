@@ -97,8 +97,18 @@ export default async function HomePage() {
       <ServicesSection />
 
       {/* ── HOW IT WORKS ── */}
-      <section id="how-it-works" className="py-20 bg-white">
-        <div className="container-alaga">
+      <section id="how-it-works" className="py-20 relative overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <img
+            src="/how-it-works-bg.png"
+            alt=""
+            className="w-full h-full object-cover object-center"
+          />
+          {/* Light cream overlay to keep text readable */}
+          <div className="absolute inset-0 bg-[#FBF6F0]/88" />
+        </div>
+        <div className="relative container-alaga">
           <div className="mb-14 text-center">
             <p className="text-[#C4714A] font-semibold text-sm uppercase tracking-widest mb-2">Simple &amp; Fast</p>
             <h2 className="text-3xl md:text-4xl font-bold text-[#2C2420]">How Alaga works</h2>
