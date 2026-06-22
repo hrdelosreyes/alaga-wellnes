@@ -197,40 +197,62 @@ export default function TherapistDashboard() {
     <div className="min-h-screen bg-[#F7F2EE]">
 
       {/* Header */}
-      <div className="relative bg-[#2C2420] text-white overflow-hidden">
-        {/* Background image */}
+      <div className="relative bg-[#2C2420] text-white overflow-hidden min-h-[260px]">
+        {/* Background image — therapist visible on the left */}
         <div className="absolute inset-0">
           <img
             src="/therapist-dashboard-hero.png"
             alt=""
-            className="w-full h-full object-cover object-top"
+            className="w-full h-full object-cover object-[center_20%]"
           />
-          <div className="absolute inset-0 bg-[#2C2420]/75" />
+          {/* Fade transparent on the left (show image) to dark on the right (stats) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2C2420]/30 via-[#2C2420]/55 to-[#2C2420]/95" />
         </div>
-        <div className="relative px-5 py-6 flex items-center justify-between">
-        <div>
-          <h1 className="font-bold text-base text-white">Hi, {therapist?.name?.split(' ')[0]} 👋</h1>
-          <p className="text-xs text-[#C8A88A]">
-            ★ {therapist?.rating_avg} · {therapist?.total_bookings} sessions · {therapist?.zone}
-          </p>
-        </div>
-        <div className="flex items-center gap-1">
-          <a
-            href="/therapist/service-area"
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 transition-colors"
-          >
-            Service area
-          </a>
-          <a
-            href="/therapist/rates"
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 transition-colors"
-          >
-            My rates
-          </a>
-          <button onClick={logout} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-            <LogOut size={16} />
-          </button>
-        </div>
+
+        {/* Content */}
+        <div className="relative flex flex-col min-h-[260px] px-5 py-5 max-w-3xl mx-auto">
+
+          {/* Top row: greeting + actions */}
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="font-bold text-lg text-white drop-shadow">Hi, {therapist?.name?.split(' ')[0]} 👋</h1>
+              <p className="text-xs text-[#E8D9CE] drop-shadow">{therapist?.zone}</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <a
+                href="/therapist/service-area"
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors"
+              >
+                Service area
+              </a>
+              <a
+                href="/therapist/rates"
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors"
+              >
+                My rates
+              </a>
+              <button onClick={logout} className="p-2 rounded-lg hover:bg-white/15 transition-colors">
+                <LogOut size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Stat cards anchored bottom-right */}
+          <div className="mt-auto flex justify-end gap-2.5 pt-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 text-center min-w-[88px] border border-white/10">
+              <p className="text-xl font-bold text-[#E0C06A]">★ {therapist?.rating_avg || '—'}</p>
+              <p className="text-[10px] text-[#E8D9CE] mt-0.5">Rating</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 text-center min-w-[88px] border border-white/10">
+              <p className="text-xl font-bold text-white">{therapist?.total_bookings ?? 0}</p>
+              <p className="text-[10px] text-[#E8D9CE] mt-0.5">Sessions</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 text-center min-w-[88px] border border-white/10">
+              <p className="text-xl font-bold text-[#8AAD8D]">{bonusStats.quarterBookings}</p>
+              <p className="text-[10px] text-[#E8D9CE] mt-0.5">This quarter</p>
+            </div>
+          </div>
+
         </div>
       </div>
 
