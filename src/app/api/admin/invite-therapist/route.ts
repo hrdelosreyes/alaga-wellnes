@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
     const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY!
     const redirectTo  = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/therapist/dashboard`
 
-    const res = await fetch(`${supabaseUrl}/auth/v1/invite`, {
+    // Try invite first; if user already exists, send a password reset instead
+    const inviteRes = await fetch(`${supabaseUrl}/auth/v1/invite`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,11 +26,28 @@ export async function POST(req: NextRequest) {
       }),
     })
 
-    const body = await res.json()
+    const inviteBody = await inviteRes.json()
 
-    if (!res.ok) {
-      console.error('invite error:', res.status, JSON.stringify(body))
-      return NextResponse.json({ error: body.msg ?? body.message ?? 'Invite failed', code: res.status }, { status: 500 })
+    if (!inviteRes.ok) {
+      // User already exists — send a password reset link instead
+      if (inviteRes.status === 422) {
+        const resetRes = await fetch(`${supabaseUrl}/auth/v1/recover`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': serviceKey,
+            'Authorization': `Bearer ${serviceKey}`,
+          },
+          body: JSON.stringify({ email, redirect_to: redirectTo }),
+        })
+        if (!resetRes.ok) {
+          const resetBody = await resetRes.json()
+          return NextResponse.json({ error: resetBody.msg ?? 'Failed to send reset email', code: resetRes.status }, { status: 500 })
+        }
+      } else {
+        console.error('invite error:', inviteRes.status, JSON.stringify(inviteBody))
+        return NextResponse.json({ error: inviteBody.msg ?? inviteBody.message ?? 'Invite failed', code: inviteRes.status }, { status: 500 })
+      }
     }
 
     return NextResponse.json({ success: true })
