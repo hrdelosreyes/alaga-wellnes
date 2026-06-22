@@ -196,71 +196,71 @@ export default function TherapistDashboard() {
   return (
     <div className="min-h-screen bg-[#F7F2EE]">
 
-      {/* Header */}
-      <div className="relative bg-[#2C2420] text-white overflow-hidden min-h-[260px]">
-        {/* Background image — therapist visible on the left */}
-        <div className="absolute inset-0">
-          <img
-            src="/therapist-dashboard-hero.png"
-            alt=""
-            className="w-full h-full object-cover object-[center_20%]"
-          />
-          {/* Fade transparent on the left (show image) to dark on the right (stats) */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#2C2420]/30 via-[#2C2420]/55 to-[#2C2420]/95" />
-        </div>
-
-        {/* Content */}
-        <div className="relative flex flex-col min-h-[260px] px-5 py-5 max-w-3xl mx-auto">
-
-          {/* Top row: greeting + actions */}
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h1 className="font-bold text-lg text-white drop-shadow">Hi, {therapist?.name?.split(' ')[0]} 👋</h1>
-              <p className="text-xs text-[#E8D9CE] drop-shadow">{therapist?.zone}</p>
-            </div>
-            <div className="flex items-center gap-1">
-              <a
-                href="/therapist/service-area"
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors"
-              >
-                Service area
-              </a>
-              <a
-                href="/therapist/rates"
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 backdrop-blur-sm transition-colors"
-              >
-                My rates
-              </a>
-              <button onClick={logout} className="p-2 rounded-lg hover:bg-white/15 transition-colors">
-                <LogOut size={16} />
-              </button>
-            </div>
+      {/* Top bar */}
+      <div className="bg-[#2C2420] text-white">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div>
+            <h1 className="font-bold text-base text-white">Hi, {therapist?.name?.split(' ')[0]} 👋</h1>
+            <p className="text-xs text-[#C8A88A]">
+              ★ {therapist?.rating_avg || '—'} · {therapist?.total_bookings ?? 0} sessions · {therapist?.zone}
+            </p>
           </div>
-
-          {/* Stat cards anchored bottom-right */}
-          <div className="mt-auto flex justify-end gap-2.5 pt-6">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 text-center min-w-[88px] border border-white/10">
-              <p className="text-xl font-bold text-[#E0C06A]">★ {therapist?.rating_avg || '—'}</p>
-              <p className="text-[10px] text-[#E8D9CE] mt-0.5">Rating</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 text-center min-w-[88px] border border-white/10">
-              <p className="text-xl font-bold text-white">{therapist?.total_bookings ?? 0}</p>
-              <p className="text-[10px] text-[#E8D9CE] mt-0.5">Sessions</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 text-center min-w-[88px] border border-white/10">
-              <p className="text-xl font-bold text-[#8AAD8D]">{bonusStats.quarterBookings}</p>
-              <p className="text-[10px] text-[#E8D9CE] mt-0.5">This quarter</p>
-            </div>
+          <div className="flex items-center gap-1">
+            <a
+              href="/therapist/service-area"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              Service area
+            </a>
+            <a
+              href="/therapist/rates"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              My rates
+            </a>
+            <button onClick={logout} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+              <LogOut size={16} />
+            </button>
           </div>
-
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 py-6">
+
+        {/* Overview: full-height image left + summary cards right */}
+        <div className="flex flex-col md:flex-row gap-6 mb-6">
+
+          {/* Left: full-height therapist image */}
+          <div className="md:w-2/5 rounded-3xl overflow-hidden min-h-[320px] flex-shrink-0">
+            <img
+              src="/therapist-dashboard-hero.png"
+              alt=""
+              className="w-full h-full object-cover object-top"
+            />
+          </div>
+
+          {/* Right: stats + referral + bonus */}
+          <div className="md:w-3/5 flex flex-col gap-4">
+
+            {/* Stat cards */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-white rounded-2xl border border-[#EDE5DF] px-4 py-4 text-center">
+                <p className="text-2xl font-bold text-[#C9A84C]">★ {therapist?.rating_avg || '—'}</p>
+                <p className="text-[10px] text-[#8C7B70] mt-1">Rating</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-[#EDE5DF] px-4 py-4 text-center">
+                <p className="text-2xl font-bold text-[#2C2420]">{therapist?.total_bookings ?? 0}</p>
+                <p className="text-[10px] text-[#8C7B70] mt-1">Sessions</p>
+              </div>
+              <div className="bg-white rounded-2xl border border-[#EDE5DF] px-4 py-4 text-center">
+                <p className="text-2xl font-bold text-[#6B8C6E]">{bonusStats.quarterBookings}</p>
+                <p className="text-[10px] text-[#8C7B70] mt-1">This quarter</p>
+              </div>
+            </div>
 
         {/* Referral card */}
         {therapist?.referral_code && (
-          <div className="bg-[#2C2420] rounded-2xl p-5 mb-6 text-white">
+          <div className="bg-[#2C2420] rounded-2xl p-5 text-white">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <p className="text-xs text-[#C8A88A] font-semibold uppercase tracking-wider mb-1">Your referral code</p>
@@ -298,7 +298,7 @@ export default function TherapistDashboard() {
         )}
 
         {/* Alaga Bonus card */}
-        <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5 mb-4">
+        <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
           <div className="flex items-center gap-2 mb-3">
             <Gift size={16} className="text-[#C9A84C]" />
             <p className="font-bold text-[#2C2420] text-sm">Alaga Bonus — {currentQuarter()}</p>
@@ -330,7 +330,11 @@ export default function TherapistDashboard() {
           )}
         </div>
 
-        {/* Tabs */}
+          </div>{/* end right column */}
+        </div>{/* end overview flex */}
+
+        {/* Tabs + bookings */}
+        <div className="max-w-lg mx-auto">
         <div className="flex gap-2 mb-6">
           {(['today', 'upcoming'] as const).map(t => (
             <button
@@ -489,6 +493,7 @@ export default function TherapistDashboard() {
             })}
           </div>
         )}
+        </div>{/* end tabs + bookings wrapper */}
       </div>
     </div>
   )
