@@ -40,7 +40,7 @@ function TherapistRatesPage() {
     const { data: t } = await supabase
       .from('therapists')
       .select('id, city_id')
-      .eq('phone', user.phone)
+      .eq('email', user.email)
       .single()
 
     if (!t) { router.replace('/therapist/login'); return }

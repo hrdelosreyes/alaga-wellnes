@@ -22,7 +22,7 @@ export default function TherapistOnboardingPage() {
       const { data: t } = await supabase
         .from('therapists')
         .select('id, name, application_status')
-        .eq('phone', user.phone)
+        .eq('email', user.email)
         .single()
 
       if (!t || t.application_status !== 'approved') {

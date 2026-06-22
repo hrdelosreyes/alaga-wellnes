@@ -33,7 +33,7 @@ function ServiceAreaPage() {
     const { data: t } = await supabase
       .from('therapists')
       .select('id, city_id, cities(name)')
-      .eq('phone', user.phone)
+      .eq('email', user.email)
       .single()
 
     if (!t) { router.replace('/therapist/login'); return }

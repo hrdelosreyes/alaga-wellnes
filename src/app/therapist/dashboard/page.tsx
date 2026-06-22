@@ -81,11 +81,11 @@ export default function TherapistDashboard() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.replace('/therapist/login'); return }
 
-    // Look up therapist by phone (user.phone from Supabase Auth)
+    // Look up therapist by email (auth accounts are email-based)
     const { data: t } = await supabase
       .from('therapists')
       .select('id, name, zone, rating_avg, total_bookings, referral_code')
-      .eq('phone', user.phone)
+      .eq('email', user.email)
       .single()
 
     if (!t) { router.replace('/therapist/login'); return }
