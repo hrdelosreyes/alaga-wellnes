@@ -172,7 +172,19 @@ export default function TherapistRegisterPage() {
         tesda_certified:    false,
       })
 
-      if (error) throw error
+      if (error) {
+        if (error.code === '23505') {
+          if (error.message.includes('phone')) {
+            setSubmitError('This mobile number is already registered. If you already applied, please wait for our review.')
+          } else if (error.message.includes('email')) {
+            setSubmitError('This email address is already registered. If you already applied, please wait for our review.')
+          } else {
+            setSubmitError('An application with this information already exists.')
+          }
+          return
+        }
+        throw error
+      }
 
       const { data: therapistRow } = await supabase
         .from('therapists')
