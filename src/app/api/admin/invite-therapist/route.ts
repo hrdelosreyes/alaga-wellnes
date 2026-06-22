@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\/$/, '')
     const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY!
-    const redirectTo  = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/therapist/dashboard`
+    const redirectTo  = `${process.env.NEXT_PUBLIC_APP_URL}/therapist/set-password`
 
     // Try invite first; if user already exists, send a password reset instead
     const inviteRes = await fetch(`${supabaseUrl}/auth/v1/invite`, {
