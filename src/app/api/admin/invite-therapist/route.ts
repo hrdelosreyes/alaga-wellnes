@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,19 +7,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    )
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\/$/, '')
+    const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const redirectTo  = `${process.env.NEXT_PUBLIC_APP_URL}/therapist/dashboard`
 
-    const { error } = await supabase.auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/therapist/dashboard`,
-      data: { therapistId, name },
+    const res = await fetch(`${supabaseUrl}/auth/v1/invite`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': serviceKey,
+        'Authorization': `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({
+        email,
+        data: { therapistId, name },
+        redirect_to: redirectTo,
+      }),
     })
 
-    if (error) {
-      console.error('invite error:', error.message, error.status, JSON.stringify(error))
-      return NextResponse.json({ error: error.message ?? 'unknown', status: error.status, name: error.name }, { status: 500 })
+    const body = await res.json()
+
+    if (!res.ok) {
+      console.error('invite error:', res.status, JSON.stringify(body))
+      return NextResponse.json({ error: body.msg ?? body.message ?? 'Invite failed', code: res.status }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
