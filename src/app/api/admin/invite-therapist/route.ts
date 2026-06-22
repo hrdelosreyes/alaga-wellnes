@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
     })
 
     if (error) {
-      console.error('invite error:', JSON.stringify(error))
-      return NextResponse.json({ error: error.message, code: error.status }, { status: 500 })
+      console.error('invite error:', error.message, error.status, JSON.stringify(error))
+      return NextResponse.json({ error: error.message ?? 'unknown', status: error.status, name: error.name }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
