@@ -209,7 +209,7 @@ export default function TherapistDashboard() {
         </div>
         <div className="relative px-5 py-6 flex items-center justify-between">
         <div>
-          <h1 className="font-bold text-base">Hi, {therapist?.name?.split(' ')[0]} 👋</h1>
+          <h1 className="font-bold text-base text-white">Hi, {therapist?.name?.split(' ')[0]} 👋</h1>
           <p className="text-xs text-[#C8A88A]">
             ★ {therapist?.rating_avg} · {therapist?.total_bookings} sessions · {therapist?.zone}
           </p>
