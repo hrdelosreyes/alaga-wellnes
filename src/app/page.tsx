@@ -87,30 +87,15 @@ export default async function HomePage() {
                 {/* Background blob */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#F2D9CC] to-[#EDE5DF] rounded-[40px] rotate-3" />
 
-                {/* Center illustration */}
-                <div className="relative bg-white rounded-[32px] p-10 shadow-xl flex flex-col items-center gap-4">
-                  {/* Icon circle */}
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#C4714A] to-[#E8956D] flex items-center justify-center shadow-lg">
-                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M24 8C24 8 14 16 14 26C14 31.5 18.5 36 24 36C29.5 36 34 31.5 34 26C34 16 24 8 24 8Z" fill="white" fillOpacity="0.9"/>
-                      <path d="M18 28C18 28 20 32 24 32C28 32 30 28 30 28" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                      <circle cx="20" cy="24" r="2" fill="white" fillOpacity="0.6"/>
-                      <circle cx="28" cy="24" r="2" fill="white" fillOpacity="0.6"/>
-                    </svg>
-                  </div>
-                  <p className="font-bold text-[#2C2420] text-lg text-center">Premium Home Wellness</p>
-                  <p className="text-[#8C7B70] text-sm text-center leading-relaxed">
-                    Professional therapists. Your comfort. Your schedule.
-                  </p>
-
-                  {/* Mini service pills */}
-                  <div className="flex flex-wrap gap-2 justify-center mt-2">
-                    {['Swedish Massage', 'Deep Tissue', 'Hilot', 'Foot Spa'].map(s => (
-                      <span key={s} className="text-xs bg-[#FBF6F0] border border-[#EDE5DF] text-[#8C7B70] px-3 py-1 rounded-full">
-                        {s}
-                      </span>
-                    ))}
-                  </div>
+                {/* Hero image */}
+                <div className="relative rounded-[32px] overflow-hidden shadow-xl aspect-[4/3]">
+                  <img
+                    src="/hero-massage.png"
+                    alt="Professional home massage therapy"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Subtle overlay for contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#2C2420]/30 to-transparent" />
                 </div>
 
                 {/* Floating: rating card */}
@@ -336,6 +321,33 @@ export default async function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── IMAGE BREAK ── */}
+      <section className="relative h-[420px] overflow-hidden">
+        <img
+          src="/hero-massage-2.png"
+          alt="Home wellness session"
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#2C2420]/70 via-[#2C2420]/30 to-transparent flex items-center">
+          <div className="container-alaga">
+            <div className="max-w-md">
+              <p className="text-[#C8A88A] text-sm font-semibold uppercase tracking-widest mb-3">For everyone</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
+                Wellness that comes to you
+              </h2>
+              <p className="text-[#C8BDB8] text-sm leading-relaxed mb-6">
+                Whether you need to unwind after a long week or recover from an intense workout — your verified Alaga therapist is ready.
+              </p>
+              <Link href="/book">
+                <Button size="lg">
+                  Book a session <ArrowRight size={18} className="ml-2" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
