@@ -100,8 +100,9 @@ export async function POST(req: NextRequest) {
         redirect_url: `${appUrl}/booking/${booking.id}?payment=success`,
         webhook:      `${appUrl}/api/webhooks/hitpay`,
         reference_number: booking.id,
-        // Allow GCash, Maya, card
-        payment_methods: ['paynow_online', 'card'],
+        // Philippine payment methods (GCash, Maya, card). Omit to let HitPay
+        // show all methods enabled for the merchant account.
+        payment_methods: ['gcash', 'paymaya', 'card'],
       }),
     })
 
@@ -112,6 +113,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         error: 'Payment gateway error — please try again',
         bookingId: booking.id,
+        debug: err, // TEMP
       }, { status: 502 })
     }
 
