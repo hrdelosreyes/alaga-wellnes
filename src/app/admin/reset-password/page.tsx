@@ -22,10 +22,29 @@ export default function AdminResetPasswordPage() {
 
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.updateUser({ password })
-    if (error) { setError(error.message); setLoading(false); return }
-    // Sign out so the next login uses the new password cleanly (and to avoid a
-    // stale session masking the change).
+
+    // The recovery session (from the email link) proves who's resetting. Send
+    // its token to the server, which sets the password via the Admin API — the
+    // client updateUser() doesn't reliably persist on a recovery session here.
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.access_token) {
+      setError('Your reset link has expired or is invalid. Please request a new one.')
+      setLoading(false)
+      return
+    }
+
+    const res = await fetch('/api/auth/complete-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessToken: session.access_token, password }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setError(data.error ?? 'Could not update password. Please try again.')
+      setLoading(false)
+      return
+    }
+
     await supabase.auth.signOut()
     setDone(true)
     setTimeout(() => router.push('/admin/login'), 3000)
