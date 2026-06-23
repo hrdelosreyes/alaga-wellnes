@@ -231,9 +231,19 @@ export default function TherapistDashboard() {
     setUpdating(null)
   }
 
-  // Therapist accepts a confirmed booking → assigned.
+  // Therapist accepts a confirmed booking → assigned (+ customer email, server-side).
   async function acceptBooking(bookingId: string) {
-    await updateStatus(bookingId, 'assigned')
+    setUpdating(bookingId)
+    const res = await fetch('/api/therapist/accept-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId }),
+    })
+    if (res.ok) {
+      setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'assigned' } : b))
+      seenConfirmedRef.current?.delete(bookingId)
+    }
+    setUpdating(null)
   }
 
   // Therapist declines → unassign so admin can reassign; drop it from the list.

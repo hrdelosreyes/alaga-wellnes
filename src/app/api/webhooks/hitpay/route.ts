@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHmac } from 'crypto'
 import { createServiceClient } from '@/lib/supabase/server'
-import { sendSms, smsNewBookingAlert } from '@/lib/sms'
 import { sendEmail, emailBookingConfirmed } from '@/lib/email'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
@@ -51,30 +50,13 @@ export async function POST(req: NextRequest) {
         })
         .eq('id', referenceNumber)
 
-      // Fetch booking + assigned therapist to send notifications
+      // Fetch booking to email the customer a confirmation. The assigned
+      // therapist is alerted via the dashboard (polling + sound), not SMS.
       const { data: booking } = await supabase
         .from('bookings')
-        .select('id, booking_date, time_slot, address, service_id, total, customer_name, customer_email, therapist_id, therapists(name, phone)')
+        .select('id, booking_date, time_slot, address, service_id, total, customer_name, customer_email')
         .eq('id', referenceNumber)
         .single()
-
-      // SMS the therapist (if already assigned)
-      if (booking?.therapist_id && booking.therapists) {
-        const therapist = booking.therapists as unknown as { name: string; phone: string }
-        const firstName = therapist.name.split(' ')[0]
-        try {
-          await sendSms(
-            therapist.phone,
-            smsNewBookingAlert({
-              firstName,
-              date: formatDate(booking.booking_date),
-              time: formatTime(booking.time_slot),
-            })
-          )
-        } catch (smsErr) {
-          console.error('SMS send failed:', smsErr)
-        }
-      }
 
       // Email the customer a booking confirmation
       if (booking?.customer_email) {
