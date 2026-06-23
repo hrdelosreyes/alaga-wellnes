@@ -66,16 +66,7 @@ export async function POST(req: NextRequest) {
 
     if (bookingError) {
       console.error('Booking insert error:', bookingError)
-      // TEMP DEBUG: surface the real DB error so we can diagnose in the browser
-      return NextResponse.json({
-        error: 'Failed to create booking',
-        debug: {
-          message: bookingError.message,
-          details: bookingError.details,
-          hint:    bookingError.hint,
-          code:    bookingError.code,
-        },
-      }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 })
     }
 
     // Create HitPay payment request
@@ -119,7 +110,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         error: 'Payment gateway error — please try again',
         bookingId: booking.id,
-        debug: err, // TEMP
       }, { status: 502 })
     }
 
