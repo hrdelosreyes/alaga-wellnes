@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 
 export default function AdminForgotPasswordPage() {
@@ -14,11 +13,18 @@ export default function AdminForgotPasswordPage() {
     setError(null)
     if (!email) { setError('Please enter your email address.'); return }
     setLoading(true)
-    const supabase = createClient()
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${location.origin}/admin/reset-password`,
+    // Server-side /auth/v1/recover → implicit (hash) reset link, no PKCE verifier.
+    const res = await fetch('/api/auth/send-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, portal: 'admin' }),
     })
-    if (error) { setError(error.message); setLoading(false); return }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setError(data.error ?? 'Could not send reset email. Please try again.')
+      setLoading(false)
+      return
+    }
     setSent(true)
     setLoading(false)
   }
