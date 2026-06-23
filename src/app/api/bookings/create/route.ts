@@ -80,9 +80,17 @@ export async function POST(req: NextRequest) {
 
     // Create HitPay payment request
     const hitpayMode = process.env.NEXT_PUBLIC_HITPAY_MODE ?? 'sandbox'
-    const hitpayBase = hitpayMode === 'sandbox'
+    const isSandbox  = hitpayMode === 'sandbox'
+    const hitpayBase = isSandbox
       ? 'https://api.sandbox.hit-pay.com/v1'
       : 'https://api.hit-pay.com/v1'
+
+    // HitPay sandbox is a Singapore environment (SGD + PayNow). Production is
+    // the live PH account (PHP + GCash/Maya). Use the right pair per mode.
+    const hitpayCurrency = isSandbox ? 'SGD' : 'PHP'
+    const hitpayMethods  = isSandbox
+      ? ['paynow_online', 'card']
+      : ['gcash', 'paymaya', 'card']
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -93,16 +101,14 @@ export async function POST(req: NextRequest) {
         'Content-Type':       'application/json',
       },
       body: JSON.stringify({
-        amount:       total.toFixed(2), // pesos as decimal string, e.g. "1200.00"
-        currency:     'PHP',
+        amount:       total.toFixed(2), // decimal string, e.g. "1200.00"
+        currency:     hitpayCurrency,
         name:         'Alaga Wellness Booking',
         description:  `Booking #${booking.id.slice(0, 8).toUpperCase()} — ${serviceId}`,
         redirect_url: `${appUrl}/booking/${booking.id}?payment=success`,
         webhook:      `${appUrl}/api/webhooks/hitpay`,
         reference_number: booking.id,
-        // Philippine payment methods (GCash, Maya, card). Omit to let HitPay
-        // show all methods enabled for the merchant account.
-        payment_methods: ['gcash', 'paymaya', 'card'],
+        payment_methods: hitpayMethods,
       }),
     })
 
