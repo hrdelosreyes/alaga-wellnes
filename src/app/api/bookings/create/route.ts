@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     // the live PH account (PHP + GCash/Maya). Use the right pair per mode.
     const hitpayCurrency = isSandbox ? 'SGD' : 'PHP'
     const hitpayMethods  = isSandbox
-      ? ['paynow_online', 'card']
+      ? ['paynow_online']
       : ['gcash', 'paymaya', 'card']
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
