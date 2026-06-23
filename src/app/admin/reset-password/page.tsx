@@ -22,20 +22,13 @@ export default function AdminResetPasswordPage() {
 
     setLoading(true)
     const supabase = createClient()
-
-    // TEMP DEBUG: which user are we actually updating?
-    const { data: before } = await supabase.auth.getUser()
-    const { data: upd, error } = await supabase.auth.updateUser({ password })
-
-    const diag = {
-      sessionUser: before?.user?.email ?? null,
-      sessionUserId: before?.user?.id ?? null,
-      updatedUser: upd?.user?.email ?? null,
-      updateError: error ? `${error.status ?? ''} ${error.message}` : null,
-    }
-    setError('DEBUG: ' + JSON.stringify(diag))
-    setLoading(false)
-    return
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) { setError(error.message); setLoading(false); return }
+    // Sign out so the next login uses the new password cleanly (and to avoid a
+    // stale session masking the change).
+    await supabase.auth.signOut()
+    setDone(true)
+    setTimeout(() => router.push('/admin/login'), 3000)
   }
 
   return (
