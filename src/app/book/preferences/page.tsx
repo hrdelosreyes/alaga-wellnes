@@ -34,7 +34,7 @@ export default function PreferencesPage() {
         .from('customers')
         .select('id, name, phone')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
       if (profile) {
         setCustomerId(profile.id)
         if (!draft.customerName)  { setName(profile.name ?? '');  setPrefilled(true) }

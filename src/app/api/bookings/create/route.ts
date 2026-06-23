@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         .select('min_rate, max_rate')
         .eq('city_id', cityId)
         .eq('service_id', serviceId)
-        .single()
+        .maybeSingle()
       if (band && (subtotal < band.min_rate || subtotal > band.max_rate)) {
         return NextResponse.json({ error: 'Price is outside the allowed range for this city.' }, { status: 400 })
       }

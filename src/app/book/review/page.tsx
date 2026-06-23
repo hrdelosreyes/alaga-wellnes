@@ -34,7 +34,7 @@ export default function ReviewPage() {
         .select('rate')
         .eq('therapist_id', draft.therapistId)
         .eq('service_id', draft.serviceId)
-        .single()
+        .maybeSingle()
       setSubtotal(data?.rate ?? null)
     } else {
       // Use city base rate for best_available
@@ -43,7 +43,7 @@ export default function ReviewPage() {
         .select('base_rate')
         .eq('city_id', draft.cityId)
         .eq('service_id', draft.serviceId)
-        .single()
+        .maybeSingle()
       setSubtotal(data?.base_rate ?? null)
     }
     setPriceLoading(false)
