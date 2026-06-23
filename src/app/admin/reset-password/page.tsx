@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function AdminResetPasswordPage() {
   const router = useRouter()
@@ -14,48 +14,6 @@ export default function AdminResetPasswordPage() {
   const [loading,  setLoading]  = useState(false)
   const [done,     setDone]     = useState(false)
   const [error,    setError]    = useState<string | null>(null)
-  const [ready,    setReady]    = useState(false)   // recovery session established?
-  const [linkError, setLinkError] = useState<string | null>(null)
-
-  // Establish the recovery session. With the implicit (hash) flow the session
-  // is parsed from the URL hash asynchronously, so we wait for it before
-  // declaring the link invalid. Also handles a legacy PKCE ?code=… fallback.
-  useEffect(() => {
-    const supabase = createClient()
-    let settled = false
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
-        settled = true
-        setReady(true)
-      }
-    })
-
-    async function establish() {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) { settled = true; setReady(true); return }
-
-      // Legacy PKCE fallback
-      const code = new URL(window.location.href).searchParams.get('code')
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
-        if (!error) { settled = true; setReady(true); return }
-        console.error('Code exchange failed:', error)
-      }
-
-      // Implicit flow: give detectSessionInUrl time to parse the hash + fire the
-      // auth event before deciding the link is bad.
-      setTimeout(async () => {
-        if (settled) return
-        const { data: { session: s2 } } = await supabase.auth.getSession()
-        if (s2) setReady(true)
-        else setLinkError('This reset link is invalid or has expired, or it was opened in a different browser than the one you requested it from. Please request a new link and open it in the same browser.')
-      }, 2500)
-    }
-
-    establish()
-    return () => subscription.unsubscribe()
-  }, [])
 
   async function handleSubmit() {
     setError(null)
@@ -81,21 +39,7 @@ export default function AdminResetPasswordPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-7">
-          {linkError ? (
-            <div className="text-center">
-              <p className="text-2xl mb-3">⚠️</p>
-              <h2 className="text-lg font-bold text-[#2C2420] mb-2">Link problem</h2>
-              <p className="text-sm text-[#8C7B70] mb-5">{linkError}</p>
-              <Button size="lg" className="w-full" onClick={() => router.push('/admin/forgot-password')}>
-                Request a new link
-              </Button>
-            </div>
-          ) : !ready ? (
-            <div className="text-center py-6">
-              <Loader2 className="animate-spin text-[#C4714A] mx-auto mb-3" size={28} />
-              <p className="text-sm text-[#8C7B70]">Verifying your reset link…</p>
-            </div>
-          ) : done ? (
+          {done ? (
             <div className="text-center">
               <p className="text-2xl mb-3">✅</p>
               <h2 className="text-lg font-bold text-[#2C2420] mb-2">Password updated</h2>
