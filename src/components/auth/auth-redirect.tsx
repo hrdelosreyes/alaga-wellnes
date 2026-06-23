@@ -1,13 +1,20 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+
+// Pages that establish the recovery session themselves — AuthRedirect must not
+// race them for the single-use PKCE code.
+const SELF_HANDLED = ['/admin/reset-password', '/therapist/set-password', '/therapist/reset-password', '/account/reset-password']
 
 export function AuthRedirect() {
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
+    if (SELF_HANDLED.some(p => pathname?.startsWith(p))) return
+
     const supabase = createClient()
 
     // Route a recovery/invite session to the correct set-password page based
@@ -59,7 +66,7 @@ export function AuthRedirect() {
     init()
 
     return () => subscription.unsubscribe()
-  }, [router])
+  }, [router, pathname])
 
   return null
 }

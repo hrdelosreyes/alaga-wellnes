@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 
 export default function AdminResetPasswordPage() {
   const router = useRouter()
@@ -14,6 +14,34 @@ export default function AdminResetPasswordPage() {
   const [loading,  setLoading]  = useState(false)
   const [done,     setDone]     = useState(false)
   const [error,    setError]    = useState<string | null>(null)
+  const [ready,    setReady]    = useState(false)   // recovery session established?
+  const [linkError, setLinkError] = useState<string | null>(null)
+
+  // Establish the recovery session: use an existing session, or exchange the
+  // PKCE ?code=… that Supabase appended to the redirect.
+  useEffect(() => {
+    const supabase = createClient()
+
+    async function establish() {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) { setReady(true); return }
+
+      const code = new URL(window.location.href).searchParams.get('code')
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (!error) { setReady(true); return }
+        console.error('Code exchange failed:', error)
+      }
+      setLinkError('This reset link is invalid or has expired, or it was opened in a different browser than the one you requested it from. Please request a new link and open it in the same browser.')
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') setReady(true)
+    })
+
+    establish()
+    return () => subscription.unsubscribe()
+  }, [])
 
   async function handleSubmit() {
     setError(null)
@@ -39,7 +67,21 @@ export default function AdminResetPasswordPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-7">
-          {done ? (
+          {linkError ? (
+            <div className="text-center">
+              <p className="text-2xl mb-3">⚠️</p>
+              <h2 className="text-lg font-bold text-[#2C2420] mb-2">Link problem</h2>
+              <p className="text-sm text-[#8C7B70] mb-5">{linkError}</p>
+              <Button size="lg" className="w-full" onClick={() => router.push('/admin/forgot-password')}>
+                Request a new link
+              </Button>
+            </div>
+          ) : !ready ? (
+            <div className="text-center py-6">
+              <Loader2 className="animate-spin text-[#C4714A] mx-auto mb-3" size={28} />
+              <p className="text-sm text-[#8C7B70]">Verifying your reset link…</p>
+            </div>
+          ) : done ? (
             <div className="text-center">
               <p className="text-2xl mb-3">✅</p>
               <h2 className="text-lg font-bold text-[#2C2420] mb-2">Password updated</h2>
