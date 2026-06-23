@@ -15,8 +15,9 @@ export default function PreferencesPage() {
 
   const [name,        setName]        = useState(draft.customerName  ?? '')
   const [phone,       setPhone]       = useState(draft.customerPhone ?? '')
+  const [email,       setEmail]       = useState(draft.customerEmail ?? '')
   const [notes,       setNotes]       = useState(draft.customerNotes ?? '')
-  const [errors,      setErrors]      = useState<{ name?: string; phone?: string }>({})
+  const [errors,      setErrors]      = useState<{ name?: string; phone?: string; email?: string }>({})
   const [customerId,  setCustomerId]  = useState<string | null>(null)
   const [prefilled,   setPrefilled]   = useState(false)
 
@@ -26,6 +27,8 @@ export default function PreferencesPage() {
     // Pre-fill from customer profile if signed in
     createClient().auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
+      // Prefill email from the signed-in account
+      if (!draft.customerEmail && user.email) setEmail(user.email)
       const supabase = createClient()
       const { data: profile } = await supabase
         .from('customers')
@@ -41,11 +44,13 @@ export default function PreferencesPage() {
   }, [draft.serviceId, router])
 
   function validate() {
-    const e: { name?: string; phone?: string } = {}
+    const e: { name?: string; phone?: string; email?: string } = {}
     if (!name.trim())  e.name  = 'Please enter your name.'
     if (!phone.trim()) e.phone = 'Please enter your mobile number.'
     else if (!/^(09|\+639)\d{9}$/.test(phone.replace(/\s/g, '')))
       e.phone = 'Please enter a valid PH mobile number (e.g. 09171234567).'
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      e.email = 'Please enter a valid email address.'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -55,6 +60,7 @@ export default function PreferencesPage() {
     update({
       customerName:  name.trim(),
       customerPhone: phone.trim(),
+      customerEmail: email.trim() || null,
       customerNotes: notes.trim() || null,
       customerId:    customerId,
     })
@@ -121,6 +127,21 @@ export default function PreferencesPage() {
               />
               {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
               <p className="text-xs text-[#8C7B70] mt-1">Shared with your therapist after they accept the booking.</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-[#2C2420] mb-2">
+                Email <span className="text-[#8C7B70] font-normal">(optional)</span>
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })) }}
+                placeholder="e.g. juan@email.com"
+                className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
+              />
+              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+              <p className="text-xs text-[#8C7B70] mt-1">For booking confirmation and reminders.</p>
             </div>
           </div>
 

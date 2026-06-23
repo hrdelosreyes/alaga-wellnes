@@ -76,6 +76,7 @@ export default function ReviewPage() {
           genderPreference:   draft.genderPreference,
           customerName:       draft.customerName,
           customerPhone:      draft.customerPhone,
+          customerEmail:      draft.customerEmail,
           customerNotes:      draft.customerNotes,
           subtotal,
           transportFee:       TRANSPORT_FEE,

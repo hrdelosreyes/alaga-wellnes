@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createHmac } from 'crypto'
 import { createServiceClient } from '@/lib/supabase/server'
 import { sendSms, smsNewBookingAlert } from '@/lib/sms'
-import { formatDate, formatTime } from '@/lib/utils'
+import { sendEmail, emailBookingConfirmed } from '@/lib/email'
+import { formatDate, formatTime, formatPrice } from '@/lib/utils'
+import { SERVICES } from '@/lib/constants'
 
 // HitPay sends a POST with form-encoded body and an HMAC signature
 export async function POST(req: NextRequest) {
@@ -49,13 +51,14 @@ export async function POST(req: NextRequest) {
         })
         .eq('id', referenceNumber)
 
-      // Fetch booking + assigned therapist to send SMS alert
+      // Fetch booking + assigned therapist to send notifications
       const { data: booking } = await supabase
         .from('bookings')
-        .select('booking_date, time_slot, therapist_id, therapists(name, phone)')
+        .select('id, booking_date, time_slot, address, service_id, total, customer_name, customer_email, therapist_id, therapists(name, phone)')
         .eq('id', referenceNumber)
         .single()
 
+      // SMS the therapist (if already assigned)
       if (booking?.therapist_id && booking.therapists) {
         const therapist = booking.therapists as unknown as { name: string; phone: string }
         const firstName = therapist.name.split(' ')[0]
@@ -71,6 +74,21 @@ export async function POST(req: NextRequest) {
         } catch (smsErr) {
           console.error('SMS send failed:', smsErr)
         }
+      }
+
+      // Email the customer a booking confirmation
+      if (booking?.customer_email) {
+        const service = SERVICES.find(s => s.id === booking.service_id)
+        const { subject, html } = emailBookingConfirmed({
+          firstName:   (booking.customer_name ?? '').split(' ')[0] || 'there',
+          bookingId:   booking.id,
+          serviceName: service?.name ?? booking.service_id,
+          date:        formatDate(booking.booking_date),
+          time:        formatTime(booking.time_slot),
+          address:     booking.address,
+          total:       formatPrice(booking.total),
+        })
+        await sendEmail({ to: booking.customer_email, subject, html })
       }
 
     } else if (status === 'failed') {

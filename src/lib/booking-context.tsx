@@ -21,6 +21,7 @@ const EMPTY: BookingDraft = {
   customerId:       null,
   customerName:     null,
   customerPhone:    null,
+  customerEmail:    null,
   customerNotes:    null,
   hasTable:         false,
   promoCode:        null,

@@ -115,6 +115,7 @@ export interface BookingDraft {
   customerId: string | null
   customerName: string | null
   customerPhone: string | null
+  customerEmail: string | null
   customerNotes: string | null
   hasTable: boolean
   promoCode: string | null

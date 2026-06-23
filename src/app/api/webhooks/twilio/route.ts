@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { sendSms, smsBookingAccepted } from '@/lib/sms'
+import { sendEmail, emailTherapistAssigned } from '@/lib/email'
+import { formatDate, formatTime } from '@/lib/utils'
+import { SERVICES } from '@/lib/constants'
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,7 +33,7 @@ export async function POST(req: NextRequest) {
     if (text === 'ACCEPT') {
       const { data: booking } = await supabase
         .from('bookings')
-        .select('id, status')
+        .select('id, status, booking_date, time_slot, service_id, customer_name, customer_email')
         .eq('therapist_id', therapist.id)
         .eq('booking_date', today)
         .in('status', ['confirmed'])
@@ -51,6 +54,20 @@ export async function POST(req: NextRequest) {
         await sendSms(from, smsBookingAccepted({ firstName }))
       } catch (err) {
         console.error('Accepted SMS failed:', err)
+      }
+
+      // Email the customer that their therapist is confirmed
+      if (booking.customer_email) {
+        const service = SERVICES.find(s => s.id === booking.service_id)
+        const { subject, html } = emailTherapistAssigned({
+          firstName:     (booking.customer_name ?? '').split(' ')[0] || 'there',
+          bookingId:     booking.id,
+          therapistName: therapist.name,
+          serviceName:   service?.name ?? booking.service_id,
+          date:          formatDate(booking.booking_date),
+          time:          formatTime(booking.time_slot),
+        })
+        await sendEmail({ to: booking.customer_email, subject, html })
       }
 
       return twiml(`Got it ${firstName}! Booking accepted.`)

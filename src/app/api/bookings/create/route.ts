@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
       customerId, serviceId, date, timeSlot, address, unitNotes,
       cityId, barangayPsgc,
       therapistId, selectionMode, genderPreference,
-      customerName, customerPhone, customerNotes,
+      customerName, customerPhone, customerEmail, customerNotes,
       subtotal, transportFee, total,
     } = body
 
@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
         therapist_gender_pref:    genderPreference ?? 'any',
         customer_name:            customerName ?? null,
         customer_phone:           customerPhone ?? null,
+        customer_email:           customerEmail ?? null,
         customer_notes:           customerNotes ?? null,
         city_id:                  cityId ?? null,
         barangay_psgc:            barangayPsgc ?? null,
