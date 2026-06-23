@@ -20,8 +20,13 @@ export async function POST(req: NextRequest) {
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\/$/, '')
     const anonKey     = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    const appUrl      = process.env.NEXT_PUBLIC_APP_URL ?? 'https://alagawellness.care'
-    const redirectTo  = `${appUrl}${PORTAL_REDIRECT[portal]}`
+    // Derive the origin from the actual request so redirect_to matches the
+    // domain the user is on (www vs non-www), rather than a possibly-mismatched
+    // NEXT_PUBLIC_APP_URL. Fall back to the env var, then the canonical domain.
+    const origin = req.nextUrl.origin
+      || process.env.NEXT_PUBLIC_APP_URL
+      || 'https://alagawellness.care'
+    const redirectTo = `${origin}${PORTAL_REDIRECT[portal]}`
 
     // GoTrue reads redirect_to from the QUERY STRING, not the JSON body.
     const recoverUrl = `${supabaseUrl}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`
