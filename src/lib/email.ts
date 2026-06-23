@@ -181,11 +181,12 @@ export function emailBookingReminder(d: {
   date: string
   time: string
   address: string
+  whenLabel: 'today' | 'tomorrow'
 }): { subject: string; html: string } {
   return {
-    subject: `Reminder: your Alaga session is tomorrow at ${d.time}`,
+    subject: `Reminder: your Alaga session is ${d.whenLabel} at ${d.time}`,
     html: shell(
-      `See you soon, ${d.firstName}! 🌿`,
+      `See you ${d.whenLabel === 'today' ? 'later today' : 'soon'}, ${d.firstName}! 🌿`,
       `<p style="margin:0 0 4px;">This is a friendly reminder of your upcoming Alaga Wellness session.</p>
        ${detailRows([
          ['Service', d.serviceName],

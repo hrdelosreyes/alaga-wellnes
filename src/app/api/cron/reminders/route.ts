@@ -5,8 +5,10 @@ import { formatDate, formatTime } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
 
 // Daily cron (configured in vercel.json) — emails customers whose
-// confirmed/assigned session is TOMORROW (Asia/Manila). Idempotent via
-// the `reminder_sent_at` column so re-runs don't double-send.
+// confirmed/assigned session is TODAY or TOMORROW (Asia/Manila) and hasn't
+// been reminded yet. Idempotent via `reminder_sent_at` so each booking is
+// reminded exactly once. Covering both days closes the gap on same-day and
+// late bookings that a tomorrow-only query would miss (Hobby plan = 1 run/day).
 
 export async function GET(req: NextRequest) {
   // Protect: Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`
@@ -19,17 +21,19 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Tomorrow's date in Asia/Manila (UTC+8), as YYYY-MM-DD
-    const phNow = new Date(Date.now() + 8 * 60 * 60 * 1000)
-    phNow.setUTCDate(phNow.getUTCDate() + 1)
-    const tomorrow = phNow.toISOString().slice(0, 10)
+    // Today & tomorrow in Asia/Manila (UTC+8), as YYYY-MM-DD
+    const phToday = new Date(Date.now() + 8 * 60 * 60 * 1000)
+    const today = phToday.toISOString().slice(0, 10)
+    const phTomorrow = new Date(phToday)
+    phTomorrow.setUTCDate(phTomorrow.getUTCDate() + 1)
+    const tomorrow = phTomorrow.toISOString().slice(0, 10)
 
     const supabase = await createServiceClient()
 
     const { data: bookings, error } = await supabase
       .from('bookings')
       .select('id, booking_date, time_slot, address, service_id, customer_name, customer_email, reminder_sent_at, therapists(name)')
-      .eq('booking_date', tomorrow)
+      .in('booking_date', [today, tomorrow])
       .in('status', ['confirmed', 'assigned'])
       .is('reminder_sent_at', null)
       .not('customer_email', 'is', null)
@@ -51,6 +55,7 @@ export async function GET(req: NextRequest) {
         date:          formatDate(b.booking_date),
         time:          formatTime(b.time_slot),
         address:       b.address,
+        whenLabel:     b.booking_date === today ? 'today' : 'tomorrow',
       })
       const ok = await sendEmail({ to: b.customer_email as string, subject, html })
       if (ok) {
@@ -62,7 +67,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, date: tomorrow, candidates: bookings?.length ?? 0, sent })
+    return NextResponse.json({ success: true, today, tomorrow, candidates: bookings?.length ?? 0, sent })
   } catch (err) {
     console.error('Reminder cron error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
