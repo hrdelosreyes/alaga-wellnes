@@ -22,10 +22,20 @@ export default function AdminResetPasswordPage() {
 
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.updateUser({ password })
-    if (error) { setError(error.message); setLoading(false); return }
-    setDone(true)
-    setTimeout(() => router.push('/admin/login'), 3000)
+
+    // TEMP DEBUG: which user are we actually updating?
+    const { data: before } = await supabase.auth.getUser()
+    const { data: upd, error } = await supabase.auth.updateUser({ password })
+
+    const diag = {
+      sessionUser: before?.user?.email ?? null,
+      sessionUserId: before?.user?.id ?? null,
+      updatedUser: upd?.user?.email ?? null,
+      updateError: error ? `${error.status ?? ''} ${error.message}` : null,
+    }
+    setError('DEBUG: ' + JSON.stringify(diag))
+    setLoading(false)
+    return
   }
 
   return (
