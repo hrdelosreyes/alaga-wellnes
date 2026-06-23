@@ -17,27 +17,41 @@ export default function AdminResetPasswordPage() {
   const [ready,    setReady]    = useState(false)   // recovery session established?
   const [linkError, setLinkError] = useState<string | null>(null)
 
-  // Establish the recovery session: use an existing session, or exchange the
-  // PKCE ?code=… that Supabase appended to the redirect.
+  // Establish the recovery session. With the implicit (hash) flow the session
+  // is parsed from the URL hash asynchronously, so we wait for it before
+  // declaring the link invalid. Also handles a legacy PKCE ?code=… fallback.
   useEffect(() => {
     const supabase = createClient()
+    let settled = false
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+        settled = true
+        setReady(true)
+      }
+    })
 
     async function establish() {
       const { data: { session } } = await supabase.auth.getSession()
-      if (session) { setReady(true); return }
+      if (session) { settled = true; setReady(true); return }
 
+      // Legacy PKCE fallback
       const code = new URL(window.location.href).searchParams.get('code')
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
-        if (!error) { setReady(true); return }
+        if (!error) { settled = true; setReady(true); return }
         console.error('Code exchange failed:', error)
       }
-      setLinkError('This reset link is invalid or has expired, or it was opened in a different browser than the one you requested it from. Please request a new link and open it in the same browser.')
-    }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') setReady(true)
-    })
+      // Implicit flow: give detectSessionInUrl time to parse the hash + fire the
+      // auth event before deciding the link is bad.
+      setTimeout(async () => {
+        if (settled) return
+        const { data: { session: s2 } } = await supabase.auth.getSession()
+        if (s2) setReady(true)
+        else setLinkError('This reset link is invalid or has expired, or it was opened in a different browser than the one you requested it from. Please request a new link and open it in the same browser.')
+      }, 2500)
+    }
 
     establish()
     return () => subscription.unsubscribe()
