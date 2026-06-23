@@ -1,14 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createHmac, timingSafeEqual } from 'crypto'
 import { createServiceClient } from '@/lib/supabase/server'
 import { sendSms, smsBookingAccepted } from '@/lib/sms'
 import { sendEmail, emailTherapistAssigned } from '@/lib/email'
 import { formatDate, formatTime } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
 
+// Validates Twilio's X-Twilio-Signature: HMAC-SHA1 (base64) of the request URL
+// followed by the POST params sorted by key (key+value concatenated), keyed by
+// the auth token. https://www.twilio.com/docs/usage/security#validating-requests
+function isValidTwilioRequest(req: NextRequest, params: URLSearchParams): boolean {
+  const authToken = process.env.TWILIO_AUTH_TOKEN
+  if (!authToken) return false // not configured → reject (no unsigned traffic)
+
+  const signature = req.headers.get('x-twilio-signature') ?? ''
+  if (!signature) return false
+
+  // Reconstruct the exact public URL Twilio called (Vercel sits behind a proxy).
+  const proto = req.headers.get('x-forwarded-proto') ?? 'https'
+  const host  = req.headers.get('x-forwarded-host') ?? req.headers.get('host') ?? ''
+  const url   = `${proto}://${host}${new URL(req.url).pathname}`
+
+  let data = url
+  for (const key of Array.from(params.keys()).sort()) {
+    data += key + params.get(key)
+  }
+
+  const expected = createHmac('sha1', authToken).update(Buffer.from(data, 'utf-8')).digest('base64')
+  const a = Buffer.from(expected)
+  const b = Buffer.from(signature)
+  return a.length === b.length && timingSafeEqual(a, b)
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body   = await req.text()
     const params = new URLSearchParams(body)
+
+    // Reject anything not genuinely signed by Twilio.
+    if (!isValidTwilioRequest(req, params)) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 403 })
+    }
 
     const from = params.get('From') ?? ''
     const text = (params.get('Body') ?? '').trim().toUpperCase()
