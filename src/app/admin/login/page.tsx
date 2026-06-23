@@ -21,8 +21,7 @@ export default function AdminLoginPage() {
     const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
 
     if (signInError) {
-      // TEMP DEBUG: surface the real error to diagnose login failures
-      setError(`[${signInError.code ?? 'error'}] ${signInError.message}`)
+      setError('Invalid email or password.')
       setLoading(false)
       return
     }
