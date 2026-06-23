@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
-import { LogOut, MapPin, Calendar, Clock, CheckCircle2, Loader2, MessageCircle, ChevronDown, Gift } from 'lucide-react'
+import { LogOut, MapPin, Calendar, Clock, CheckCircle2, Loader2, MessageCircle, ChevronDown, Gift, Check, X, Bell, BellOff } from 'lucide-react'
 import { currentQuarter, BONUS_MIN_BOOKINGS } from '@/lib/bonus'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { Button } from '@/components/ui/button'
@@ -34,8 +34,10 @@ type Therapist = {
   referral_code: string | null
 }
 
+// 'confirmed' is handled separately (Accept / Decline). The rest map to a
+// single forward action (Check in → Check out).
 const ACTION: Record<string, { label: string; next: string; color: string } | null> = {
-  confirmed:  { label: 'Check in',  next: 'checked_in', color: 'bg-[#C4714A] text-white' },
+  confirmed:  null,
   assigned:   { label: 'Check in',  next: 'checked_in', color: 'bg-[#C4714A] text-white' },
   checked_in: { label: 'Check out', next: 'completed',  color: 'bg-[#6B8C6E] text-white' },
   en_route:   { label: 'Check in',  next: 'checked_in', color: 'bg-[#C4714A] text-white' },
@@ -45,7 +47,7 @@ const ACTION: Record<string, { label: string; next: string; color: string } | nu
 
 const STATUS_LABEL: Record<string, string> = {
   pending_payment: 'Pending payment',
-  confirmed:       'Confirmed',
+  confirmed:       'New — awaiting your response',
   assigned:        'Assigned to you',
   en_route:        'En route',
   checked_in:      'Session in progress',
@@ -54,7 +56,7 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 const STATUS_COLOR: Record<string, string> = {
-  confirmed:  'text-blue-700 bg-blue-50',
+  confirmed:  'text-[#A05938] bg-[#F2D9CC]',
   assigned:   'text-purple-700 bg-purple-50',
   en_route:   'text-indigo-700 bg-indigo-50',
   checked_in: 'text-teal-700 bg-teal-50',
@@ -73,8 +75,50 @@ export default function TherapistDashboard() {
   const [tab,               setTab]               = useState<'today' | 'upcoming'>('today')
   const [openChat,          setOpenChat]           = useState<string | null>(null)
   const [copied,            setCopied]            = useState(false)
+  const [soundOn,           setSoundOn]           = useState(true)
+
+  // New-booking sound alert: track which 'confirmed' bookings we've already
+  // seen so we only chime for genuinely new ones (not on first load).
+  const seenConfirmedRef = useRef<Set<string> | null>(null)
+  const audioCtxRef      = useRef<AudioContext | null>(null)
+  const soundOnRef       = useRef(true)
+  const therapistIdRef   = useRef<string | null>(null)
+  useEffect(() => { soundOnRef.current = soundOn }, [soundOn])
+
+  function playAlert() {
+    if (!soundOnRef.current) return
+    try {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      const ctx = audioCtxRef.current ?? new Ctx()
+      audioCtxRef.current = ctx
+      if (ctx.state === 'suspended') ctx.resume()
+      const beep = (freq: number, start: number, dur: number) => {
+        const osc  = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain); gain.connect(ctx.destination)
+        osc.type = 'sine'
+        osc.frequency.value = freq
+        const t0 = ctx.currentTime + start
+        gain.gain.setValueAtTime(0.0001, t0)
+        gain.gain.exponentialRampToValueAtTime(0.35, t0 + 0.02)
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur)
+        osc.start(t0); osc.stop(t0 + dur)
+      }
+      beep(880, 0, 0.25); beep(1175, 0.28, 0.32)  // two-tone "ding-dong"
+    } catch { /* audio not available */ }
+  }
 
   useEffect(() => { init() }, [])
+
+  // Poll for new bookings every 25s while the dashboard is open.
+  useEffect(() => {
+    if (!therapist) return
+    therapistIdRef.current = therapist.id
+    const interval = setInterval(() => {
+      if (therapistIdRef.current) loadBookings(therapistIdRef.current)
+    }, 25000)
+    return () => clearInterval(interval)
+  }, [therapist])
 
   async function init() {
     const supabase = createClient()
@@ -157,7 +201,20 @@ export default function TherapistDashboard() {
       .order('booking_date', { ascending: true })
       .order('time_slot',    { ascending: true })
 
-    setBookings((data ?? []) as BookingRow[])
+    const rows = (data ?? []) as BookingRow[]
+
+    // Detect newly-arrived bookings awaiting acceptance → chime.
+    const confirmedIds = rows.filter(b => b.status === 'confirmed').map(b => b.id)
+    if (seenConfirmedRef.current === null) {
+      // First load — seed without chiming.
+      seenConfirmedRef.current = new Set(confirmedIds)
+    } else {
+      const hasNew = confirmedIds.some(id => !seenConfirmedRef.current!.has(id))
+      if (hasNew) playAlert()
+      seenConfirmedRef.current = new Set(confirmedIds)
+    }
+
+    setBookings(rows)
     setLoading(false)
   }
 
@@ -171,6 +228,24 @@ export default function TherapistDashboard() {
 
     await supabase.from('bookings').update(update).eq('id', bookingId)
     setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: nextStatus } : b))
+    setUpdating(null)
+  }
+
+  // Therapist accepts a confirmed booking → assigned.
+  async function acceptBooking(bookingId: string) {
+    await updateStatus(bookingId, 'assigned')
+  }
+
+  // Therapist declines → unassign so admin can reassign; drop it from the list.
+  async function declineBooking(bookingId: string) {
+    setUpdating(bookingId)
+    const supabase = createClient()
+    await supabase
+      .from('bookings')
+      .update({ therapist_id: null, status: 'confirmed' })
+      .eq('id', bookingId)
+    seenConfirmedRef.current?.delete(bookingId)
+    setBookings(prev => prev.filter(b => b.id !== bookingId))
     setUpdating(null)
   }
 
@@ -218,6 +293,17 @@ export default function TherapistDashboard() {
             >
               My rates
             </a>
+            <button
+              onClick={() => {
+                const next = !soundOn
+                setSoundOn(next)
+                if (next) playAlert() // also unlocks audio on user gesture
+              }}
+              title={soundOn ? 'Booking sound on' : 'Booking sound off'}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            >
+              {soundOn ? <Bell size={16} /> : <BellOff size={16} className="text-[#C8A88A]" />}
+            </button>
             <button onClick={logout} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
               <LogOut size={16} />
             </button>
@@ -443,7 +529,32 @@ export default function TherapistDashboard() {
                     </span>
                   </div>
 
-                  {/* Action button */}
+                  {/* Accept / Decline for newly-assigned bookings */}
+                  {booking.status === 'confirmed' && (
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        className="flex-1 bg-[#6B8C6E] text-white"
+                        loading={updating === booking.id}
+                        onClick={() => acceptBooking(booking.id)}
+                      >
+                        <Check size={16} className="mr-1.5" /> Accept
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        disabled={updating === booking.id}
+                        onClick={() => {
+                          if (confirm('Decline this booking? It will be reassigned to another therapist.')) {
+                            declineBooking(booking.id)
+                          }
+                        }}
+                      >
+                        <X size={16} className="mr-1.5" /> Decline
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Action button (Check in / Check out) */}
                   {action && (
                     <Button
                       className={cn('w-full mt-3', action.color)}
