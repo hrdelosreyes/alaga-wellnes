@@ -9,23 +9,39 @@ export function AuthRedirect() {
 
   useEffect(() => {
     const supabase = createClient()
+
+    // Route a recovery/invite session to the correct set-password page based
+    // on the user's role. Admins/staff have a row in user_roles; everyone else
+    // is treated as a therapist.
+    async function routeRecovery() {
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
+      if (!user) return
+
+      const { data: roleRow } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (roleRow?.role === 'admin' || roleRow?.role === 'staff') {
+        router.push('/admin/reset-password')
+      } else {
+        router.push('/therapist/set-password')
+      }
+    }
+
     const hash = window.location.hash
     const isRecovery = hash.includes('type=recovery') || hash.includes('type=invite')
 
-    // Listen for the recovery event — fires once the hash is processed into a session.
+    // Fires once the hash is processed into a session.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        router.push('/therapist/set-password')
-      }
+      if (event === 'PASSWORD_RECOVERY') routeRecovery()
     })
 
-    // Fallback: if the hash is present, ensure the session is established
-    // (this triggers hash processing) then navigate.
-    if (isRecovery) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) router.push('/therapist/set-password')
-      })
-    }
+    // Fallback: if a recovery hash is present, ensure the session is established
+    // (this triggers hash processing) then route by role.
+    if (isRecovery) routeRecovery()
 
     return () => subscription.unsubscribe()
   }, [router])
