@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
         'Content-Type':       'application/json',
       },
       body: JSON.stringify({
-        amount:       (total / 100).toFixed(2), // HitPay expects decimal
+        amount:       total.toFixed(2), // pesos as decimal string, e.g. "1200.00"
         currency:     'PHP',
         name:         'Alaga Wellness Booking',
         description:  `Booking #${booking.id.slice(0, 8).toUpperCase()} — ${serviceId}`,
