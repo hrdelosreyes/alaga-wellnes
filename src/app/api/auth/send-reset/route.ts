@@ -23,14 +23,16 @@ export async function POST(req: NextRequest) {
     const appUrl      = process.env.NEXT_PUBLIC_APP_URL ?? 'https://alagawellness.care'
     const redirectTo  = `${appUrl}${PORTAL_REDIRECT[portal]}`
 
-    const res = await fetch(`${supabaseUrl}/auth/v1/recover`, {
+    // GoTrue reads redirect_to from the QUERY STRING, not the JSON body.
+    const recoverUrl = `${supabaseUrl}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`
+    const res = await fetch(recoverUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'apikey': anonKey,
         'Authorization': `Bearer ${anonKey}`,
       },
-      body: JSON.stringify({ email, redirect_to: redirectTo }),
+      body: JSON.stringify({ email }),
     })
 
     // Supabase returns 200 even when the email doesn't exist (to avoid leaking
