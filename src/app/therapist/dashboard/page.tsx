@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
 import { MapPin, Calendar, Clock, CheckCircle2, Loader2, MessageCircle, ChevronDown, Gift, Check, X, Bell, BellOff } from 'lucide-react'
-import { currentQuarter, BONUS_MIN_BOOKINGS } from '@/lib/bonus'
+import { currentQuarter, quarterDateRange, BONUS_MIN_BOOKINGS } from '@/lib/bonus'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { TherapistNav } from '@/components/therapist/therapist-nav'
 import { Button } from '@/components/ui/button'
@@ -224,14 +224,18 @@ export default function TherapistDashboard() {
     const paid    = (commissions ?? []).filter(c => c.status === 'paid').reduce((s, c) => s + c.amount, 0)
     setReferralEarnings({ pending, paid, referees: refCount ?? 0 })
 
-    // Alaga Bonus stats for current quarter
+    // Alaga Bonus stats for current quarter. Count completed bookings directly
+    // from the bookings table (source of truth) rather than bonus-pool rows.
     const quarter = currentQuarter()
+    const { start, end } = quarterDateRange(quarter)
     const [{ count: qBookings }, { data: bonusPayout }] = await Promise.all([
       supabase
-        .from('alaga_bonus_pool')
+        .from('bookings')
         .select('id', { count: 'exact', head: true })
         .eq('therapist_id', t.id)
-        .eq('quarter', quarter),
+        .eq('status', 'completed')
+        .gte('booking_date', start)
+        .lte('booking_date', end),
       supabase
         .from('alaga_bonus_payouts')
         .select('pool_share')
