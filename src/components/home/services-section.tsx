@@ -51,7 +51,7 @@ export function ServicesSection() {
             return (
               <div
                 key={service.id}
-                className="bg-white rounded-2xl p-6 border border-[#EDE5DF] hover:border-[#C4714A] hover:shadow-md transition-all duration-200 group"
+                className="bg-white rounded-2xl p-6 border border-[#EDE5DF] hover:border-[#C4714A] hover:shadow-md transition-all duration-200 group flex flex-col h-full"
               >
                 {service.tag && (
                   <span className="badge-tag mb-4 inline-block">{service.tag}</span>
@@ -59,7 +59,7 @@ export function ServicesSection() {
                 <h3 className="text-xl font-bold text-[#2C2420] mb-2">{service.name}</h3>
                 <p className="text-[#8C7B70] text-sm leading-relaxed mb-5">{service.description}</p>
 
-                <div className="flex items-end justify-between pt-4 border-t border-[#F2EBE6]">
+                <div className="flex items-end justify-between pt-4 border-t border-[#F2EBE6] mt-auto">
                   <div>
                     {p ? (
                       <>
