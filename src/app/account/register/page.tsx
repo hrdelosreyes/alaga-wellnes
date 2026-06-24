@@ -20,6 +20,7 @@ function RegisterPage() {
   const [loading,  setLoading]  = useState(false)
   const [errors,   setErrors]   = useState<Record<string, string>>({})
   const [error,    setError]    = useState<string | null>(null)
+  const [sent,     setSent]     = useState(false)
 
   function validate() {
     const e: Record<string, string> = {}
@@ -41,31 +42,35 @@ function RegisterPage() {
 
     const supabase = createClient()
 
-    // Create auth user
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+    // Create auth user. The customer profile is created automatically by a DB
+    // trigger from this metadata (works even when there's no session yet because
+    // email confirmation is required).
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name:        name.trim(),
+          phone:       phone.replace(/\s/g, '').replace(/^0/, '+63'),
+          is_customer: true,
+        },
+      },
+    })
     if (signUpError) {
       setError(signUpError.message)
       setLoading(false)
       return
     }
 
-    if (data.user) {
-      // Create customer profile
-      const { error: profileError } = await supabase.from('customers').insert({
-        id:    data.user.id,
-        name:  name.trim(),
-        phone: phone.replace(/\s/g, '').replace(/^0/, '+63'),
-        email: email.trim().toLowerCase(),
-      })
-      if (profileError) {
-        setError('Account created but could not save your profile. Please sign in.')
-        setLoading(false)
-        return
-      }
+    if (data.session) {
+      // Email confirmation disabled — user is signed in immediately.
+      router.push(redirectTo)
+      router.refresh()
+    } else {
+      // Email confirmation required — they must confirm before signing in.
+      setSent(true)
+      setLoading(false)
     }
-
-    router.push(redirectTo)
-    router.refresh()
   }
 
   return (
@@ -79,6 +84,22 @@ function RegisterPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-8">
+          {sent ? (
+            <div className="text-center">
+              <p className="text-3xl mb-3">📧</p>
+              <h1 className="text-xl font-bold text-[#2C2420] mb-2">Check your email</h1>
+              <p className="text-sm text-[#8C7B70] mb-6">
+                We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.
+              </p>
+              <Link
+                href={`/account/login${redirectTo !== '/account' ? `?next=${encodeURIComponent(redirectTo)}` : ''}`}
+                className="text-[#C4714A] font-semibold hover:underline text-sm"
+              >
+                Go to sign in →
+              </Link>
+            </div>
+          ) : (
+          <>
           <h1 className="text-xl font-bold text-[#2C2420] mb-1">Create account</h1>
           <p className="text-sm text-[#8C7B70] mb-6">Save your details and track your bookings.</p>
 
@@ -158,6 +179,8 @@ function RegisterPage() {
               Sign in
             </Link>
           </p>
+          </>
+          )}
         </div>
 
         <p className="text-center text-sm text-[#8C7B70] mt-6">
