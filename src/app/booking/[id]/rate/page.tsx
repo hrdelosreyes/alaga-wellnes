@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Star, Loader2, CheckCircle } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { RATING_TAGS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
@@ -32,13 +31,9 @@ export default function RatePage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('bookings')
-        .select('id, service_id, status, therapist_id, therapists(name)')
-        .eq('id', id)
-        .single()
-
+      const res = await fetch(`/api/booking/${id}`)
+      if (!res.ok) { router.replace('/'); return }
+      const { booking: data } = await res.json()
       if (!data) { router.replace('/'); return }
       if (data.status !== 'completed') { router.replace(`/booking/${id}`); return }
       setBooking(data as unknown as BookingRow)

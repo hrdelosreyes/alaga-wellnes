@@ -318,11 +318,11 @@ export default function TherapistDashboard() {
   // Therapist declines → unassign so admin can reassign; drop it from the list.
   async function declineBooking(bookingId: string) {
     setUpdating(bookingId)
-    const supabase = createClient()
-    await supabase
-      .from('bookings')
-      .update({ therapist_id: null, status: 'confirmed' })
-      .eq('id', bookingId)
+    await fetch('/api/therapist/decline-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId }),
+    })
     seenConfirmedRef.current?.delete(bookingId)
     setBookings(prev => prev.filter(b => b.id !== bookingId))
     setUpdating(null)

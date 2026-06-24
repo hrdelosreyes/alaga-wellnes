@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle, Clock, MapPin, Calendar, User, AlertCircle, Loader2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { SERVICES } from '@/lib/constants'
 import { formatPrice, formatDate, formatTime } from '@/lib/utils'
 import { ChatThread } from '@/components/chat/chat-thread'
@@ -58,32 +57,24 @@ function BookingConfirmationPage() {
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
-    fetchBooking()
-    // Subscribe to real-time status changes
-    const supabase = createClient()
-    const channel  = supabase
-      .channel(`booking-${id}`)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'bookings', filter: `id=eq.${id}` },
-        (payload) => setBooking(prev => prev ? { ...prev, ...payload.new } : prev)
-      )
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
+    fetchBooking(true)
+    // Poll for status changes (booking PII is read via a server endpoint, so
+    // the table has no public realtime/SELECT access).
+    const interval = setInterval(() => fetchBooking(false), 6000)
+    return () => clearInterval(interval)
   }, [id])
 
-  async function fetchBooking() {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('bookings')
-      .select('*, therapists(name, phone)')
-      .eq('id', id)
-      .single()
-
-    if (error || !data) { setNotFound(true); setLoading(false); return }
-    setBooking(data as BookingRow)
-    setLoading(false)
+  async function fetchBooking(first: boolean) {
+    try {
+      const res = await fetch(`/api/booking/${id}`)
+      if (!res.ok) { if (first) { setNotFound(true); setLoading(false) } return }
+      const { booking } = await res.json()
+      setBooking(booking as BookingRow)
+    } catch {
+      if (first) setNotFound(true)
+    } finally {
+      if (first) setLoading(false)
+    }
   }
 
   if (loading) {
