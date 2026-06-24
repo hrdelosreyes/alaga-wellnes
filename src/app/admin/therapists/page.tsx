@@ -18,6 +18,8 @@ type Therapist = {
   phone: string
   email: string | null
   address: string | null
+  address_barangay_psgc: string | null
+  address_barangay: string | null
   gender: string
   zone: string
   is_active: boolean
@@ -42,7 +44,8 @@ type EditState = {
   phone: string
   email: string
   gender: string
-  address: string
+  address: string               // street
+  addressBarangayPsgc: string
   cityId: string
   yearsExperience: string
   bio: string
@@ -113,15 +116,16 @@ export default function AdminTherapistsPage() {
   async function startEdit(t: Therapist) {
     setEditing(t.id)
     setEditState({
-      name:            t.name ?? '',
-      phone:           t.phone ?? '',
-      email:           t.email ?? '',
-      gender:          t.gender ?? '',
-      address:         t.address ?? '',
-      cityId:          t.cities?.id ?? '',
-      yearsExperience: String(t.years_experience ?? ''),
-      bio:             t.bio ?? '',
-      specialties:     [...t.specialties],
+      name:                t.name ?? '',
+      phone:               t.phone ?? '',
+      email:               t.email ?? '',
+      gender:              t.gender ?? '',
+      address:             t.address ?? '',
+      addressBarangayPsgc: t.address_barangay_psgc ?? '',
+      cityId:              t.cities?.id ?? '',
+      yearsExperience:     String(t.years_experience ?? ''),
+      bio:                 t.bio ?? '',
+      specialties:         [...t.specialties],
     })
     // Load all barangays for the city + current approved selections
     const cityName = t.cities?.name ?? ''
@@ -148,7 +152,9 @@ export default function AdminTherapistsPage() {
         phone:            editState.phone.trim(),
         email:            editState.email.trim().toLowerCase() || null,
         gender:           editState.gender,
-        address:          editState.address.trim() || null,
+        address:               editState.address.trim() || null,
+        address_barangay_psgc: editState.addressBarangayPsgc || null,
+        address_barangay:      saAllBarangays.find(b => b.psgc_code === editState.addressBarangayPsgc)?.name ?? null,
         city_id:          editState.cityId || null,
         zone:             cities.find(c => c.id === editState.cityId)?.name ?? '',
         years_experience: editState.yearsExperience ? parseInt(editState.yearsExperience) : null,
@@ -421,7 +427,7 @@ export default function AdminTherapistsPage() {
                             <InfoField label="Email"       value={t.email ?? '—'} />
                             <InfoField label="Phone"       value={t.phone} />
                             <InfoField label="Gender"      value={t.gender ? t.gender.charAt(0).toUpperCase() + t.gender.slice(1) : '—'} />
-                            <InfoField label="Address"     value={t.address ?? '—'} />
+                            <InfoField label="Address"     value={[t.address, t.address_barangay, t.cities?.name].filter(Boolean).join(', ') || '—'} />
                             <InfoField label="City"        value={t.cities ? `${t.cities.name}, ${t.cities.region}` : '—'} />
                             <InfoField label="Experience"  value={t.years_experience ? `${t.years_experience} years` : '—'} />
                             <InfoField label="Referral code" value={t.referral_code ?? '—'} mono />
@@ -570,16 +576,31 @@ export default function AdminTherapistsPage() {
                             </div>
                           </div>
 
-                          {/* Address */}
-                          <div>
-                            <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Address</label>
-                            <input
-                              type="text"
-                              value={editState?.address ?? ''}
-                              onChange={e => setEditState(p => p ? { ...p, address: e.target.value } : p)}
-                              placeholder="Therapist's home/contact address"
-                              className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]"
-                            />
+                          {/* Home address: barangay (from city) + street */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Home barangay</label>
+                              <select
+                                value={editState?.addressBarangayPsgc ?? ''}
+                                onChange={e => setEditState(p => p ? { ...p, addressBarangayPsgc: e.target.value } : p)}
+                                className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A] bg-white"
+                              >
+                                <option value="">Select barangay…</option>
+                                {saAllBarangays.map(b => (
+                                  <option key={b.psgc_code} value={b.psgc_code}>{b.name}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Street address</label>
+                              <input
+                                type="text"
+                                value={editState?.address ?? ''}
+                                onChange={e => setEditState(p => p ? { ...p, address: e.target.value } : p)}
+                                placeholder="e.g. 123 Mabini St."
+                                className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]"
+                              />
+                            </div>
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">

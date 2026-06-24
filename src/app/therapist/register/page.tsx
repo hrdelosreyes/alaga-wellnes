@@ -31,6 +31,8 @@ type FormData = {
   phone: string
   gender: string
   cityId: string
+  barangayPsgc: string
+  street: string
   referralCode: string
   yearsExperience: string
   specialties: string[]
@@ -43,6 +45,7 @@ type FormData = {
 
 const EMPTY: FormData = {
   name: '', email: '', phone: '', gender: '', cityId: '',
+  barangayPsgc: '', street: '',
   referralCode: '',
   yearsExperience: '', specialties: [], bio: '',
   referralSource: '',
@@ -56,6 +59,8 @@ export default function TherapistRegisterPage() {
   const [step,          setStep]          = useState(-1)
   const [form,          setForm]          = useState<FormData>(EMPTY)
   const [cities,        setCities]        = useState<City[]>([])
+  const [barangays,     setBarangays]     = useState<{ psgc_code: string; name: string }[]>([])
+  const [bgyLoading,    setBgyLoading]    = useState(false)
   const [errors,        setErrors]        = useState<Partial<Record<keyof FormData, string>>>({})
   const [referrerName,  setReferrerName]  = useState<string | null>(null)
   const [referrerId,    setReferrerId]    = useState<string | null>(null)
@@ -70,6 +75,23 @@ export default function TherapistRegisterPage() {
       .order('region').order('name')
       .then(({ data }) => setCities((data ?? []) as City[]))
   }, [])
+
+  // Load barangays whenever the selected city changes.
+  useEffect(() => {
+    if (!form.cityId) { setBarangays([]); return }
+    const city = cities.find(c => c.id === form.cityId)
+    if (!city) return
+    setBgyLoading(true)
+    createClient()
+      .from('barangays')
+      .select('psgc_code, name')
+      .in('city_name', [city.name, `City of ${city.name}`])
+      .order('name')
+      .then(({ data }) => {
+        setBarangays((data ?? []) as { psgc_code: string; name: string }[])
+        setBgyLoading(false)
+      })
+  }, [form.cityId, cities])
 
   function patch(updates: Partial<FormData>) {
     setForm(prev => ({ ...prev, ...updates }))
@@ -111,6 +133,9 @@ export default function TherapistRegisterPage() {
         e.phone = 'Enter a valid PH mobile number.'
       if (!form.gender)       e.gender = 'Please select your gender.'
       if (!form.cityId)       e.cityId = 'Please select your city.'
+      if (form.cityId && barangays.length > 0 && !form.barangayPsgc)
+        e.barangayPsgc = 'Please select your barangay.'
+      if (!form.street.trim()) e.street = 'Please enter your street address.'
     }
     if (step === 1) {
       if (form.specialties.length === 0) e.specialties     = 'Select at least one specialty.'
@@ -158,6 +183,9 @@ export default function TherapistRegisterPage() {
         gender:             form.gender,
         city_id:            form.cityId,
         zone:               cities.find(c => c.id === form.cityId)?.name ?? '',
+        address:               form.street.trim() || null,
+        address_barangay_psgc: form.barangayPsgc || null,
+        address_barangay:      barangays.find(b => b.psgc_code === form.barangayPsgc)?.name ?? null,
         years_experience:   parseInt(form.yearsExperience),
         specialties:        form.specialties,
         bio:                form.bio.trim() || null,
@@ -466,7 +494,7 @@ export default function TherapistRegisterPage() {
                 <label className="block text-sm font-semibold text-[#2C2420] mb-2">City you will serve <span className="text-red-400">*</span></label>
                 <select
                   value={form.cityId}
-                  onChange={e => patch({ cityId: e.target.value })}
+                  onChange={e => patch({ cityId: e.target.value, barangayPsgc: '' })}
                   className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors bg-white"
                 >
                   <option value="">Select a city…</option>
@@ -479,6 +507,43 @@ export default function TherapistRegisterPage() {
                   ))}
                 </select>
                 {errors.cityId && <p className="text-xs text-red-500 mt-1">{errors.cityId}</p>}
+              </div>
+
+              {/* Barangay — shown after city is selected */}
+              {form.cityId && (
+                <div>
+                  <label className="block text-sm font-semibold text-[#2C2420] mb-2">Barangay <span className="text-red-400">*</span></label>
+                  {bgyLoading ? (
+                    <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#8C7B70]">Loading barangays…</div>
+                  ) : barangays.length === 0 ? (
+                    <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#8C7B70]">No barangay data — enter it in your street address below.</div>
+                  ) : (
+                    <select
+                      value={form.barangayPsgc}
+                      onChange={e => patch({ barangayPsgc: e.target.value })}
+                      className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors bg-white"
+                    >
+                      <option value="">Select your barangay…</option>
+                      {barangays.map(b => (
+                        <option key={b.psgc_code} value={b.psgc_code}>{b.name}</option>
+                      ))}
+                    </select>
+                  )}
+                  {errors.barangayPsgc && <p className="text-xs text-red-500 mt-1">{errors.barangayPsgc}</p>}
+                </div>
+              )}
+
+              {/* Street address */}
+              <div>
+                <label className="block text-sm font-semibold text-[#2C2420] mb-2">Street address <span className="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  value={form.street}
+                  onChange={e => patch({ street: e.target.value })}
+                  placeholder="e.g. 123 Mabini St., Brgy. hall area"
+                  className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
+                />
+                {errors.street && <p className="text-xs text-red-500 mt-1">{errors.street}</p>}
               </div>
 
               {/* Referral code */}
