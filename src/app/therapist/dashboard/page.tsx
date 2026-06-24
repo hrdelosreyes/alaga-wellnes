@@ -111,6 +111,48 @@ export default function TherapistDashboard() {
     } catch { /* audio not available */ }
   }
 
+  // Flash the browser tab title so a new booking is noticed even if the tab is
+  // backgrounded or the sound is blocked. Clears when the tab regains focus.
+  const titleFlashRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  function flashTitle() {
+    if (typeof document === 'undefined') return
+    if (titleFlashRef.current) return // already flashing
+    const original = 'Alaga — Therapist'
+    let on = true
+    titleFlashRef.current = setInterval(() => {
+      document.title = on ? '🔔 New booking!' : original
+      on = !on
+    }, 1000)
+    const stop = () => {
+      if (titleFlashRef.current) { clearInterval(titleFlashRef.current); titleFlashRef.current = null }
+      document.title = original
+      window.removeEventListener('focus', stop)
+    }
+    window.addEventListener('focus', stop)
+    setTimeout(stop, 60000)
+  }
+
+  // Unlock audio on the therapist's first interaction (browsers block audio
+  // until a user gesture). After one tap/click/key, alert sounds can play.
+  useEffect(() => {
+    function unlock() {
+      try {
+        const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+        const ctx = audioCtxRef.current ?? new Ctx()
+        audioCtxRef.current = ctx
+        if (ctx.state === 'suspended') ctx.resume()
+      } catch { /* ignore */ }
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+    window.addEventListener('pointerdown', unlock)
+    window.addEventListener('keydown', unlock)
+    return () => {
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+  }, [])
+
   useEffect(() => { init() }, [])
 
   // Poll for new bookings every 25s while the dashboard is open.
@@ -213,7 +255,7 @@ export default function TherapistDashboard() {
       seenConfirmedRef.current = new Set(confirmedIds)
     } else {
       const hasNew = confirmedIds.some(id => !seenConfirmedRef.current!.has(id))
-      if (hasNew) playAlert()
+      if (hasNew) { playAlert(); flashTitle() }
       seenConfirmedRef.current = new Set(confirmedIds)
     }
 

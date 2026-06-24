@@ -38,39 +38,49 @@ export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
   useEffect(() => {
     const supabase = createClient()
 
-    // Initial load
-    supabase
-      .from('messages')
-      .select('*')
-      .eq('booking_id', bookingId)
-      .order('created_at', { ascending: true })
-      .then(({ data }) => {
-        setMessages((data ?? []) as Message[])
-        setLoading(false)
-      })
+    // Merge authoritative server messages with any still-pending optimistic
+    // ones (matched by sender+body so we don't drop or duplicate them).
+    function mergeServer(prev: Message[], server: Message[]): Message[] {
+      const serverKeys = new Set(server.map(m => `${m.sender}|${m.body}`))
+      const pending = prev.filter(m => m.id.startsWith('opt-') && !serverKeys.has(`${m.sender}|${m.body}`))
+      return [...server, ...pending].sort((a, b) => a.created_at.localeCompare(b.created_at))
+    }
 
-    // Real-time subscription
+    async function refetch(first = false) {
+      const { data } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('booking_id', bookingId)
+        .order('created_at', { ascending: true })
+      const server = (data ?? []) as Message[]
+      setMessages(prev => (first ? server : mergeServer(prev, server)))
+      if (first) setLoading(false)
+    }
+
+    refetch(true)
+
+    // Realtime (instant when the table is in the realtime publication).
     const channel = supabase
       .channel(`chat-${bookingId}`)
       .on(
         'postgres_changes',
-        {
-          event:  'INSERT',
-          schema: 'public',
-          table:  'messages',
-          filter: `booking_id=eq.${bookingId}`,
-        },
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: `booking_id=eq.${bookingId}` },
         (payload) => {
+          const incoming = payload.new as Message
           setMessages(prev => {
-            // Avoid duplicates from optimistic updates
-            if (prev.find(m => m.id === payload.new.id)) return prev
-            return [...prev, payload.new as Message]
+            if (prev.find(m => m.id === incoming.id)) return prev
+            // Replace a matching optimistic copy (our own just-sent message)
+            const withoutOpt = prev.filter(m => !(m.id.startsWith('opt-') && m.sender === incoming.sender && m.body === incoming.body))
+            return [...withoutOpt, incoming]
           })
         }
       )
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    // Polling fallback — guarantees updates even if realtime isn't enabled.
+    const interval = setInterval(() => refetch(false), 4000)
+
+    return () => { supabase.removeChannel(channel); clearInterval(interval) }
   }, [bookingId])
 
   // Scroll to bottom on new messages
