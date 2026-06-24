@@ -155,7 +155,7 @@ export default function TherapistDashboard() {
 
   useEffect(() => { init() }, [])
 
-  // Poll for new bookings every 25s while the dashboard is open.
+  // Poll for new bookings every 25s while the dashboard is open (fallback).
   useEffect(() => {
     if (!therapist) return
     therapistIdRef.current = therapist.id
@@ -163,6 +163,22 @@ export default function TherapistDashboard() {
       if (therapistIdRef.current) loadBookings(therapistIdRef.current)
     }, 25000)
     return () => clearInterval(interval)
+  }, [therapist])
+
+  // Realtime: react instantly to any change on this therapist's bookings
+  // (new assignment / payment confirmed) — loadBookings detects & chimes.
+  useEffect(() => {
+    if (!therapist) return
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`therapist-bookings-${therapist.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bookings', filter: `therapist_id=eq.${therapist.id}` },
+        () => loadBookings(therapist.id),
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [therapist])
 
   async function init() {
