@@ -90,10 +90,11 @@ export default function TherapistPage() {
     const rateMap: Record<string, number> = {}
     for (const r of rateData ?? []) rateMap[r.therapist_id] = r.rate
 
-    // Only show therapists who actually offer the selected service (have a rate set).
-    setTherapists(eligible.filter(t => rateMap[t.id] !== undefined))
+    // Show therapists who are priceable: own rate, OR a city base rate fallback.
+    const base = (cityRate as any)?.base_rate ?? null
+    setTherapists(eligible.filter(t => base != null || rateMap[t.id] !== undefined))
     setTherapistRates(rateMap)
-    setCityBaseRate((cityRate as any)?.base_rate ?? null)
+    setCityBaseRate(base)
     setLoading(false)
   }
 

@@ -96,20 +96,32 @@ export default function SchedulePage() {
         : Promise.resolve({ data: null }),
     ])
 
-    // Therapists who actually offer the selected service (have a rate set).
+    // A therapist is bookable for the service if they're priceable: either they
+    // set their own rate, OR the city has a base rate (fallback price).
     const { data: serviceRates } = await supabase
       .from('therapist_rates')
       .select('therapist_id')
       .eq('service_id', draft.serviceId)
     const offersService = new Set((serviceRates ?? []).map(r => r.therapist_id))
 
+    let cityBaseExists = false
+    if (draft.cityId) {
+      const { data: cr } = await supabase
+        .from('city_service_rates')
+        .select('base_rate')
+        .eq('city_id', draft.cityId)
+        .eq('service_id', draft.serviceId)
+        .maybeSingle()
+      cityBaseExists = cr?.base_rate != null
+    }
+
     const blockedIds  = new Set((blocked ?? []).map(a => a.therapist_id))
     const barangayIds = barangayTherapists ? new Set(barangayTherapists.map(b => b.therapist_id)) : null
 
-    // Active therapists serving the barangay, offering the service, not blocked.
+    // Active therapists serving the barangay, not blocked, and priceable.
     const eligibleIds = (therapists ?? [])
       .map(t => t.id)
-      .filter(id => (barangayIds === null || barangayIds.has(id)) && !blockedIds.has(id) && offersService.has(id))
+      .filter(id => (barangayIds === null || barangayIds.has(id)) && !blockedIds.has(id) && (cityBaseExists || offersService.has(id)))
 
     if (eligibleIds.length === 0) { setCountsLoading(false); return }
 
