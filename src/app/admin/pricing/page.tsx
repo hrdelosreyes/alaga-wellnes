@@ -122,10 +122,10 @@ export default function AdminPricingPage() {
         {/* Tier legend */}
         <div className="grid grid-cols-4 gap-3 mb-6">
           {[
-            { tier: 'NCR',  rates: '₱750–₱1,200', label: 'Metro Manila' },
-            { tier: 'HUC',  rates: '₱600–₱1,000', label: 'Major cities' },
-            { tier: 'ICC',  rates: '₱500–₱850',   label: 'Independent cities' },
-            { tier: 'CC',   rates: '₱400–₱700',   label: 'Component cities' },
+            { tier: 'NCR',  rates: '₱525–₱840',  label: 'Metro Manila' },
+            { tier: 'HUC',  rates: '₱420–₱700',  label: 'Major cities' },
+            { tier: 'ICC',  rates: '₱350–₱595',  label: 'Independent cities' },
+            { tier: 'CC',   rates: '₱280–₱490',  label: 'Component cities' },
         // Hilot rates are ₱50–₱100 above Relax within each tier
           ].map(t => (
             <div key={t.tier} className="bg-white rounded-xl border border-[#EDE5DF] p-3">
