@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
-import { LogOut, MapPin, Calendar, Clock, CheckCircle2, Loader2, MessageCircle, ChevronDown, Gift, Check, X, Bell, BellOff } from 'lucide-react'
+import { MapPin, Calendar, Clock, CheckCircle2, Loader2, MessageCircle, ChevronDown, Gift, Check, X, Bell, BellOff } from 'lucide-react'
 import { currentQuarter, BONUS_MIN_BOOKINGS } from '@/lib/bonus'
 import { ChatThread } from '@/components/chat/chat-thread'
+import { TherapistNav } from '@/components/therapist/therapist-nav'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -259,12 +260,6 @@ export default function TherapistDashboard() {
     setUpdating(null)
   }
 
-  async function logout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/therapist/login')
-  }
-
   const today    = new Date().toISOString().slice(0, 10)
   const todayBookings    = bookings.filter(b => b.booking_date === today)
   const upcomingBookings = bookings.filter(b => b.booking_date >  today)
@@ -281,8 +276,10 @@ export default function TherapistDashboard() {
   return (
     <div className="min-h-screen bg-[#F7F2EE]">
 
-      {/* Top bar */}
-      <div className="bg-[#2C2420] text-white">
+      <TherapistNav />
+
+      {/* Greeting bar */}
+      <div className="bg-[#2C2420] text-white border-t border-white/10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div>
             <h1 className="font-bold text-base text-white">Hi, {therapist?.name?.split(' ')[0]} 👋</h1>
@@ -290,34 +287,18 @@ export default function TherapistDashboard() {
               ★ {therapist?.rating_avg || '—'} · {therapist?.total_bookings ?? 0} sessions · {therapist?.zone}
             </p>
           </div>
-          <div className="flex items-center gap-1">
-            <a
-              href="/therapist/service-area"
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 transition-colors"
-            >
-              Service area
-            </a>
-            <a
-              href="/therapist/rates"
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 transition-colors"
-            >
-              My rates
-            </a>
-            <button
-              onClick={() => {
-                const next = !soundOn
-                setSoundOn(next)
-                if (next) playAlert() // also unlocks audio on user gesture
-              }}
-              title={soundOn ? 'Booking sound on' : 'Booking sound off'}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-            >
-              {soundOn ? <Bell size={16} /> : <BellOff size={16} className="text-[#C8A88A]" />}
-            </button>
-            <button onClick={logout} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-              <LogOut size={16} />
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              const next = !soundOn
+              setSoundOn(next)
+              if (next) playAlert() // also unlocks audio on user gesture
+            }}
+            title={soundOn ? 'New-booking sound on' : 'New-booking sound off'}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 transition-colors shrink-0"
+          >
+            {soundOn ? <Bell size={15} /> : <BellOff size={15} className="text-[#C8A88A]" />}
+            <span className="hidden sm:inline">{soundOn ? 'Alerts on' : 'Alerts off'}</span>
+          </button>
         </div>
       </div>
 

@@ -2,9 +2,10 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ChevronLeft, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { TherapistNav } from '@/components/therapist/therapist-nav'
 import { cn } from '@/lib/utils'
 
 type ServiceId = 'relax-60' | 'recovery-90' | 'hilot-75'
@@ -98,17 +99,10 @@ function TherapistRatesPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F2EE]">
-      <div className="bg-[#2C2420] text-white px-5 py-4 flex items-center gap-4">
-        <button onClick={() => router.push('/therapist/dashboard')} className="p-1 hover:opacity-70">
-          <ChevronLeft size={20} />
-        </button>
-        <div>
-          <h1 className="font-bold text-base">My rates</h1>
-          <p className="text-xs text-[#C8A88A]">Set what you charge per service</p>
-        </div>
-      </div>
+      <TherapistNav />
 
       <div className="max-w-lg mx-auto px-4 py-6">
+        <h1 className="text-2xl font-bold text-[#2C2420] mb-1">My rates</h1>
         <p className="text-sm text-[#8C7B70] mb-6">
           Your rates must stay within the range set for your city. Clients see your rate before booking.
         </p>
