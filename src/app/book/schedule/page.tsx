@@ -68,13 +68,14 @@ export default function SchedulePage() {
     setSlotCounts({})
     const supabase = createClient()
 
-    // Get therapists marked available for this date
-    const [{ data: avail }, { data: therapists }, { data: bookings }, { data: barangayTherapists }] = await Promise.all([
+    // Opt-out model: therapists are available by default. We only exclude
+    // dates they've explicitly BLOCKED (is_blocked = true = day off).
+    const [{ data: blocked }, { data: therapists }, { data: bookings }, { data: barangayTherapists }] = await Promise.all([
       supabase
         .from('therapist_availability')
         .select('therapist_id')
         .eq('date', date)
-        .eq('is_blocked', false),
+        .eq('is_blocked', true),
       supabase
         .from('therapists')
         .select('id')
@@ -95,14 +96,13 @@ export default function SchedulePage() {
         : Promise.resolve({ data: null }),
     ])
 
-    const availableIds  = new Set((avail ?? []).map(a => a.therapist_id))
-    const activeIds     = new Set((therapists ?? []).map(t => t.id))
-    const barangayIds   = barangayTherapists ? new Set(barangayTherapists.map(b => b.therapist_id)) : null
+    const blockedIds  = new Set((blocked ?? []).map(a => a.therapist_id))
+    const barangayIds = barangayTherapists ? new Set(barangayTherapists.map(b => b.therapist_id)) : null
 
-    // Therapists available today, active, and serving the customer's barangay
-    const eligibleIds = [...availableIds].filter(id =>
-      activeIds.has(id) && (barangayIds === null || barangayIds.has(id))
-    )
+    // Active therapists serving the customer's barangay, minus those who blocked the day
+    const eligibleIds = (therapists ?? [])
+      .map(t => t.id)
+      .filter(id => (barangayIds === null || barangayIds.has(id)) && !blockedIds.has(id))
 
     if (eligibleIds.length === 0) { setCountsLoading(false); return }
 

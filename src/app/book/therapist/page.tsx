@@ -31,33 +31,37 @@ export default function TherapistPage() {
     setLoading(true)
     const supabase = createClient()
 
-    // Get therapist IDs that have marked themselves available on the selected date
-    // (row exists and is_blocked = false)
-    const { data: availability } = await supabase
+    // Opt-out model: therapists are available by default; only those who
+    // BLOCKED this date (is_blocked = true) are excluded.
+    const { data: blocked } = await supabase
       .from('therapist_availability')
       .select('therapist_id')
       .eq('date', draft.date)
-      .eq('is_blocked', false)
+      .eq('is_blocked', true)
+    const blockedIds = new Set((blocked ?? []).map(a => a.therapist_id))
 
-    const availableIds = (availability ?? []).map(a => a.therapist_id)
-
-    if (availableIds.length === 0) {
-      setTherapists([])
-      setLoading(false)
-      return
-    }
-
-    // If the customer selected a barangay, further filter to therapists who serve it
-    let eligibleIds = availableIds
+    // If the customer selected a barangay, restrict to therapists who serve it
+    let barangayIds: Set<string> | null = null
     if (draft.barangayPsgc) {
       const { data: serviceArea } = await supabase
         .from('therapist_barangays')
         .select('therapist_id')
         .eq('barangay_psgc', draft.barangayPsgc)
         .eq('status', 'approved')
-        .in('therapist_id', availableIds)
-      eligibleIds = (serviceArea ?? []).map(r => r.therapist_id)
+      barangayIds = new Set((serviceArea ?? []).map(r => r.therapist_id))
     }
+
+    // Load active therapists, then apply barangay + not-blocked filters in JS
+    const { data: activeList } = await supabase
+      .from('therapists')
+      .select('*')
+      .eq('is_active', true)
+      .order('rating_avg', { ascending: false })
+
+    const eligible = (activeList ?? []).filter(t =>
+      (barangayIds === null || barangayIds.has(t.id)) && !blockedIds.has(t.id)
+    )
+    const eligibleIds = eligible.map(t => t.id)
 
     if (eligibleIds.length === 0) {
       setTherapists([])
@@ -65,13 +69,7 @@ export default function TherapistPage() {
       return
     }
 
-    const [{ data }, { data: rateData }, { data: cityRate }] = await Promise.all([
-      supabase
-        .from('therapists')
-        .select('*')
-        .eq('is_active', true)
-        .in('id', eligibleIds)
-        .order('rating_avg', { ascending: false }),
+    const [{ data: rateData }, { data: cityRate }] = await Promise.all([
       // Each therapist's rate for the selected service
       supabase
         .from('therapist_rates')
@@ -92,7 +90,7 @@ export default function TherapistPage() {
     const rateMap: Record<string, number> = {}
     for (const r of rateData ?? []) rateMap[r.therapist_id] = r.rate
 
-    setTherapists(data ?? [])
+    setTherapists(eligible)
     setTherapistRates(rateMap)
     setCityBaseRate((cityRate as any)?.base_rate ?? null)
     setLoading(false)
