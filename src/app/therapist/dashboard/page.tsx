@@ -77,6 +77,7 @@ export default function TherapistDashboard() {
   const [openChat,          setOpenChat]           = useState<string | null>(null)
   const [copied,            setCopied]            = useState(false)
   const [linkCopied,        setLinkCopied]        = useState(false)
+  const [igCopied,          setIgCopied]          = useState(false)
   const [soundOn,           setSoundOn]           = useState(true)
 
   // New-booking sound alert: track which 'confirmed' bookings we've already
@@ -360,17 +361,54 @@ export default function TherapistDashboard() {
             </p>
 
             {/* Shareable invite link — opens registration with the code pre-filled */}
-            <button
-              onClick={() => {
-                const link = `https://alagawellness.care/therapist/register?ref=${therapist.referral_code}`
-                navigator.clipboard.writeText(link)
-                setLinkCopied(true)
-                setTimeout(() => setLinkCopied(false), 2000)
-              }}
-              className="w-full mb-3 flex items-center justify-center gap-2 text-sm font-semibold bg-[#C4714A] hover:bg-[#b56340] text-white px-4 py-2.5 rounded-xl transition-colors"
-            >
-              {linkCopied ? '✓ Link copied!' : '🔗 Copy referral link'}
-            </button>
+            {(() => {
+              const refLink   = `https://alagawellness.care/therapist/register?ref=${therapist.referral_code}`
+              const shareText = `Join me as an Alaga Wellness therapist! Set your own rates and get home-service bookings near you. Register here: ${refLink}`
+              return (
+                <>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(refLink)
+                      setLinkCopied(true)
+                      setTimeout(() => setLinkCopied(false), 2000)
+                    }}
+                    className="w-full mb-2 flex items-center justify-center gap-2 text-sm font-semibold bg-[#C4714A] hover:bg-[#b56340] text-white px-4 py-2.5 rounded-xl transition-colors"
+                  >
+                    {linkCopied ? '✓ Link copied!' : '🔗 Copy referral link'}
+                  </button>
+
+                  {/* Quick share */}
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center py-2 rounded-xl text-xs font-semibold text-white bg-[#25D366] hover:opacity-90 transition-opacity"
+                    >WhatsApp</a>
+                    <a
+                      href={`viber://forward?text=${encodeURIComponent(shareText)}`}
+                      className="flex items-center justify-center py-2 rounded-xl text-xs font-semibold text-white bg-[#7360F2] hover:opacity-90 transition-opacity"
+                    >Viber</a>
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(refLink)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center py-2 rounded-xl text-xs font-semibold text-white bg-[#1877F2] hover:opacity-90 transition-opacity"
+                    >Facebook</a>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(refLink)
+                        setIgCopied(true)
+                        setTimeout(() => setIgCopied(false), 2500)
+                      }}
+                      title="Instagram has no direct share link — copy and paste into your IG bio, story, or DM"
+                      className="flex items-center justify-center py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-90 transition-opacity"
+                    >{igCopied ? '✓ Copied' : 'Instagram'}</button>
+                  </div>
+                  {igCopied && (
+                    <p className="text-[10px] text-[#C8A88A] -mt-1 mb-3">Link copied — paste it into your Instagram bio, story, or DM.</p>
+                  )}
+                </>
+              )
+            })()}
 
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-white/10 rounded-xl p-3 text-center">
