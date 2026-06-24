@@ -96,13 +96,20 @@ export default function SchedulePage() {
         : Promise.resolve({ data: null }),
     ])
 
+    // Therapists who actually offer the selected service (have a rate set).
+    const { data: serviceRates } = await supabase
+      .from('therapist_rates')
+      .select('therapist_id')
+      .eq('service_id', draft.serviceId)
+    const offersService = new Set((serviceRates ?? []).map(r => r.therapist_id))
+
     const blockedIds  = new Set((blocked ?? []).map(a => a.therapist_id))
     const barangayIds = barangayTherapists ? new Set(barangayTherapists.map(b => b.therapist_id)) : null
 
-    // Active therapists serving the customer's barangay, minus those who blocked the day
+    // Active therapists serving the barangay, offering the service, not blocked.
     const eligibleIds = (therapists ?? [])
       .map(t => t.id)
-      .filter(id => (barangayIds === null || barangayIds.has(id)) && !blockedIds.has(id))
+      .filter(id => (barangayIds === null || barangayIds.has(id)) && !blockedIds.has(id) && offersService.has(id))
 
     if (eligibleIds.length === 0) { setCountsLoading(false); return }
 

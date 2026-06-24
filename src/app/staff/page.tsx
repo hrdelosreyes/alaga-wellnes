@@ -226,7 +226,7 @@ export default function StaffPage() {
     if (status === 'approved' && applicant) {
       let code = generateReferralCode(applicant.name)
       for (let i = 0; i < 5; i++) {
-        const { data } = await supabase.from('therapists').select('id').eq('referral_code', code).single()
+        const { data } = await supabase.from('therapists').select('id').eq('referral_code', code).maybeSingle()
         if (!data) break
         code = generateReferralCode(applicant.name)
       }

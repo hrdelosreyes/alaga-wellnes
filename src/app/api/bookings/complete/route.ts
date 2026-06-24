@@ -43,12 +43,21 @@ export async function POST(req: NextRequest) {
       .update({ status: 'completed', checked_out_at: new Date().toISOString() })
       .eq('id', bookingId)
 
-    // Referral commissions + Alaga Bonus (both idempotent via upsert).
-    if (booking.therapist_id && booking.subtotal) {
-      await Promise.all([
-        createReferralCommissions(supabase, bookingId, booking.therapist_id, booking.subtotal),
-        recordBonusContribution(supabase, bookingId, booking.therapist_id, booking.subtotal),
-      ])
+    if (booking.therapist_id) {
+      if (booking.subtotal) {
+        // Referral commissions + Alaga Bonus (both idempotent via upsert).
+        await Promise.all([
+          createReferralCommissions(supabase, bookingId, booking.therapist_id, booking.subtotal),
+          recordBonusContribution(supabase, bookingId, booking.therapist_id, booking.subtotal),
+        ])
+      }
+      // Keep total_bookings accurate (the rating trigger only fires on rating).
+      const { count } = await supabase
+        .from('bookings')
+        .select('id', { count: 'exact', head: true })
+        .eq('therapist_id', booking.therapist_id)
+        .eq('status', 'completed')
+      await supabase.from('therapists').update({ total_bookings: count ?? 0 }).eq('id', booking.therapist_id)
     }
 
     return NextResponse.json({ ok: true })

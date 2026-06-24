@@ -20,7 +20,7 @@ export function Navbar() {
         .from('customers')
         .select('name')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
       if (data) setCustomerName(data.name.split(' ')[0]) // first name only
     })
 

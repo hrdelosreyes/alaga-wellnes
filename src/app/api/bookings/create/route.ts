@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { SERVICES } from '@/lib/constants'
+
+const TRAVEL_BUFFER = 30 // minutes between sessions for the same therapist
+const slotToMins = (s: string) => { const [h, m] = s.split(':').map(Number); return h * 60 + m }
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,6 +32,37 @@ export async function POST(req: NextRequest) {
         .maybeSingle()
       if (band && (subtotal < band.min_rate || subtotal > band.max_rate)) {
         return NextResponse.json({ error: 'Price is outside the allowed range for this city.' }, { status: 400 })
+      }
+    }
+
+    // Double-booking guard: if a specific therapist was chosen, ensure they
+    // aren't already booked (with a travel buffer) at the requested time.
+    if (therapistId) {
+      const { data: existing } = await supabase
+        .from('bookings')
+        .select('time_slot, service_id')
+        .eq('therapist_id', therapistId)
+        .eq('booking_date', date)
+        .in('status', ['confirmed', 'assigned', 'en_route', 'checked_in'])
+
+      const reqDur   = SERVICES.find(s => s.id === serviceId)?.duration ?? 60
+      const reqStart = slotToMins(timeSlot)
+      const reqEnd   = reqStart + reqDur
+
+      const conflict = (existing ?? []).some(b => {
+        if (!b.time_slot) return false
+        const bDur   = SERVICES.find(s => s.id === b.service_id)?.duration ?? 60
+        const bStart = slotToMins(b.time_slot)
+        const bEnd   = bStart + bDur
+        // Need at least TRAVEL_BUFFER between the two sessions.
+        return reqStart < bEnd + TRAVEL_BUFFER && reqEnd + TRAVEL_BUFFER > bStart
+      })
+
+      if (conflict) {
+        return NextResponse.json(
+          { error: 'This therapist was just booked for that time. Please choose another slot or therapist.' },
+          { status: 409 },
+        )
       }
     }
 

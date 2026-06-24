@@ -56,7 +56,7 @@ export default function AccountPage() {
     if (!user) { router.replace('/account/login'); return }
 
     const [{ data: profile }, { data: bks }] = await Promise.all([
-      supabase.from('customers').select('*').eq('id', user.id).single(),
+      supabase.from('customers').select('*').eq('id', user.id).maybeSingle(),
       supabase
         .from('bookings')
         .select('id, service_id, booking_date, time_slot, address, status, total, therapists(name)')
