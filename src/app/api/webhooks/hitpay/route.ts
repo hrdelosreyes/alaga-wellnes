@@ -41,6 +41,19 @@ export async function POST(req: NextRequest) {
     const supabase = await createServiceClient()
 
     if (status === 'completed') {
+      // Idempotency: both the per-request and dashboard webhooks fire (plus
+      // HitPay retries). Only process the first time — otherwise we'd send
+      // duplicate confirmation emails.
+      const { data: booking } = await supabase
+        .from('bookings')
+        .select('id, payment_status, booking_date, time_slot, address, service_id, total, customer_name, customer_email')
+        .eq('id', referenceNumber)
+        .maybeSingle()
+
+      if (!booking || booking.payment_status === 'paid') {
+        return NextResponse.json({ success: true }) // unknown or already processed
+      }
+
       await supabase
         .from('bookings')
         .update({
@@ -50,16 +63,9 @@ export async function POST(req: NextRequest) {
         })
         .eq('id', referenceNumber)
 
-      // Fetch booking to email the customer a confirmation. The assigned
-      // therapist is alerted via the dashboard (polling + sound), not SMS.
-      const { data: booking } = await supabase
-        .from('bookings')
-        .select('id, booking_date, time_slot, address, service_id, total, customer_name, customer_email')
-        .eq('id', referenceNumber)
-        .single()
-
-      // Email the customer a booking confirmation
-      if (booking?.customer_email) {
+      // Email the customer a booking confirmation. The assigned therapist is
+      // alerted via the dashboard (realtime + sound), not SMS.
+      if (booking.customer_email) {
         const service = SERVICES.find(s => s.id === booking.service_id)
         const { subject, html } = emailBookingConfirmed({
           firstName:   (booking.customer_name ?? '').split(' ')[0] || 'there',
