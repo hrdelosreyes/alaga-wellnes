@@ -82,8 +82,8 @@ export async function GET(req: NextRequest) {
   const liveMatch = matchCity(liveCities)
   if (liveMatch) {
     const { data: pricing } = await supabase
-      .from('city_pricing')
-      .select('service_id, price_min, price_max')
+      .from('city_service_rates')
+      .select('service_id, price_min:min_rate, price_max:max_rate')
       .eq('city_id', liveMatch.id)
 
     const debug = searchParams.get('debug') === '1'
@@ -124,8 +124,8 @@ export async function GET(req: NextRequest) {
   // No detection at all — fall back to first live city
   const fallback = liveCities[0]
   const { data: pricing } = await supabase
-    .from('city_pricing')
-    .select('service_id, price_min, price_max')
+    .from('city_service_rates')
+    .select('service_id, price_min:min_rate, price_max:max_rate')
     .eq('city_id', fallback.id)
 
   return NextResponse.json({

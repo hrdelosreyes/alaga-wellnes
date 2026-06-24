@@ -87,7 +87,10 @@ export function ServicesSection() {
           })}
         </div>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center flex flex-col gap-2">
+          <p className="text-xs text-[#8C7B70]">
+            💡 Each therapist sets their own rate within this range — you&rsquo;ll see exact prices when you choose your therapist.
+          </p>
           <p className="text-sm text-[#8C7B70]">
             More services coming soon — Postpartum Care, Senior Care, and more.
           </p>

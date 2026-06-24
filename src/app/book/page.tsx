@@ -5,6 +5,7 @@ import { Clock, Leaf } from 'lucide-react'
 import { ProgressBar } from '@/components/booking/progress-bar'
 import { Button } from '@/components/ui/button'
 import { useBooking } from '@/lib/booking-context'
+import { useGeoCity } from '@/components/geo/city-context'
 import { SERVICES } from '@/lib/constants'
 import { formatPrice, cn } from '@/lib/utils'
 import type { ServiceId } from '@/types'
@@ -12,6 +13,7 @@ import type { ServiceId } from '@/types'
 export default function BookServicePage() {
   const router = useRouter()
   const { draft, update } = useBooking()
+  const { pricing } = useGeoCity()
 
   function select(id: ServiceId) {
     update({ serviceId: id })
@@ -28,11 +30,13 @@ export default function BookServicePage() {
 
       <div className="container-alaga py-12 max-w-2xl">
         <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Choose your service</h1>
-        <p className="text-[#8C7B70] mb-8">All sessions include a verified therapist, premium oils, and towels. Final price is set by your city and therapist.</p>
+        <p className="text-[#8C7B70] mb-8">All sessions include a verified therapist, premium oils, and towels. Prices show the range for your area — each therapist sets their exact rate within it.</p>
 
         <div className="flex flex-col gap-4">
           {SERVICES.map((service) => {
             const selected = draft.serviceId === service.id
+            const p = pricing.find(x => x.service_id === service.id)
+            const hasRange = !!p && p.price_max > p.price_min
 
             return (
               <button
@@ -69,8 +73,17 @@ export default function BookServicePage() {
                   </div>
 
                   <div className="text-right flex-shrink-0">
-                    <div className="text-2xl font-bold text-[#2C2420]">{formatPrice(service.price)}</div>
-                    <div className="text-xs text-[#8C7B70]">guide price</div>
+                    {hasRange ? (
+                      <>
+                        <div className="text-xl font-bold text-[#2C2420] whitespace-nowrap">{formatPrice(p!.price_min)}–{formatPrice(p!.price_max)}</div>
+                        <div className="text-xs text-[#8C7B70]">price range</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold text-[#2C2420]">{formatPrice(p ? p.price_min : service.price)}</div>
+                        <div className="text-xs text-[#8C7B70]">guide price</div>
+                      </>
+                    )}
                     {/* Radio indicator */}
                     <div className={cn(
                       'w-5 h-5 rounded-full border-2 mt-3 ml-auto transition-colors',
