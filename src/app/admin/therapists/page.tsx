@@ -16,6 +16,8 @@ type Therapist = {
   id: string
   name: string
   phone: string
+  email: string | null
+  address: string | null
   gender: string
   zone: string
   is_active: boolean
@@ -36,6 +38,11 @@ type Therapist = {
 }
 
 type EditState = {
+  name: string
+  phone: string
+  email: string
+  gender: string
+  address: string
   cityId: string
   yearsExperience: string
   bio: string
@@ -106,6 +113,11 @@ export default function AdminTherapistsPage() {
   async function startEdit(t: Therapist) {
     setEditing(t.id)
     setEditState({
+      name:            t.name ?? '',
+      phone:           t.phone ?? '',
+      email:           t.email ?? '',
+      gender:          t.gender ?? '',
+      address:         t.address ?? '',
       cityId:          t.cities?.id ?? '',
       yearsExperience: String(t.years_experience ?? ''),
       bio:             t.bio ?? '',
@@ -132,6 +144,11 @@ export default function AdminTherapistsPage() {
     const { error: updateError } = await supabase
       .from('therapists')
       .update({
+        name:             editState.name.trim(),
+        phone:            editState.phone.trim(),
+        email:            editState.email.trim().toLowerCase() || null,
+        gender:           editState.gender,
+        address:          editState.address.trim() || null,
         city_id:          editState.cityId || null,
         zone:             cities.find(c => c.id === editState.cityId)?.name ?? '',
         years_experience: editState.yearsExperience ? parseInt(editState.yearsExperience) : null,
@@ -401,7 +418,10 @@ export default function AdminTherapistsPage() {
                         <>
                           {/* Info grid */}
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                            <InfoField label="Email"       value={t.email ?? '—'} />
                             <InfoField label="Phone"       value={t.phone} />
+                            <InfoField label="Gender"      value={t.gender ? t.gender.charAt(0).toUpperCase() + t.gender.slice(1) : '—'} />
+                            <InfoField label="Address"     value={t.address ?? '—'} />
                             <InfoField label="City"        value={t.cities ? `${t.cities.name}, ${t.cities.region}` : '—'} />
                             <InfoField label="Experience"  value={t.years_experience ? `${t.years_experience} years` : '—'} />
                             <InfoField label="Referral code" value={t.referral_code ?? '—'} mono />
@@ -500,6 +520,67 @@ export default function AdminTherapistsPage() {
                         /* Edit form */
                         <div className="flex flex-col gap-4">
                           <p className="text-sm font-bold text-[#2C2420]">Edit therapist details</p>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            {/* Name */}
+                            <div>
+                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Full name</label>
+                              <input
+                                type="text"
+                                value={editState?.name ?? ''}
+                                onChange={e => setEditState(p => p ? { ...p, name: e.target.value } : p)}
+                                className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]"
+                              />
+                            </div>
+
+                            {/* Gender */}
+                            <div>
+                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Gender</label>
+                              <select
+                                value={editState?.gender ?? ''}
+                                onChange={e => setEditState(p => p ? { ...p, gender: e.target.value } : p)}
+                                className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A] bg-white"
+                              >
+                                <option value="">Select…</option>
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                              </select>
+                            </div>
+
+                            {/* Phone */}
+                            <div>
+                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Mobile number</label>
+                              <input
+                                type="tel"
+                                value={editState?.phone ?? ''}
+                                onChange={e => setEditState(p => p ? { ...p, phone: e.target.value } : p)}
+                                className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]"
+                              />
+                            </div>
+
+                            {/* Email */}
+                            <div>
+                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Email</label>
+                              <input
+                                type="email"
+                                value={editState?.email ?? ''}
+                                onChange={e => setEditState(p => p ? { ...p, email: e.target.value } : p)}
+                                className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Address */}
+                          <div>
+                            <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Address</label>
+                            <input
+                              type="text"
+                              value={editState?.address ?? ''}
+                              onChange={e => setEditState(p => p ? { ...p, address: e.target.value } : p)}
+                              placeholder="Therapist's home/contact address"
+                              className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]"
+                            />
+                          </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             {/* City */}
