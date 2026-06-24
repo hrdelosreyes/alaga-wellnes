@@ -1,28 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { createReferralCommissions } from '@/lib/referral'
 import { recordBonusContribution } from '@/lib/bonus'
 
+// Marks a booking completed and runs referral commissions + Alaga Bonus.
+// Authorized for the booking's assigned therapist OR an admin/staff user.
 export async function POST(req: NextRequest) {
   try {
     const { bookingId } = await req.json()
     if (!bookingId) return NextResponse.json({ error: 'Missing bookingId' }, { status: 400 })
 
+    const authed = await createClient()
+    const { data: { user } } = await authed.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const supabase = await createServiceClient()
 
-    // Fetch the booking to get therapist and subtotal
-    const { data: booking, error } = await supabase
+    const { data: booking } = await supabase
       .from('bookings')
-      .update({ status: 'completed' })
+      .select('id, status, therapist_id, subtotal')
       .eq('id', bookingId)
-      .select('therapist_id, subtotal')
-      .single()
+      .maybeSingle()
+    if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
-    if (error || !booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
+    // Authorize: admin/staff, or the therapist assigned to this booking.
+    const { data: role } = await supabase
+      .from('user_roles').select('role').eq('user_id', user.id).maybeSingle()
+    const isStaff = role?.role === 'admin' || role?.role === 'staff'
+
+    let isOwnTherapist = false
+    if (!isStaff && booking.therapist_id) {
+      const { data: t } = await supabase
+        .from('therapists').select('id').eq('email', user.email).maybeSingle()
+      isOwnTherapist = t?.id === booking.therapist_id
+    }
+    if (!isStaff && !isOwnTherapist) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    // Calculate referral commissions + record Alaga Bonus contribution
+    await supabase
+      .from('bookings')
+      .update({ status: 'completed', checked_out_at: new Date().toISOString() })
+      .eq('id', bookingId)
+
+    // Referral commissions + Alaga Bonus (both idempotent via upsert).
     if (booking.therapist_id && booking.subtotal) {
       await Promise.all([
         createReferralCommissions(supabase, bookingId, booking.therapist_id, booking.subtotal),

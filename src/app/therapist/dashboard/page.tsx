@@ -281,13 +281,21 @@ export default function TherapistDashboard() {
 
   async function updateStatus(bookingId: string, nextStatus: string) {
     setUpdating(bookingId)
-    const supabase = createClient()
 
-    const update: Record<string, unknown> = { status: nextStatus }
-    if (nextStatus === 'checked_in') update.checked_in_at  = new Date().toISOString()
-    if (nextStatus === 'completed')  update.checked_out_at = new Date().toISOString()
+    if (nextStatus === 'completed') {
+      // Server route marks completed AND runs referral commissions + Alaga Bonus.
+      await fetch('/api/bookings/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId }),
+      })
+    } else {
+      const supabase = createClient()
+      const update: Record<string, unknown> = { status: nextStatus }
+      if (nextStatus === 'checked_in') update.checked_in_at = new Date().toISOString()
+      await supabase.from('bookings').update(update).eq('id', bookingId)
+    }
 
-    await supabase.from('bookings').update(update).eq('id', bookingId)
     setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: nextStatus } : b))
     setUpdating(null)
   }
