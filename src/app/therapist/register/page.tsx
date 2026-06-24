@@ -76,6 +76,16 @@ export default function TherapistRegisterPage() {
       .then(({ data }) => setCities((data ?? []) as City[]))
   }, [])
 
+  // Pre-fill referral code from a shared link (?ref=CODE).
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get('ref')
+    if (ref) {
+      const code = ref.trim().toUpperCase()
+      patch({ referralCode: code })
+      lookupReferralCode(code)
+    }
+  }, [])
+
   // Load barangays whenever the selected city changes.
   useEffect(() => {
     if (!form.cityId) { setBarangays([]); return }

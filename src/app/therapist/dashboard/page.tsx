@@ -76,6 +76,7 @@ export default function TherapistDashboard() {
   const [tab,               setTab]               = useState<'today' | 'upcoming'>('today')
   const [openChat,          setOpenChat]           = useState<string | null>(null)
   const [copied,            setCopied]            = useState(false)
+  const [linkCopied,        setLinkCopied]        = useState(false)
   const [soundOn,           setSoundOn]           = useState(true)
 
   // New-booking sound alert: track which 'confirmed' bookings we've already
@@ -357,6 +358,20 @@ export default function TherapistDashboard() {
             <p className="text-xs text-[#C8A88A] mb-3">
               Earn 5% of every booking from therapists you invite — for their first 100 bookings. Works 2 levels deep.
             </p>
+
+            {/* Shareable invite link — opens registration with the code pre-filled */}
+            <button
+              onClick={() => {
+                const link = `https://alagawellness.care/therapist/register?ref=${therapist.referral_code}`
+                navigator.clipboard.writeText(link)
+                setLinkCopied(true)
+                setTimeout(() => setLinkCopied(false), 2000)
+              }}
+              className="w-full mb-3 flex items-center justify-center gap-2 text-sm font-semibold bg-[#C4714A] hover:bg-[#b56340] text-white px-4 py-2.5 rounded-xl transition-colors"
+            >
+              {linkCopied ? '✓ Link copied!' : '🔗 Copy referral link'}
+            </button>
+
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-white/10 rounded-xl p-3 text-center">
                 <p className="text-lg font-bold">{referralEarnings.referees}</p>
