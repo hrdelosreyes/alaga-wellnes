@@ -26,6 +26,7 @@ export const SERVICES: Service[] = [
     price: 909,
     therapistPayout: 525,
     description: 'Deep tissue massage targeting back, shoulders, and neck tension.',
+    tag: 'Deep Tissue',
   },
 ]
 
