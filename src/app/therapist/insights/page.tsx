@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 
 type Insights = {
   earnings: { thisWeek: number; thisMonth: number; lastMonth: number; allTime: number; avgPerSession: number }
-  volume:   { sessionsThisWeek: number; sessionsThisMonth: number; completed: number; cancelled: number; completionRate: number | null }
+  volume:   { sessionsThisWeek: number; sessionsThisMonth: number; completed: number; cancelled: number; completionRate: number | null; accepted: number; declined: number; acceptanceRate: number | null }
   perService: Record<string, { count: number; earned: number }>
   customers: { unique: number; repeat: number }
   reviews:  {
@@ -94,9 +94,14 @@ export default function TherapistInsightsPage() {
         <section>
           <h2 className="text-sm font-bold text-[#2C2420] mb-3">Business health</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Stat label="Sessions this week" value={String(volume.sessionsThisWeek)} />
             <Stat label="Sessions this month" value={String(volume.sessionsThisMonth)} />
             <Stat label="Completed (all)" value={String(volume.completed)} accent="text-[#6B8C6E]" />
+            <Stat
+              label="Acceptance rate"
+              value={volume.acceptanceRate !== null ? `${volume.acceptanceRate}%` : '—'}
+              accent="text-[#C4714A]"
+              sub={volume.acceptanceRate !== null ? `${volume.accepted} accepted · ${volume.declined} declined` : 'No responses yet'}
+            />
             <Stat
               label="Completion rate"
               value={volume.completionRate !== null ? `${volume.completionRate}%` : '—'}

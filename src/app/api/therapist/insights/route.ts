@@ -18,7 +18,7 @@ export async function GET() {
   const { data: t } = await svc.from('therapists').select('id').eq('email', user.email).maybeSingle()
   if (!t) return NextResponse.json({ error: 'Therapist not found' }, { status: 403 })
 
-  const [{ data: completed }, { count: cancelledCount }, { data: ratings }] = await Promise.all([
+  const [{ data: completed }, { count: cancelledCount }, { data: ratings }, { data: responses }] = await Promise.all([
     svc.from('bookings')
       .select('subtotal, service_id, booking_date, customer_phone')
       .eq('therapist_id', t.id).eq('status', 'completed'),
@@ -28,6 +28,9 @@ export async function GET() {
     svc.from('ratings')
       .select('stars, tags, review_text, created_at')
       .eq('therapist_id', t.id).order('created_at', { ascending: false }),
+    svc.from('therapist_responses')
+      .select('response')
+      .eq('therapist_id', t.id),
   ])
 
   const comp = completed ?? []
@@ -53,6 +56,9 @@ export async function GET() {
 
   const totalCancelled = cancelledCount ?? 0
 
+  const accepted = (responses ?? []).filter(r => r.response === 'accepted').length
+  const declined = (responses ?? []).filter(r => r.response === 'declined').length
+
   const volume = {
     sessionsThisWeek:  comp.filter(b => b.booking_date >= weekAgo).length,
     sessionsThisMonth: comp.filter(b => b.booking_date >= thisMonthStart).length,
@@ -60,6 +66,11 @@ export async function GET() {
     cancelled:         totalCancelled,
     completionRate:    comp.length + totalCancelled > 0
       ? Math.round((comp.length / (comp.length + totalCancelled)) * 100)
+      : null,
+    accepted,
+    declined,
+    acceptanceRate:    accepted + declined > 0
+      ? Math.round((accepted / (accepted + declined)) * 100)
       : null,
   }
 

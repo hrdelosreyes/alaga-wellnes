@@ -24,6 +24,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     }
 
+    // Log the response (before nulling therapist_id) for acceptance-rate tracking.
+    await svc.from('therapist_responses').insert({
+      therapist_id: therapist.id, booking_id: bookingId, response: 'declined',
+    })
+
     await svc.from('bookings').update({ therapist_id: null, status: 'confirmed' }).eq('id', bookingId)
     return NextResponse.json({ success: true })
   } catch (err) {

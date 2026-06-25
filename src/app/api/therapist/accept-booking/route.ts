@@ -39,6 +39,11 @@ export async function POST(req: NextRequest) {
 
     await svc.from('bookings').update({ status: 'assigned' }).eq('id', bookingId)
 
+    // Log the response for acceptance-rate tracking.
+    await svc.from('therapist_responses').insert({
+      therapist_id: therapist.id, booking_id: booking.id, response: 'accepted',
+    })
+
     // Notify the customer.
     if (booking.customer_email) {
       const service = SERVICES.find(s => s.id === booking.service_id)
