@@ -6,12 +6,13 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, MapPin, DollarSign, Wallet, Users, Gift, ChevronRight } from 'lucide-react'
 
-type Screen = 'loading' | 'earnings' | 'referral' | 'bonus' | 'setup'
+type Screen = 'loading' | 'founding' | 'earnings' | 'referral' | 'bonus' | 'setup'
 
 export default function TherapistOnboardingPage() {
   const router  = useRouter()
-  const [screen, setScreen] = useState<Screen>('loading')
-  const [name,   setName]   = useState('')
+  const [screen,   setScreen]   = useState<Screen>('loading')
+  const [name,     setName]     = useState('')
+  const [cityName, setCityName] = useState('')
 
   useEffect(() => {
     async function init() {
@@ -21,7 +22,7 @@ export default function TherapistOnboardingPage() {
 
       const { data: t } = await supabase
         .from('therapists')
-        .select('id, name, application_status')
+        .select('id, name, application_status, city_id, cities(name)')
         .eq('email', user.email)
         .single()
 
@@ -41,7 +42,25 @@ export default function TherapistOnboardingPage() {
       }
 
       setName(t.name.split(' ')[0])
-      setScreen('earnings')
+
+      // Founding-city guard: a therapist can register in a city before it's set
+      // up for bookings. If there are no rate bands or barangay data for their
+      // city yet, the rates/service-area steps would be a dead-end — so show a
+      // friendly "founding list" screen instead of a broken setup flow.
+      const city = Array.isArray(t.cities) ? t.cities[0] : t.cities
+      const cName = city?.name ?? ''
+      setCityName(cName)
+
+      let cityReady = false
+      if (t.city_id) {
+        const [{ count: rateCount }, { count: bgyCount }] = await Promise.all([
+          supabase.from('city_service_rates').select('city_id', { count: 'exact', head: true }).eq('city_id', t.city_id),
+          supabase.from('barangays').select('psgc_code', { count: 'exact', head: true }).in('city_name', [cName, `City of ${cName}`]),
+        ])
+        cityReady = (rateCount ?? 0) > 0 && (bgyCount ?? 0) > 0
+      }
+
+      setScreen(cityReady ? 'earnings' : 'founding')
     }
     init()
   }, [router])
@@ -50,6 +69,46 @@ export default function TherapistOnboardingPage() {
     return (
       <div className="min-h-screen bg-[#FBF6F0] flex items-center justify-center">
         <p className="text-[#8C7B70] text-sm">Loading…</p>
+      </div>
+    )
+  }
+
+  // ── Founding-city screen: approved, but their city isn't open yet ──
+  if (screen === 'founding') {
+    return (
+      <div className="min-h-screen bg-[#FBF6F0] flex flex-col items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <img src="/logo-vertical.png" alt="Alaga Wellness" className="h-20 w-auto mx-auto" />
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#EDE5DF] p-8 text-center">
+            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#FDF3D8] mx-auto mb-6">
+              <Gift size={28} className="text-[#C9A84C]" />
+            </div>
+
+            <h1 className="text-xl font-bold text-[#2C2420] mb-2">
+              You&rsquo;re approved, {name}! 🎉
+            </h1>
+            <p className="text-sm text-[#8C7B70] mb-5">
+              {cityName ? <>You&rsquo;re a <strong>founding therapist</strong> for {cityName}.</> : <>You&rsquo;re a <strong>founding therapist</strong>.</>}{' '}
+              We&rsquo;re still gathering enough therapists in your area to open it for bookings.
+            </p>
+
+            <div className="bg-[#FBF6F0] rounded-2xl p-5 mb-6 text-left">
+              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">What happens next</p>
+              <ul className="flex flex-col gap-2.5 text-sm text-[#5C4B45]">
+                <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-[#6B8C6E] mt-0.5 flex-shrink-0" /> Your spot is reserved — no need to register again.</li>
+                <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-[#6B8C6E] mt-0.5 flex-shrink-0" /> We&rsquo;ll email you the moment {cityName || 'your city'} goes live.</li>
+                <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-[#6B8C6E] mt-0.5 flex-shrink-0" /> Then you&rsquo;ll set your rates and service area and start receiving bookings.</li>
+              </ul>
+            </div>
+
+            <p className="text-xs text-[#8C7B70]">
+              Want to help your city open sooner? Invite other therapists near you — the more who join, the faster {cityName || 'it'} launches.
+            </p>
+          </div>
+        </div>
       </div>
     )
   }
