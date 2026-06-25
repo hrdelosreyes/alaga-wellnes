@@ -2,24 +2,54 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutDashboard, Wallet, MapPin, CalendarDays, BarChart3, Banknote, UserCircle, History, LogOut } from 'lucide-react'
+import {
+  LayoutDashboard, Wallet, MapPin, CalendarDays, BarChart3, Banknote,
+  UserCircle, History, Settings, ChevronDown, LogOut,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const LINKS = [
-  { href: '/therapist/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
-  { href: '/therapist/history',      label: 'History',      icon: History },
-  { href: '/therapist/insights',     label: 'Insights',     icon: BarChart3 },
-  { href: '/therapist/availability', label: 'Availability', icon: CalendarDays },
-  { href: '/therapist/rates',        label: 'My rates',     icon: Wallet },
-  { href: '/therapist/payout',       label: 'Payout',       icon: Banknote },
-  { href: '/therapist/service-area', label: 'Service area', icon: MapPin },
-  { href: '/therapist/profile',      label: 'Profile',      icon: UserCircle },
+type Item = { href: string; label: string; icon: React.ComponentType<{ size?: number }> }
+type Group = { label: string; icon: React.ComponentType<{ size?: number }>; items: Item[] }
+
+const DASHBOARD: Item = { href: '/therapist/dashboard', label: 'Dashboard', icon: LayoutDashboard }
+
+const GROUPS: Group[] = [
+  {
+    label: 'Business', icon: BarChart3,
+    items: [
+      { href: '/therapist/insights', label: 'Insights', icon: BarChart3 },
+      { href: '/therapist/history',  label: 'History',  icon: History },
+      { href: '/therapist/payout',   label: 'Payout',   icon: Banknote },
+    ],
+  },
+  {
+    label: 'Settings', icon: Settings,
+    items: [
+      { href: '/therapist/profile',      label: 'Profile',      icon: UserCircle },
+      { href: '/therapist/availability', label: 'Availability', icon: CalendarDays },
+      { href: '/therapist/rates',        label: 'My rates',     icon: Wallet },
+      { href: '/therapist/service-area', label: 'Service area', icon: MapPin },
+    ],
+  },
 ]
 
 export function TherapistNav() {
   const pathname = usePathname()
   const router   = useRouter()
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
+  const navRef = useRef<HTMLElement | null>(null)
+
+  // Close any open dropdown on outside click or route change.
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) setOpenMenu(null)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [])
+  useEffect(() => { setOpenMenu(null) }, [pathname])
 
   async function logout() {
     await createClient().auth.signOut()
@@ -33,23 +63,62 @@ export function TherapistNav() {
           alaga <span className="text-[#C4714A]">pro</span>
         </Link>
 
-        <nav className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto">
-          {LINKS.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href
+        <nav ref={navRef} className="flex items-center gap-1">
+          {/* Dashboard */}
+          <Link
+            href={DASHBOARD.href}
+            className={cn(
+              'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shrink-0',
+              pathname === DASHBOARD.href ? 'bg-white/15 text-white' : 'text-[#C8A88A] hover:bg-white/10 hover:text-white',
+            )}
+          >
+            <DASHBOARD.icon size={15} />
+            <span className="hidden sm:inline">{DASHBOARD.label}</span>
+          </Link>
+
+          {/* Grouped dropdowns */}
+          {GROUPS.map(group => {
+            const groupActive = group.items.some(i => i.href === pathname)
+            const isOpen      = openMenu === group.label
             return (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shrink-0',
-                  active ? 'bg-white/15 text-white' : 'text-[#C8A88A] hover:bg-white/10 hover:text-white',
+              <div key={group.label} className="relative shrink-0">
+                <button
+                  onClick={() => setOpenMenu(isOpen ? null : group.label)}
+                  className={cn(
+                    'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors',
+                    groupActive || isOpen ? 'bg-white/15 text-white' : 'text-[#C8A88A] hover:bg-white/10 hover:text-white',
+                  )}
+                >
+                  <group.icon size={15} />
+                  <span>{group.label}</span>
+                  <ChevronDown size={13} className={cn('transition-transform', isOpen && 'rotate-180')} />
+                </button>
+
+                {isOpen && (
+                  <div className="absolute right-0 mt-1.5 w-44 bg-white rounded-xl shadow-lg border border-[#EDE5DF] py-1.5 z-40">
+                    {group.items.map(item => {
+                      const active = pathname === item.href
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setOpenMenu(null)}
+                          className={cn(
+                            'flex items-center gap-2.5 px-3.5 py-2 text-sm transition-colors',
+                            active ? 'text-[#C4714A] font-semibold bg-[#FBF6F0]' : 'text-[#5C4B45] hover:bg-[#FBF6F0]',
+                          )}
+                        >
+                          <item.icon size={15} />
+                          {item.label}
+                        </Link>
+                      )
+                    })}
+                  </div>
                 )}
-              >
-                <Icon size={15} />
-                <span className="hidden sm:inline">{label}</span>
-              </Link>
+              </div>
             )
           })}
+
           <button
             onClick={logout}
             title="Sign out"
