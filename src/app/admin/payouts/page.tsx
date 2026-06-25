@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { formatPrice } from '@/lib/utils'
 import { AdminNav } from '@/components/layout/admin-nav'
-import { Loader2, Wallet } from 'lucide-react'
+import { Loader2, Wallet, AlertCircle, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type Row = {
   therapist_id: string
@@ -11,12 +12,32 @@ type Row = {
   earned: number
   paidOut: number
   pending: number
+  payout_method: string | null
+  payout_account_name: string | null
+  payout_account_number: string | null
+  payout_bank_name: string | null
+}
+
+const MIN_PAYOUT = 500
+
+function destinationLabel(row: Row): string | null {
+  if (!row.payout_method) return null
+  const label = row.payout_method === 'gcash' ? 'GCash'
+    : row.payout_method === 'maya' ? 'Maya'
+    : (row.payout_bank_name || 'Bank')
+  return [label, row.payout_account_number, row.payout_account_name].filter(Boolean).join(' · ')
 }
 
 export default function AdminPayoutsPage() {
   const [rows,    setRows]    = useState<Row[]>([])
   const [loading, setLoading] = useState(true)
-  const [paying,  setPaying]  = useState<string | null>(null)
+  const [paying,  setPaying]  = useState(false)
+  const [error,   setError]   = useState<string | null>(null)
+
+  // Modal state
+  const [active,    setActive]    = useState<Row | null>(null)
+  const [amount,    setAmount]    = useState('')
+  const [reference, setReference] = useState('')
 
   useEffect(() => { load() }, [])
 
@@ -28,28 +49,33 @@ export default function AdminPayoutsPage() {
     setLoading(false)
   }
 
-  async function recordPayout(row: Row) {
-    const input = window.prompt(
-      `Record a payout to ${row.name}.\nPending balance: ${formatPrice(row.pending)}\n\nEnter amount to pay (₱):`,
-      String(row.pending),
-    )
-    if (input === null) return
-    const amount = Math.round(Number(input))
-    if (!amount || amount <= 0) { alert('Enter a positive amount.'); return }
+  function openModal(row: Row) {
+    setActive(row)
+    setAmount(String(row.pending))
+    setReference('')
+    setError(null)
+  }
 
-    setPaying(row.therapist_id)
+  async function submitPayout() {
+    if (!active) return
+    const amt = Math.round(Number(amount))
+    if (!amt || amt <= 0) { setError('Enter a positive amount.'); return }
+
+    setPaying(true)
+    setError(null)
     const res = await fetch('/api/admin/payouts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ therapistId: row.therapist_id, amount }),
+      body: JSON.stringify({ therapistId: active.therapist_id, amount: amt, referenceNo: reference }),
     })
+    setPaying(false)
     if (!res.ok) {
       const d = await res.json().catch(() => ({}))
-      alert(d.error ?? 'Could not record payout.')
-    } else {
-      await load()
+      setError(d.error ?? 'Could not record payout.')
+      return
     }
-    setPaying(null)
+    setActive(null)
+    await load()
   }
 
   const totalPending = rows.reduce((s, r) => s + r.pending, 0)
@@ -65,7 +91,10 @@ export default function AdminPayoutsPage() {
           <Wallet size={20} className="text-[#C4714A]" />
           <h1 className="text-2xl font-bold text-[#2C2420]">Therapist payouts</h1>
         </div>
-        <p className="text-sm text-[#8C7B70] mb-6">Session take-home is 75% of each completed booking. Record payouts as you send them.</p>
+        <p className="text-sm text-[#8C7B70] mb-6">
+          Take-home is 75% of each completed booking. Pay weekly via the therapist&rsquo;s saved method,
+          then record the transaction reference here. Suggested minimum per payout: {formatPrice(MIN_PAYOUT)}.
+        </p>
 
         {/* Summary */}
         <div className="grid grid-cols-3 gap-3 mb-6">
@@ -89,30 +118,102 @@ export default function AdminPayoutsPage() {
           <div className="text-center py-20 text-[#8C7B70]">No therapist earnings yet.</div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#EDE5DF] overflow-hidden divide-y divide-[#F2EBE6]">
-            {rows.map(row => (
-              <div key={row.therapist_id} className="flex items-center gap-4 px-5 py-4">
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-[#2C2420] truncate">{row.name}</p>
-                  <p className="text-xs text-[#8C7B70] mt-0.5">
-                    Earned {formatPrice(row.earned)} · Paid {formatPrice(row.paidOut)}
-                  </p>
+            {rows.map(row => {
+              const dest = destinationLabel(row)
+              return (
+                <div key={row.therapist_id} className="flex items-center gap-4 px-5 py-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-[#2C2420] truncate">{row.name}</p>
+                    <p className="text-xs text-[#8C7B70] mt-0.5">
+                      Earned {formatPrice(row.earned)} · Paid {formatPrice(row.paidOut)}
+                    </p>
+                    {dest ? (
+                      <p className="text-xs text-[#6B8C6E] mt-1 truncate">{dest}</p>
+                    ) : (
+                      <p className="text-xs text-[#C4714A] mt-1 flex items-center gap-1">
+                        <AlertCircle size={12} /> No payout details on file
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-[#C4714A]">{formatPrice(row.pending)}</p>
+                    <p className="text-[10px] text-[#8C7B70]">pending</p>
+                  </div>
+                  <button
+                    onClick={() => openModal(row)}
+                    disabled={row.pending <= 0}
+                    className="text-xs font-semibold bg-[#2C2420] text-white px-4 py-2 rounded-xl hover:bg-[#C4714A] transition-colors disabled:opacity-40 whitespace-nowrap"
+                  >
+                    Record payout
+                  </button>
                 </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-[#C4714A]">{formatPrice(row.pending)}</p>
-                  <p className="text-[10px] text-[#8C7B70]">pending</p>
-                </div>
-                <button
-                  onClick={() => recordPayout(row)}
-                  disabled={paying === row.therapist_id || row.pending <= 0}
-                  className="text-xs font-semibold bg-[#2C2420] text-white px-4 py-2 rounded-xl hover:bg-[#C4714A] transition-colors disabled:opacity-40 whitespace-nowrap"
-                >
-                  {paying === row.therapist_id ? 'Saving…' : 'Record payout'}
-                </button>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
+
+      {/* Record-payout modal */}
+      {active && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-4" onClick={() => !paying && setActive(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-1">
+              <h2 className="text-lg font-bold text-[#2C2420]">Record payout</h2>
+              <button onClick={() => !paying && setActive(null)} className="text-[#8C7B70] hover:text-[#2C2420]"><X size={18} /></button>
+            </div>
+            <p className="text-sm text-[#8C7B70] mb-4">{active.name} · pending {formatPrice(active.pending)}</p>
+
+            {/* Destination */}
+            {destinationLabel(active) ? (
+              <div className="bg-[#F3F6F2] border border-[#D9E5D8] rounded-xl px-3 py-2.5 mb-4">
+                <p className="text-[10px] text-[#6B8C6E] uppercase tracking-wide font-semibold">Send to</p>
+                <p className="text-sm text-[#2C2420] mt-0.5">{destinationLabel(active)}</p>
+              </div>
+            ) : (
+              <div className="bg-[#FCF3EE] border border-[#EAD0C2] rounded-xl px-3 py-2.5 mb-4 flex items-start gap-2">
+                <AlertCircle size={15} className="text-[#C4714A] mt-0.5 shrink-0" />
+                <p className="text-sm text-[#9A4A28]">
+                  This therapist hasn&rsquo;t added payout details yet. Ask them to fill in their
+                  payout method in the therapist portal before sending.
+                </p>
+              </div>
+            )}
+
+            <label className="text-sm font-semibold text-[#2C2420] mb-1.5 block">Amount paid (₱)</label>
+            <input
+              type="number" min={1} value={amount}
+              onChange={e => setAmount(e.target.value)}
+              className="w-full border border-[#EDE5DF] rounded-xl px-3 py-2.5 text-sm mb-4 focus:outline-none focus:border-[#C4714A]"
+            />
+
+            <label className="text-sm font-semibold text-[#2C2420] mb-1.5 block">
+              Reference number <span className="text-[#8C7B70] font-normal">(from GCash/bank receipt)</span>
+            </label>
+            <input
+              value={reference}
+              onChange={e => setReference(e.target.value)}
+              placeholder="e.g. 1234567890"
+              className="w-full border border-[#EDE5DF] rounded-xl px-3 py-2.5 text-sm mb-4 focus:outline-none focus:border-[#C4714A]"
+            />
+
+            {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+
+            <button
+              onClick={submitPayout}
+              disabled={paying}
+              className={cn(
+                'w-full font-semibold text-white py-3 rounded-xl transition-colors',
+                'bg-[#2C2420] hover:bg-[#C4714A] disabled:opacity-50',
+              )}
+            >
+              {paying ? 'Saving…' : 'Mark as paid'}
+            </button>
+            <p className="text-[11px] text-[#8C7B70] text-center mt-2">
+              This records that you sent the money. It does not transfer funds automatically.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

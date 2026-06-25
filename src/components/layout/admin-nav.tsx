@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { RefreshCw, MapPin, DollarSign, Users, ShieldCheck, Gift, Wallet } from 'lucide-react'
+import { RefreshCw, MapPin, DollarSign, Users, ShieldCheck, Gift, Wallet, LayoutDashboard, CalendarDays } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
@@ -25,7 +25,8 @@ export function AdminNav({ subtitle, onRefresh, refreshing, pendingApps }: Props
   const router   = useRouter()
 
   const navItems: NavItem[] = [
-    { href: '/admin',              label: 'Bookings' },
+    { href: '/admin',              label: 'Overview',    icon: <LayoutDashboard size={13} /> },
+    { href: '/admin/bookings',     label: 'Bookings',    icon: <CalendarDays size={13} /> },
     { href: '/admin/applicants',   label: 'Applicants',  icon: <Users size={13} />,      badge: pendingApps },
     { href: '/admin/therapists',   label: 'Therapists',  icon: <Users size={13} /> },
     { href: '/admin/cities',       label: 'Cities',      icon: <MapPin size={13} /> },

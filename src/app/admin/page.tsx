@@ -3,235 +3,229 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { formatPrice, formatDate, formatTime } from '@/lib/utils'
-import { SERVICES } from '@/lib/constants'
-import { ChevronDown, RefreshCw, Users } from 'lucide-react'
+import { formatPrice } from '@/lib/utils'
 import { AdminNav } from '@/components/layout/admin-nav'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import {
+  TrendingUp, TrendingDown, Users, Star, AlertTriangle,
+  Wallet, MapPin, Activity,
+} from 'lucide-react'
 
-type BookingRow = {
-  id: string
-  service_id: string
-  booking_date: string
-  time_slot: string
-  address: string
-  status: string
-  payment_status: string
-  total: number
-  created_at: string
-  therapist_selection_mode: string
-  therapists: { name: string } | null
+type Overview = {
+  money: {
+    gmv: number; platformRev: number; therapistShare: number
+    netProfit: number; referralPool: number; bonusPool: number
+    outstandingPayouts: number
+    revThisMonth: number; revLastMonth: number; revMoM: number | null
+  }
+  growth: {
+    bookingsThisWeek: number; bookingsThisMonth: number
+    newCustomers: number; newTherapists: number; totalCustomers: number
+  }
+  health: {
+    activeTherapists: number; approvedTherapists: number; utilization: number
+    completionRate: number | null; cancellationRate: number | null
+    acceptanceRate: number | null; accepted: number; declined: number
+    avgRating: number | null; reviewCount: number
+  }
+  waitlistByCity: { city: string; count: number }[]
+  alerts: { unassignedConfirmed: number; pendingApplicants: number; outstandingPayouts: number }
 }
 
-const STATUSES = ['pending_payment','confirmed','assigned','en_route','checked_in','completed','cancelled']
-
-const STATUS_LABEL: Record<string, string> = {
-  pending_payment: 'Pending payment',
-  confirmed:       'Confirmed',
-  assigned:        'Assigned',
-  en_route:        'En route',
-  checked_in:      'Checked in',
-  completed:       'Completed',
-  cancelled:       'Cancelled',
+function Stat({ label, value, sub, accent, hint }: { label: string; value: string; sub?: React.ReactNode; accent?: string; hint?: string }) {
+  return (
+    <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4">
+      <p className="text-[10px] text-[#8C7B70] uppercase tracking-wider font-semibold">{label}</p>
+      <p className={cn('text-2xl font-bold mt-1', accent ?? 'text-[#2C2420]')}>{value}</p>
+      {sub && <div className="text-[11px] text-[#8C7B70] mt-0.5">{sub}</div>}
+      {hint && <p className="text-[10px] text-[#B0A399] mt-1 leading-snug">{hint}</p>}
+    </div>
+  )
 }
 
-const STATUS_COLOR: Record<string, string> = {
-  pending_payment: 'bg-amber-100 text-amber-700',
-  confirmed:       'bg-blue-100 text-blue-700',
-  assigned:        'bg-purple-100 text-purple-700',
-  en_route:        'bg-indigo-100 text-indigo-700',
-  checked_in:      'bg-teal-100 text-teal-700',
-  completed:       'bg-green-100 text-green-700',
-  cancelled:       'bg-red-100 text-red-700',
-}
-
-export default function AdminPage() {
+export default function AdminOverviewPage() {
   const router = useRouter()
-  const [bookings,        setBookings]        = useState<BookingRow[]>([])
-  const [pendingApps,     setPendingApps]     = useState<number>(0)
-  const [loading,         setLoading]         = useState(true)
-  const [filter,          setFilter]          = useState<string>('all')
-  const [updating,        setUpdating]        = useState<string | null>(null)
+  const [data, setData]       = useState<Overview | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function checkAuth() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.replace('/admin/login'); return }
-      const { data: roleRow } = await supabase.from('user_roles').select('role').eq('user_id', user.id).single()
-      if (roleRow?.role !== 'admin') { router.replace('/admin/login'); return }
-      fetchBookings()
-    }
-    checkAuth()
-  }, [router])
-
-  async function fetchBookings() {
+  function load() {
     setLoading(true)
-    const supabase = createClient()
-    const [{ data }, { count }] = await Promise.all([
-      supabase
-        .from('bookings')
-        .select('*, therapists(name)')
-        .order('booking_date', { ascending: false })
-        .order('time_slot',    { ascending: false }),
-      supabase
-        .from('therapists')
-        .select('id', { count: 'exact', head: true })
-        .eq('application_status', 'pending'),
-    ])
-    setBookings((data ?? []) as BookingRow[])
-    setPendingApps(count ?? 0)
-    setLoading(false)
-  }
-
-  async function updateStatus(bookingId: string, status: string) {
-    setUpdating(bookingId)
-    if (status === 'completed') {
-      // Server route handles the update + referral commission calculation
-      await fetch('/api/bookings/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId }),
+    fetch('/api/admin/overview')
+      .then(async res => {
+        if (res.status === 401 || res.status === 403) { router.replace('/admin/login'); return null }
+        return res.json()
       })
-    } else {
-      const supabase = createClient()
-      await supabase.from('bookings').update({ status }).eq('id', bookingId)
-    }
-    setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b))
-    setUpdating(null)
+      .then(d => { if (d && !d.error) setData(d); setLoading(false) })
+      .catch(() => setLoading(false))
   }
 
-  const filtered = filter === 'all' ? bookings : bookings.filter(b => b.status === filter)
+  useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Stats
-  const today      = new Date().toISOString().slice(0, 10)
-  const todayCount = bookings.filter(b => b.booking_date === today && b.status !== 'cancelled').length
-  const revenue    = bookings.filter(b => b.payment_status === 'paid').reduce((s, b) => s + b.total, 0)
-  const pending    = bookings.filter(b => b.status === 'confirmed' || b.status === 'assigned').length
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F7F2EE]">
+        <AdminNav />
+        <div className="max-w-5xl mx-auto px-4 py-20 text-center text-[#8C7B70]">Loading overview…</div>
+      </div>
+    )
+  }
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-[#F7F2EE]">
+        <AdminNav />
+        <div className="max-w-5xl mx-auto px-4 py-20 text-center text-[#8C7B70]">Couldn&rsquo;t load the dashboard.</div>
+      </div>
+    )
+  }
+
+  const { money, growth, health, waitlistByCity, alerts } = data
+  const maxCity = Math.max(1, ...waitlistByCity.map(c => c.count))
+  const totalAlerts = alerts.unassignedConfirmed + alerts.pendingApplicants + (alerts.outstandingPayouts > 0 ? 1 : 0)
 
   return (
     <div className="min-h-screen bg-[#F7F2EE]">
-      <AdminNav onRefresh={fetchBookings} refreshing={loading} pendingApps={pendingApps} />
+      <AdminNav onRefresh={load} refreshing={loading} pendingApps={alerts.pendingApplicants} />
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
-
-        {/* Stats row */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
-          {[
-            { label: "Today's bookings", value: todayCount },
-            { label: 'Pending dispatch',  value: pending },
-            { label: 'Total revenue',     value: formatPrice(revenue) },
-          ].map(stat => (
-            <div key={stat.label} className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-              <p className="text-xs text-[#8C7B70] mb-1">{stat.label}</p>
-              <p className="text-2xl font-bold text-[#2C2420]">{stat.value}</p>
-            </div>
-          ))}
-          <Link
-            href="/admin/applicants"
-            className="bg-white rounded-2xl border border-[#EDE5DF] p-5 hover:border-[#C4714A] transition-colors group"
-          >
-            <p className="text-xs text-[#8C7B70] mb-1 flex items-center gap-1">
-              <Users size={11} /> Pending applicants
-            </p>
-            <p className={cn('text-2xl font-bold', pendingApps > 0 ? 'text-[#C4714A]' : 'text-[#2C2420]')}>
-              {pendingApps}
-            </p>
-          </Link>
+      <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-6">
+        <div className="flex items-end justify-between">
+          <h1 className="text-2xl font-bold text-[#2C2420]">Business overview</h1>
+          <Link href="/admin/bookings" className="text-xs font-semibold text-[#C4714A] hover:underline">Manage bookings →</Link>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex flex-wrap gap-2 mb-5">
-          {['all', ...STATUSES].map(s => (
-            <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors capitalize',
-                filter === s
-                  ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                  : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#2C2420] bg-white',
+        {/* Alerts */}
+        {totalAlerts > 0 && (
+          <section className="bg-[#FCF3EE] border border-[#EAD0C2] rounded-2xl p-4">
+            <h2 className="text-sm font-bold text-[#9A4A28] mb-2 flex items-center gap-1.5"><AlertTriangle size={15} /> Needs attention</h2>
+            <div className="flex flex-wrap gap-2">
+              {alerts.unassignedConfirmed > 0 && (
+                <Link href="/admin/bookings" className="bg-white border border-[#EAD0C2] rounded-xl px-3 py-2 text-sm hover:border-[#C4714A]">
+                  <strong className="text-[#C4714A]">{alerts.unassignedConfirmed}</strong> unassigned booking{alerts.unassignedConfirmed === 1 ? '' : 's'} — dispatch a therapist
+                </Link>
               )}
-            >
-              {s === 'all' ? `All (${bookings.length})` : STATUS_LABEL[s]}
-            </button>
-          ))}
-        </div>
-
-        {/* Bookings table */}
-        {loading ? (
-          <div className="text-center py-20 text-[#8C7B70]">Loading…</div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-[#8C7B70]">No bookings found.</div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {filtered.map(booking => {
-              const service = SERVICES.find(s => s.id === booking.service_id)
-              return (
-                <div
-                  key={booking.id}
-                  className="bg-white rounded-2xl border border-[#EDE5DF] p-5"
-                >
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    {/* Left: booking info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="font-bold text-[#2C2420]">
-                          {service?.name ?? booking.service_id}
-                        </span>
-                        <span className={cn('text-xs font-semibold px-2 py-0.5 rounded-full', STATUS_COLOR[booking.status])}>
-                          {STATUS_LABEL[booking.status]}
-                        </span>
-                        {booking.payment_status === 'paid' && (
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                            Paid
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="text-sm text-[#8C7B70] mb-0.5">
-                        {formatDate(booking.booking_date)} · {formatTime(booking.time_slot)}
-                      </p>
-                      <p className="text-sm text-[#8C7B70] truncate mb-0.5">{booking.address}</p>
-                      <p className="text-sm text-[#8C7B70]">
-                        Therapist:{' '}
-                        {booking.therapists?.name ?? (
-                          booking.therapist_selection_mode === 'best_available'
-                            ? <em>Best available</em>
-                            : <em>Unassigned</em>
-                        )}
-                      </p>
-                    </div>
-
-                    {/* Right: total + status changer */}
-                    <div className="flex flex-col items-end gap-3 flex-shrink-0">
-                      <span className="font-bold text-[#2C2420]">{formatPrice(booking.total)}</span>
-
-                      <div className="relative">
-                        <select
-                          value={booking.status}
-                          disabled={updating === booking.id}
-                          onChange={e => updateStatus(booking.id, e.target.value)}
-                          className="appearance-none bg-[#F7F2EE] border border-[#EDE5DF] rounded-xl pl-3 pr-8 py-2 text-xs font-semibold text-[#2C2420] focus:outline-none focus:border-[#C4714A] cursor-pointer disabled:opacity-50"
-                        >
-                          {STATUSES.map(s => (
-                            <option key={s} value={s}>{STATUS_LABEL[s]}</option>
-                          ))}
-                        </select>
-                        <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8C7B70] pointer-events-none" />
-                      </div>
-
-                      <span className="text-[10px] text-[#C8BDB8]">
-                        #{booking.id.slice(0, 8).toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+              {alerts.pendingApplicants > 0 && (
+                <Link href="/admin/applicants" className="bg-white border border-[#EAD0C2] rounded-xl px-3 py-2 text-sm hover:border-[#C4714A]">
+                  <strong className="text-[#C4714A]">{alerts.pendingApplicants}</strong> applicant{alerts.pendingApplicants === 1 ? '' : 's'} awaiting review
+                </Link>
+              )}
+              {alerts.outstandingPayouts > 0 && (
+                <Link href="/admin/payouts" className="bg-white border border-[#EAD0C2] rounded-xl px-3 py-2 text-sm hover:border-[#C4714A]">
+                  <strong className="text-[#C4714A]">{formatPrice(alerts.outstandingPayouts)}</strong> in therapist payouts owed
+                </Link>
+              )}
+            </div>
+          </section>
         )}
+
+        {/* Money */}
+        <section>
+          <h2 className="text-sm font-bold text-[#2C2420] mb-3 flex items-center gap-1.5"><Wallet size={15} /> Money</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Stat
+              label="Platform revenue" value={formatPrice(money.platformRev)} accent="text-[#C4714A]"
+              hint="Your 25% cut of paid bookings"
+            />
+            <Stat
+              label="Revenue this month" value={formatPrice(money.revThisMonth)}
+              sub={money.revMoM !== null && (
+                <span className={cn('inline-flex items-center gap-0.5', money.revMoM >= 0 ? 'text-[#6B8C6E]' : 'text-red-500')}>
+                  {money.revMoM >= 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+                  {Math.abs(money.revMoM)}% vs last month
+                </span>
+              )}
+            />
+            <Stat label="GMV (gross)" value={formatPrice(money.gmv)} hint="Total booking value. 75% is therapists' money." />
+            <Stat
+              label="Outstanding payouts" value={formatPrice(money.outstandingPayouts)}
+              accent={money.outstandingPayouts > 0 ? 'text-[#9A4A28]' : undefined}
+              hint="Earned by therapists, not yet paid"
+            />
+          </div>
+          {/* 25% breakdown */}
+          <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4 mt-3">
+            <p className="text-[10px] text-[#8C7B70] uppercase tracking-wider font-semibold mb-3">Where the platform&rsquo;s 25% goes (realized on completed sessions)</p>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-xl font-bold text-[#6B8C6E]">{formatPrice(money.netProfit)}</p>
+                <p className="text-[10px] text-[#8C7B70] mt-0.5">Net profit (~10%)</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold text-[#2C2420]">{formatPrice(money.referralPool)}</p>
+                <p className="text-[10px] text-[#8C7B70] mt-0.5">Referral commissions</p>
+              </div>
+              <div>
+                <p className="text-xl font-bold text-[#C9A84C]">{formatPrice(money.bonusPool)}</p>
+                <p className="text-[10px] text-[#8C7B70] mt-0.5">Alaga Bonus pool</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Growth */}
+        <section>
+          <h2 className="text-sm font-bold text-[#2C2420] mb-3 flex items-center gap-1.5"><TrendingUp size={15} /> Growth</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Stat label="Bookings this week" value={String(growth.bookingsThisWeek)} />
+            <Stat label="Bookings this month" value={String(growth.bookingsThisMonth)} accent="text-[#C4714A]" />
+            <Stat label="New customers (mo.)" value={String(growth.newCustomers)} sub={`${growth.totalCustomers} total`} />
+            <Stat label="New therapists (mo.)" value={String(growth.newTherapists)} />
+          </div>
+        </section>
+
+        {/* Marketplace health */}
+        <section>
+          <h2 className="text-sm font-bold text-[#2C2420] mb-3 flex items-center gap-1.5"><Activity size={15} /> Marketplace health</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Stat
+              label="Active therapists" value={String(health.activeTherapists)}
+              sub={`${health.approvedTherapists} approved`}
+            />
+            <Stat
+              label="Utilization" value={String(health.utilization)}
+              hint="Avg completed sessions per active therapist"
+            />
+            <Stat
+              label="Acceptance rate" value={health.acceptanceRate !== null ? `${health.acceptanceRate}%` : '—'}
+              sub={health.acceptanceRate !== null ? `${health.accepted} accepted · ${health.declined} declined` : 'No responses yet'}
+            />
+            <Stat
+              label="Completion rate" value={health.completionRate !== null ? `${health.completionRate}%` : '—'}
+              sub={health.cancellationRate !== null ? `${health.cancellationRate}% cancelled` : undefined}
+            />
+          </div>
+          <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4 mt-3 flex items-center gap-3">
+            <Star size={18} className="text-[#C9A84C]" fill="#C9A84C" />
+            <div>
+              <span className="text-xl font-bold text-[#2C2420]">{health.avgRating ?? '—'}</span>
+              <span className="text-sm text-[#8C7B70]"> avg rating across {health.reviewCount} review{health.reviewCount === 1 ? '' : 's'}</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Expansion */}
+        <section>
+          <h2 className="text-sm font-bold text-[#2C2420] mb-3 flex items-center gap-1.5"><MapPin size={15} /> Where demand is (waitlist)</h2>
+          <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
+            {waitlistByCity.length === 0 ? (
+              <p className="text-sm text-[#8C7B70]">No waitlist sign-ups yet.</p>
+            ) : (
+              <div className="flex flex-col gap-2.5">
+                {waitlistByCity.map(c => (
+                  <div key={c.city} className="flex items-center gap-3">
+                    <span className="text-sm text-[#2C2420] w-32 truncate">{c.city}</span>
+                    <div className="flex-1 h-3 bg-[#F2EBE6] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#C4714A] rounded-full" style={{ width: `${(c.count / maxCity) * 100}%` }} />
+                    </div>
+                    <span className="text-sm font-semibold text-[#2C2420] w-8 text-right">{c.count}</span>
+                  </div>
+                ))}
+                <p className="text-[11px] text-[#8C7B70] mt-2 flex items-center gap-1">
+                  <Users size={11} /> Cities with the most sign-ups are your strongest expansion candidates.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   )
