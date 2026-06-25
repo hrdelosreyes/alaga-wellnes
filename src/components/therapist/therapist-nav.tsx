@@ -3,11 +3,12 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutDashboard, Wallet, MapPin, CalendarDays, BarChart3, Banknote, UserCircle, LogOut } from 'lucide-react'
+import { LayoutDashboard, Wallet, MapPin, CalendarDays, BarChart3, Banknote, UserCircle, History, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const LINKS = [
   { href: '/therapist/dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
+  { href: '/therapist/history',      label: 'History',      icon: History },
   { href: '/therapist/insights',     label: 'Insights',     icon: BarChart3 },
   { href: '/therapist/availability', label: 'Availability', icon: CalendarDays },
   { href: '/therapist/rates',        label: 'My rates',     icon: Wallet },
@@ -32,7 +33,7 @@ export function TherapistNav() {
           alaga <span className="text-[#C4714A]">pro</span>
         </Link>
 
-        <nav className="flex items-center gap-0.5 sm:gap-1">
+        <nav className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto">
           {LINKS.map(({ href, label, icon: Icon }) => {
             const active = pathname === href
             return (
@@ -40,7 +41,7 @@ export function TherapistNav() {
                 key={href}
                 href={href}
                 className={cn(
-                  'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors',
+                  'flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors shrink-0',
                   active ? 'bg-white/15 text-white' : 'text-[#C8A88A] hover:bg-white/10 hover:text-white',
                 )}
               >
@@ -52,7 +53,7 @@ export function TherapistNav() {
           <button
             onClick={logout}
             title="Sign out"
-            className="p-2 rounded-lg text-[#C8A88A] hover:bg-white/10 hover:text-white transition-colors"
+            className="p-2 rounded-lg text-[#C8A88A] hover:bg-white/10 hover:text-white transition-colors shrink-0"
           >
             <LogOut size={16} />
           </button>
