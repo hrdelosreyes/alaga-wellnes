@@ -24,6 +24,7 @@ type BookingRow = {
   customer_notes: string | null
   status: string
   total: number
+  subtotal: number | null
 }
 
 type Therapist = {
@@ -72,6 +73,7 @@ export default function TherapistDashboard() {
   const [referralEarnings,  setReferralEarnings]  = useState<{ pending: number; paid: number; referees: number }>({ pending: 0, paid: 0, referees: 0 })
   const [bonusStats,        setBonusStats]        = useState<{ quarterBookings: number; pendingBonus: number }>({ quarterBookings: 0, pendingBonus: 0 })
   const [earnings,          setEarnings]          = useState<{ earned: number; paidOut: number; pending: number }>({ earned: 0, paidOut: 0, pending: 0 })
+  const [monthEarned,       setMonthEarned]       = useState<number>(0)
   const [loading,           setLoading]           = useState(true)
   const [updating,          setUpdating]          = useState<string | null>(null)
   const [tab,               setTab]               = useState<'today' | 'upcoming'>('today')
@@ -252,12 +254,16 @@ export default function TherapistDashboard() {
 
     // Booking earnings: take-home is 75% of each completed session's subtotal.
     const [{ data: completed }, { data: payouts }] = await Promise.all([
-      supabase.from('bookings').select('subtotal').eq('therapist_id', t.id).eq('status', 'completed'),
+      supabase.from('bookings').select('subtotal, booking_date').eq('therapist_id', t.id).eq('status', 'completed'),
       supabase.from('payout_records').select('amount, status').eq('therapist_id', t.id),
     ])
-    const earned  = (completed ?? []).reduce((s, b) => s + Math.round((b.subtotal ?? 0) * THERAPIST_PAYOUT_RATE), 0)
-    const paidOut = (payouts ?? []).filter(p => p.status === 'sent').reduce((s, p) => s + (p.amount ?? 0), 0)
+    const takeHome = (sub: number | null) => Math.round((sub ?? 0) * THERAPIST_PAYOUT_RATE)
+    const earned   = (completed ?? []).reduce((s, b) => s + takeHome(b.subtotal), 0)
+    const paidOut  = (payouts ?? []).filter(p => p.status === 'sent').reduce((s, p) => s + (p.amount ?? 0), 0)
     setEarnings({ earned, paidOut, pending: Math.max(0, earned - paidOut) })
+
+    const monthStart = new Date().toISOString().slice(0, 7) + '-01'
+    setMonthEarned((completed ?? []).filter(b => (b.booking_date ?? '') >= monthStart).reduce((s, b) => s + takeHome(b.subtotal), 0))
 
     await loadBookings(t.id)
   }
@@ -268,7 +274,7 @@ export default function TherapistDashboard() {
 
     const { data } = await supabase
       .from('bookings')
-      .select('id, service_id, booking_date, time_slot, address, unit_notes, customer_name, customer_phone, customer_notes, status, total')
+      .select('id, service_id, booking_date, time_slot, address, unit_notes, customer_name, customer_phone, customer_notes, status, total, subtotal')
       .eq('therapist_id', therapistId)
       .neq('status', 'cancelled')
       .neq('status', 'pending_payment')
@@ -412,8 +418,8 @@ export default function TherapistDashboard() {
                 <p className="text-[10px] text-[#8C7B70] mt-1">Sessions</p>
               </div>
               <div className="bg-white rounded-2xl border border-[#EDE5DF] px-4 py-4 text-center">
-                <p className="text-2xl font-bold text-[#6B8C6E]">{bonusStats.quarterBookings}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-1">This quarter</p>
+                <p className="text-2xl font-bold text-[#6B8C6E]">{formatPrice(monthEarned)}</p>
+                <p className="text-[10px] text-[#8C7B70] mt-1">Earned this month</p>
               </div>
             </div>
 
@@ -687,7 +693,7 @@ export default function TherapistDashboard() {
                   <div className="mt-3 pt-3 border-t border-[#F2EBE6] flex items-center justify-between">
                     <span className="text-xs text-[#8C7B70]">Your payout</span>
                     <span className="font-bold text-[#2C2420]">
-                      {formatPrice(service?.therapistPayout ?? 0)}
+                      {formatPrice(Math.round((booking.subtotal ?? 0) * THERAPIST_PAYOUT_RATE))}
                     </span>
                   </div>
 

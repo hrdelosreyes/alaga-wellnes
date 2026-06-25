@@ -12,12 +12,25 @@ export async function GET() {
   const svc = await createServiceClient()
   const { data: t } = await svc
     .from('therapists')
-    .select('payout_method, payout_account_name, payout_account_number, payout_bank_name')
+    .select('id, payout_method, payout_account_name, payout_account_number, payout_bank_name')
     .eq('email', user.email)
     .maybeSingle()
   if (!t) return NextResponse.json({ error: 'Therapist not found' }, { status: 403 })
 
-  return NextResponse.json({ details: t })
+  // Payout history — what's actually been sent to them, for their records.
+  const { data: history } = await svc
+    .from('payout_records')
+    .select('amount, status, sent_at, created_at, method, destination, reference_no')
+    .eq('therapist_id', t.id)
+    .eq('status', 'sent')
+    .order('sent_at', { ascending: false })
+    .limit(50)
+
+  const { payout_method, payout_account_name, payout_account_number, payout_bank_name } = t
+  return NextResponse.json({
+    details: { payout_method, payout_account_name, payout_account_number, payout_bank_name },
+    history: history ?? [],
+  })
 }
 
 // POST — save/update payout destination.

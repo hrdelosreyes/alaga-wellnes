@@ -5,7 +5,16 @@ import { useRouter } from 'next/navigation'
 import { Loader2, Banknote, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TherapistNav } from '@/components/therapist/therapist-nav'
-import { cn } from '@/lib/utils'
+import { cn, formatPrice, formatDate } from '@/lib/utils'
+
+type PayoutRecord = {
+  amount: number
+  sent_at: string | null
+  created_at: string
+  method: string | null
+  destination: string | null
+  reference_no: string | null
+}
 
 type Method = 'gcash' | 'maya' | 'bank'
 
@@ -26,6 +35,7 @@ export default function TherapistPayoutPage() {
   const [accountName,   setAccountName]   = useState('')
   const [accountNumber, setAccountNumber] = useState('')
   const [bankName,      setBankName]      = useState('')
+  const [history,       setHistory]       = useState<PayoutRecord[]>([])
 
   useEffect(() => {
     fetch('/api/therapist/payout-details')
@@ -40,6 +50,7 @@ export default function TherapistPayoutPage() {
           setAccountNumber(d.details.payout_account_number ?? '')
           setBankName(d.details.payout_bank_name ?? '')
         }
+        if (d?.history) setHistory(d.history)
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -159,6 +170,33 @@ export default function TherapistPayoutPage() {
         <p className="text-center text-xs text-[#8C7B70] mt-4">
           Your earnings are 75% of each completed session. See your balance on the dashboard.
         </p>
+
+        {/* Payout history */}
+        <div className="mt-2">
+          <h2 className="text-sm font-bold text-[#2C2420] mb-3">Payout history</h2>
+          {history.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5 text-center text-sm text-[#8C7B70]">
+              No payouts yet. Once Alaga sends your earnings, each payment will appear here with its reference number.
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-[#EDE5DF] overflow-hidden divide-y divide-[#F2EBE6]">
+              {history.map((p, i) => (
+                <div key={i} className="flex items-center justify-between gap-3 px-4 py-3.5">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-[#2C2420]">
+                      {p.sent_at ? formatDate(p.sent_at.slice(0, 10)) : formatDate(p.created_at.slice(0, 10))}
+                    </p>
+                    <p className="text-xs text-[#8C7B70] truncate mt-0.5">
+                      {p.destination || (p.method ? p.method.toUpperCase() : 'Manual')}
+                      {p.reference_no && <span> · Ref {p.reference_no}</span>}
+                    </p>
+                  </div>
+                  <span className="font-bold text-[#6B8C6E] shrink-0">{formatPrice(p.amount)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
