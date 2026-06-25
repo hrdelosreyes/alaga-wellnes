@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
 import { MapPin, Calendar, Clock, CheckCircle2, Loader2, MessageCircle, ChevronDown, Gift, Check, X, Bell, BellOff } from 'lucide-react'
-import { currentQuarter, quarterDateRange, BONUS_MIN_BOOKINGS } from '@/lib/bonus'
+import { currentQuarter, quarterDateRange, BONUS_MIN_BOOKINGS, THERAPIST_PAYOUT_RATE } from '@/lib/bonus'
 import { ChatThread } from '@/components/chat/chat-thread'
 import { TherapistNav } from '@/components/therapist/therapist-nav'
 import { Button } from '@/components/ui/button'
@@ -71,6 +71,7 @@ export default function TherapistDashboard() {
   const [bookings,          setBookings]          = useState<BookingRow[]>([])
   const [referralEarnings,  setReferralEarnings]  = useState<{ pending: number; paid: number; referees: number }>({ pending: 0, paid: 0, referees: 0 })
   const [bonusStats,        setBonusStats]        = useState<{ quarterBookings: number; pendingBonus: number }>({ quarterBookings: 0, pendingBonus: 0 })
+  const [earnings,          setEarnings]          = useState<{ earned: number; paidOut: number; pending: number }>({ earned: 0, paidOut: 0, pending: 0 })
   const [loading,           setLoading]           = useState(true)
   const [updating,          setUpdating]          = useState<string | null>(null)
   const [tab,               setTab]               = useState<'today' | 'upcoming'>('today')
@@ -249,6 +250,15 @@ export default function TherapistDashboard() {
       pendingBonus:    bonusPayout?.pool_share ?? 0,
     })
 
+    // Booking earnings: take-home is 75% of each completed session's subtotal.
+    const [{ data: completed }, { data: payouts }] = await Promise.all([
+      supabase.from('bookings').select('subtotal').eq('therapist_id', t.id).eq('status', 'completed'),
+      supabase.from('payout_records').select('amount, status').eq('therapist_id', t.id),
+    ])
+    const earned  = (completed ?? []).reduce((s, b) => s + Math.round((b.subtotal ?? 0) * THERAPIST_PAYOUT_RATE), 0)
+    const paidOut = (payouts ?? []).filter(p => p.status === 'sent').reduce((s, p) => s + (p.amount ?? 0), 0)
+    setEarnings({ earned, paidOut, pending: Math.max(0, earned - paidOut) })
+
     await loadBookings(t.id)
   }
 
@@ -405,6 +415,28 @@ export default function TherapistDashboard() {
                 <p className="text-2xl font-bold text-[#6B8C6E]">{bonusStats.quarterBookings}</p>
                 <p className="text-[10px] text-[#8C7B70] mt-1">This quarter</p>
               </div>
+            </div>
+
+            {/* Earnings card */}
+            <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
+              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">Your earnings (sessions)</p>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                <div>
+                  <p className="text-xl font-bold text-[#2C2420]">{formatPrice(earnings.earned)}</p>
+                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Total earned</p>
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-[#6B8C6E]">{formatPrice(earnings.paidOut)}</p>
+                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Paid out</p>
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-[#C4714A]">{formatPrice(earnings.pending)}</p>
+                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Pending payout</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-[#8C7B70] mt-3 text-center">
+                Your take-home is 75% of each completed session. Referral &amp; bonus earnings are shown below.
+              </p>
             </div>
 
         {/* Referral card */}
