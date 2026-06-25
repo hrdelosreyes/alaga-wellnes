@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { RefreshCw, MapPin, DollarSign, Users, ShieldCheck, Gift } from 'lucide-react'
+import { RefreshCw, MapPin, DollarSign, Users, ShieldCheck, Gift, Wallet } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
@@ -30,6 +30,7 @@ export function AdminNav({ subtitle, onRefresh, refreshing, pendingApps }: Props
     { href: '/admin/therapists',   label: 'Therapists',  icon: <Users size={13} /> },
     { href: '/admin/cities',       label: 'Cities',      icon: <MapPin size={13} /> },
     { href: '/admin/pricing',      label: 'Pricing',     icon: <DollarSign size={13} /> },
+    { href: '/admin/payouts',      label: 'Payouts',     icon: <Wallet size={13} /> },
     { href: '/admin/commissions',  label: 'Commissions', icon: <DollarSign size={13} /> },
     { href: '/admin/bonus',        label: 'Alaga Bonus', icon: <Gift size={13} /> },
     { href: '/admin/users',        label: 'Users',       icon: <ShieldCheck size={13} /> },
