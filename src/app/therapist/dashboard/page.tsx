@@ -517,15 +517,31 @@ export default function TherapistDashboard() {
               </p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#C9A84C]">
-                {bonusStats.pendingBonus > 0 ? `₱${bonusStats.pendingBonus.toLocaleString()}` : '—'}
-              </p>
-              <p className="text-[10px] text-[#8C7B70] mt-0.5">Bonus queued</p>
+              {bonusStats.pendingBonus > 0 ? (
+                <>
+                  <p className="text-2xl font-bold text-[#C9A84C]">₱{bonusStats.pendingBonus.toLocaleString()}</p>
+                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Bonus queued</p>
+                </>
+              ) : bonusStats.quarterBookings >= BONUS_MIN_BOOKINGS ? (
+                <>
+                  <p className="text-2xl font-bold text-[#6B8C6E]">✓</p>
+                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Qualified · pending</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-2xl">🔒</p>
+                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Unlock at {BONUS_MIN_BOOKINGS}</p>
+                </>
+              )}
             </div>
           </div>
-          {bonusStats.quarterBookings < BONUS_MIN_BOOKINGS && (
+          {bonusStats.quarterBookings < BONUS_MIN_BOOKINGS ? (
             <p className="text-xs text-[#8C7B70] mt-3 text-center">
-              Complete {BONUS_MIN_BOOKINGS} bookings this quarter to receive your Alaga Bonus payout.
+              You&rsquo;re <strong>{BONUS_MIN_BOOKINGS - bonusStats.quarterBookings}</strong> booking{BONUS_MIN_BOOKINGS - bonusStats.quarterBookings === 1 ? '' : 's'} away from unlocking your Alaga Bonus this quarter. Keep going! 💪
+            </p>
+          ) : (
+            <p className="text-xs text-[#6B8C6E] mt-3 text-center">
+              ✓ You&rsquo;ve qualified! Your bonus share is calculated at the end of the quarter.
             </p>
           )}
         </div>
