@@ -44,6 +44,9 @@ const REGIONS = [
 
 type RegionFilter = typeof REGIONS[number]
 
+const STATUS_OPTIONS = ['All', 'Live', 'Ready to launch', 'Not live'] as const
+type StatusFilter = typeof STATUS_OPTIONS[number]
+
 const REGION_LABELS: Record<string, string> = {
   'NCR':        'NCR — Metro Manila',
   'CAR':        'CAR — Cordillera',
@@ -73,6 +76,7 @@ export default function AdminCitiesPage() {
   const [loading,   setLoading]   = useState(true)
   const [launching, setLaunching] = useState<string | null>(null)
   const [region,    setRegion]    = useState<RegionFilter>('All')
+  const [status,    setStatus]    = useState<StatusFilter>('All')
   const [search,    setSearch]    = useState('')
 
   useEffect(() => { load() }, [])
@@ -131,7 +135,13 @@ export default function AdminCitiesPage() {
     const matchRegion = region === 'All' || c.region === region
     const q = search.toLowerCase()
     const matchSearch = !q || c.name.toLowerCase().includes(q) || c.region.toLowerCase().includes(q) || (c.province ?? '').toLowerCase().includes(q)
-    return matchRegion && matchSearch
+    const isReady = !c.is_customer_live && (counts[c.id] ?? 0) >= c.therapist_threshold
+    const matchStatus =
+      status === 'All' ? true :
+      status === 'Live' ? c.is_customer_live :
+      status === 'Ready to launch' ? isReady :
+      /* Not live */ !c.is_customer_live
+    return matchRegion && matchSearch && matchStatus
   })
 
   const liveCount       = cities.filter(c => c.is_customer_live).length
@@ -184,6 +194,16 @@ export default function AdminCitiesPage() {
                 <option key={r} value={r}>{REGION_LABELS[r]}</option>
               ))}
             </optgroup>
+          </select>
+
+          <select
+            value={status}
+            onChange={e => setStatus(e.target.value as StatusFilter)}
+            className="border border-[#EDE5DF] rounded-xl px-4 py-2 text-sm bg-white focus:outline-none focus:border-[#C4714A] transition-colors text-[#2C2420]"
+          >
+            {STATUS_OPTIONS.map(s => (
+              <option key={s} value={s}>{s === 'All' ? 'All statuses' : s}</option>
+            ))}
           </select>
 
           <input
@@ -260,12 +280,10 @@ export default function AdminCitiesPage() {
                         </span>
                       </div>
 
-                      {waitlistCount > 0 && (
-                        <p className="text-xs text-[#8C7B70] flex items-center gap-1 mt-2">
-                          <Mail size={11} />
-                          {waitlistCount} on waitlist
-                        </p>
-                      )}
+                      <p className="text-xs text-[#8C7B70] flex items-center gap-1 mt-2">
+                        <Mail size={11} />
+                        {waitlistCount} on waitlist
+                      </p>
                     </div>
 
                     {/* Controls */}
