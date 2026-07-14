@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { AdminNav } from '@/components/layout/admin-nav'
-import { RefreshCw, Rocket, Users } from 'lucide-react'
+import { RefreshCw, Rocket, Users, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type CityRow = {
@@ -66,8 +66,10 @@ const REGION_LABELS: Record<string, string> = {
 }
 
 export default function AdminCitiesPage() {
-  const [cities,    setCities]    = useState<CityRow[]>([])
-  const [counts,    setCounts]    = useState<Record<string, number>>({})
+  const [cities,         setCities]         = useState<CityRow[]>([])
+  const [counts,         setCounts]         = useState<Record<string, number>>({})
+  const [waitlistByCity, setWaitlistByCity] = useState<Record<string, number>>({})
+  const [waitlistTotal,  setWaitlistTotal]  = useState(0)
   const [loading,   setLoading]   = useState(true)
   const [launching, setLaunching] = useState<string | null>(null)
   const [region,    setRegion]    = useState<RegionFilter>('All')
@@ -79,12 +81,13 @@ export default function AdminCitiesPage() {
     setLoading(true)
     const supabase = createClient()
 
-    const [{ data: cityData }, { data: countData }] = await Promise.all([
+    const [{ data: cityData }, { data: countData }, waitlistRes] = await Promise.all([
       supabase.from('cities').select('*').order('region').order('name'),
       supabase.from('therapists')
         .select('city_id')
         .eq('application_status', 'approved')
         .eq('is_active', true),
+      fetch('/api/admin/waitlist-by-city').then(r => r.ok ? r.json() : { total: 0, byCity: {} }).catch(() => ({ total: 0, byCity: {} })),
     ])
 
     const tally: Record<string, number> = {}
@@ -94,6 +97,8 @@ export default function AdminCitiesPage() {
 
     setCities((cityData ?? []) as CityRow[])
     setCounts(tally)
+    setWaitlistByCity(waitlistRes.byCity ?? {})
+    setWaitlistTotal(waitlistRes.total ?? 0)
     setLoading(false)
   }
 
@@ -142,11 +147,12 @@ export default function AdminCitiesPage() {
       <div className="max-w-5xl mx-auto px-4 py-8">
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Cities live',         value: liveCount },
-            { label: 'Ready to launch',     value: readyCount },
-            { label: 'Verified therapists', value: totalTherapists },
+            { label: 'Cities live',           value: liveCount },
+            { label: 'Ready to launch',       value: readyCount },
+            { label: 'Verified therapists',   value: totalTherapists },
+            { label: 'Waitlist nationwide',   value: waitlistTotal },
           ].map(s => (
             <div key={s.label} className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
               <p className="text-xs text-[#8C7B70] mb-1">{s.label}</p>
@@ -205,6 +211,7 @@ export default function AdminCitiesPage() {
               const threshold      = city.therapist_threshold
               const isReady        = therapistCount >= threshold
               const pct            = Math.min(100, Math.round((therapistCount / threshold) * 100))
+              const waitlistCount  = waitlistByCity[city.name] ?? 0
 
               return (
                 <div key={city.id} className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
@@ -252,6 +259,13 @@ export default function AdminCitiesPage() {
                           {therapistCount} / {threshold}
                         </span>
                       </div>
+
+                      {waitlistCount > 0 && (
+                        <p className="text-xs text-[#8C7B70] flex items-center gap-1 mt-2">
+                          <Mail size={11} />
+                          {waitlistCount} on waitlist
+                        </p>
+                      )}
                     </div>
 
                     {/* Controls */}
