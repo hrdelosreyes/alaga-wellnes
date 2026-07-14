@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, CheckCircle, Upload, Wallet, Users, Gift, St
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { TherapistFaq } from '@/components/therapist/register-faq'
 
 type City = { id: string; name: string; region: string; province: string }
 
@@ -374,6 +375,9 @@ export default function TherapistRegisterPage() {
             </ul>
           </div>
         </div>
+
+        {/* FAQ */}
+        <TherapistFaq />
 
         {/* CTA */}
         <div className="sticky bottom-0 bg-[#2C2420] border-t border-white/10 px-4 py-4">
