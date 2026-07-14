@@ -7,6 +7,7 @@ import WaitlistForm from '@/components/WaitlistForm'
 import { ServicesSection } from '@/components/home/services-section'
 import { CityBadge } from '@/components/home/city-badge'
 import { BookLink } from '@/components/home/book-link'
+import { FromPrice } from '@/components/home/from-price'
 
 async function getTopTherapists(): Promise<Therapist[]> {
   const supabase = await createClient()
@@ -357,7 +358,7 @@ export default async function HomePage() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <BookLink>
                   <Button size="lg" className="w-full sm:w-auto">
-                    Book Now — From ₱899
+                    Book Now — From <FromPrice />
                     <ArrowRight size={18} className="ml-2" />
                   </Button>
                 </BookLink>
