@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
+  const authed = await createClient()
+  const { data: { user } } = await authed.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const svc = await createServiceClient()
+  const { data: role } = await svc.from('user_roles').select('role').eq('user_id', user.id).maybeSingle()
+  if (role?.role !== 'admin' && role?.role !== 'staff') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   try {
     const { therapistId, email, name } = await req.json()
     if (!therapistId || !email) {

@@ -123,7 +123,7 @@ export default function AdminApplicantsPage() {
       referralCode = code
     }
 
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from('therapists')
       .update({
         application_status: status,
@@ -133,6 +133,7 @@ export default function AdminApplicantsPage() {
         ...(referralCode ? { referral_code: referralCode } : {}),
       })
       .eq('id', id)
+      .select('id')
 
     if (error) {
       showToast('error', `Couldn't ${status === 'approved' ? 'approve' : 'reject'} ${applicant?.name ?? 'applicant'} — ${error.message}`)
@@ -140,7 +141,28 @@ export default function AdminApplicantsPage() {
       return
     }
 
-    showToast('success', `${applicant?.name ?? 'Applicant'} ${status === 'approved' ? 'approved' : 'rejected'}.`)
+    // Supabase doesn't return an error for an update that RLS silently
+    // filters to zero matching rows — an empty result here means it didn't
+    // actually happen (e.g. no admin/staff permission), even though there
+    // was no thrown error.
+    if (!updated || updated.length === 0) {
+      showToast('error', `Couldn't ${status === 'approved' ? 'approve' : 'reject'} ${applicant?.name ?? 'applicant'} — no record was updated. You may not have permission to do this.`)
+      setUpdating(null)
+      return
+    }
+
+    if (status === 'approved' && applicant) {
+      const invite = await callInviteApi(applicant)
+      if (invite.ok) {
+        setInviteSent(prev => ({ ...prev, [id]: true }))
+        showToast('success', `${applicant.name} approved — invite email sent.`)
+      } else {
+        showToast('error', `${applicant.name} approved, but the invite email failed to send (${invite.error}). You can resend it from the Approved tab.`)
+      }
+    } else {
+      showToast('success', `${applicant?.name ?? 'Applicant'} rejected.`)
+    }
+
     setApplicants(prev => prev.filter(a => a.id !== id))
     setExpanded(null)
     setUpdating(null)
@@ -163,20 +185,27 @@ export default function AdminApplicantsPage() {
     }
   }
 
-  async function sendInvite(a: Applicant) {
-    if (!a.email) return
-    setInviting(a.id)
+  async function callInviteApi(a: Applicant): Promise<{ ok: true } | { ok: false; error: string }> {
+    if (!a.email) return { ok: false, error: 'No email on file.' }
     const res = await fetch('/api/admin/invite-therapist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ therapistId: a.id, email: a.email, name: a.name }),
     })
-    if (res.ok) {
+    if (res.ok) return { ok: true }
+    const { error } = await res.json().catch(() => ({ error: 'Something went wrong.' }))
+    return { ok: false, error: error ?? 'Something went wrong.' }
+  }
+
+  async function sendInvite(a: Applicant) {
+    if (!a.email) return
+    setInviting(a.id)
+    const result = await callInviteApi(a)
+    if (result.ok) {
       setInviteSent(prev => ({ ...prev, [a.id]: true }))
       showToast('success', `Invite sent to ${a.email}.`)
     } else {
-      const { error } = await res.json().catch(() => ({ error: 'Something went wrong.' }))
-      showToast('error', `Couldn't send invite to ${a.email} — ${error ?? 'Something went wrong.'}`)
+      showToast('error', `Couldn't send invite to ${a.email} — ${result.error}`)
     }
     setInviting(null)
   }
