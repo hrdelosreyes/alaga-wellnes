@@ -76,11 +76,20 @@ export function ServicesSection() {
                       </>
                     )}
                   </div>
-                  <Link href={isLive ? '/book' : '/#waitlist'}>
-                    <Button size="sm" variant="outline" className="group-hover:bg-[#C4714A] group-hover:text-white group-hover:border-[#C4714A] transition-colors">
-                      Book
-                    </Button>
-                  </Link>
+                  {isLive ? (
+                    <Link href="/book">
+                      <Button size="sm" variant="outline" className="group-hover:bg-[#C4714A] group-hover:text-white group-hover:border-[#C4714A] transition-colors">
+                        Book
+                      </Button>
+                    </Link>
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
+                    <a href="/#waitlist">
+                      <Button size="sm" variant="outline" className="group-hover:bg-[#C4714A] group-hover:text-white group-hover:border-[#C4714A] transition-colors">
+                        Book
+                      </Button>
+                    </a>
+                  )}
                 </div>
               </div>
             )

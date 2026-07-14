@@ -110,15 +110,28 @@ export default function AccountPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-8">
 
-        <Link href={isLive ? '/book' : '/#waitlist'}>
-          <div className="bg-[#C4714A] text-white rounded-2xl p-5 mb-8 flex items-center justify-between hover:bg-[#b36540] transition-colors">
-            <div>
-              <p className="font-bold text-base">Book a session</p>
-              <p className="text-sm text-[#F2D9CC] mt-0.5">Your details will be pre-filled.</p>
+        {isLive ? (
+          <Link href="/book">
+            <div className="bg-[#C4714A] text-white rounded-2xl p-5 mb-8 flex items-center justify-between hover:bg-[#b36540] transition-colors">
+              <div>
+                <p className="font-bold text-base">Book a session</p>
+                <p className="text-sm text-[#F2D9CC] mt-0.5">Your details will be pre-filled.</p>
+              </div>
+              <ChevronRight size={20} />
             </div>
-            <ChevronRight size={20} />
-          </div>
-        </Link>
+          </Link>
+        ) : (
+          // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
+          <a href="/#waitlist">
+            <div className="bg-[#C4714A] text-white rounded-2xl p-5 mb-8 flex items-center justify-between hover:bg-[#b36540] transition-colors">
+              <div>
+                <p className="font-bold text-base">Book a session</p>
+                <p className="text-sm text-[#F2D9CC] mt-0.5">Your details will be pre-filled.</p>
+              </div>
+              <ChevronRight size={20} />
+            </div>
+          </a>
+        )}
 
         {upcoming.length > 0 && (
           <section className="mb-8">

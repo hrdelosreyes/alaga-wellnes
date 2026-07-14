@@ -229,12 +229,22 @@ function BookingConfirmationPage() {
             Rate your session ★
           </Link>
         )}
-        <Link
-          href={isLive ? '/book' : '/#waitlist'}
-          className="w-full text-center py-3.5 rounded-xl bg-[#C4714A] text-white font-semibold hover:bg-[#A05938] transition-colors"
-        >
-          Book another session
-        </Link>
+        {isLive ? (
+          <Link
+            href="/book"
+            className="w-full text-center py-3.5 rounded-xl bg-[#C4714A] text-white font-semibold hover:bg-[#A05938] transition-colors"
+          >
+            Book another session
+          </Link>
+        ) : (
+          // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
+          <a
+            href="/#waitlist"
+            className="w-full text-center py-3.5 rounded-xl bg-[#C4714A] text-white font-semibold hover:bg-[#A05938] transition-colors"
+          >
+            Book another session
+          </a>
+        )}
         <Link
           href="/"
           className="w-full text-center py-3.5 rounded-xl border-2 border-[#EDE5DF] text-[#8C7B70] font-semibold hover:border-[#C4714A] hover:text-[#C4714A] transition-colors"

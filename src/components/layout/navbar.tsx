@@ -72,9 +72,16 @@ export function Navbar() {
               <Button variant="ghost" size="sm">Sign in</Button>
             </Link>
           ) : null}
-          <Link href={isLive ? '/book' : '/#waitlist'}>
-            <Button size="sm">Book Now</Button>
-          </Link>
+          {isLive ? (
+            <Link href="/book">
+              <Button size="sm">Book Now</Button>
+            </Link>
+          ) : (
+            // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
+            <a href="/#waitlist">
+              <Button size="sm">Book Now</Button>
+            </a>
+          )}
         </div>
 
         {/* Mobile menu toggle */}
@@ -112,9 +119,16 @@ export function Navbar() {
           ) : isLive ? (
             <Link href="/account/login" onClick={() => setOpen(false)} className="text-sm font-medium text-[#2C2420]">Sign in</Link>
           ) : null}
-          <Link href={isLive ? '/book' : '/#waitlist'} onClick={() => setOpen(false)}>
-            <Button className="w-full">Book Now</Button>
-          </Link>
+          {isLive ? (
+            <Link href="/book" onClick={() => setOpen(false)}>
+              <Button className="w-full">Book Now</Button>
+            </Link>
+          ) : (
+            // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
+            <a href="/#waitlist" onClick={() => setOpen(false)}>
+              <Button className="w-full">Book Now</Button>
+            </a>
+          )}
         </div>
       )}
     </header>
