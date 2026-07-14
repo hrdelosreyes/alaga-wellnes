@@ -324,7 +324,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── WAITLIST ── */}
-      <section className="py-20 bg-[#2C2420]">
+      <section id="waitlist" className="py-20 bg-[#2C2420]">
         <div className="container-alaga">
           <div className="max-w-xl mx-auto text-center">
             <p className="text-[#C8A88A] text-sm font-semibold uppercase tracking-widest mb-3">Coming to your city</p>

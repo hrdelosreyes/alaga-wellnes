@@ -31,7 +31,7 @@ export function CityBadge() {
             Coming soon in {city.name}!
           </div>
           <a
-            href={`mailto:hello@alagawellness.care?subject=Waitlist – ${encodeURIComponent(city.name)}&body=Hi! I'd like to join the waitlist for Alaga Wellness in ${encodeURIComponent(city.name)}.`}
+            href="#waitlist"
             className="text-xs text-[#C4714A] hover:underline underline-offset-2 pl-1"
           >
             Join the waitlist →

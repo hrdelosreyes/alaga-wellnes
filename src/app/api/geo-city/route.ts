@@ -121,8 +121,12 @@ export async function GET(req: NextRequest) {
     })
   }
 
-  // No detection at all — fall back to first live city
+  // No detection at all — fall back to first live city, if any
   const fallback = liveCities[0]
+  if (!fallback) {
+    return NextResponse.json({ city: null, isLive: false, pricing: [], allLiveCities: [] })
+  }
+
   const { data: pricing } = await supabase
     .from('city_service_rates')
     .select('service_id, price_min:min_rate, price_max:max_rate')
