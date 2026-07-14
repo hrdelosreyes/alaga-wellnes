@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -12,22 +12,68 @@ export default function SetPasswordPage() {
   const [loading,   setLoading]   = useState(false)
   const [error,     setError]     = useState<string | null>(null)
   const [ready,     setReady]     = useState(false)
+  const [linkError, setLinkError] = useState<string | null>(null)
+  const readyRef = useRef(false)
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
 
-    // The recovery session may already be set (event fired before this mounted).
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setReady(true)
-    })
+    function markReady() {
+      readyRef.current = true
+      if (!cancelled) setReady(true)
+    }
+
+    async function establishSession() {
+      // Invite/recovery links sent via the admin API (service-role, triggered
+      // server-side) come back as an implicit-flow hash (#access_token=...),
+      // not a PKCE ?code= — there's no client that generated a PKCE verifier.
+      // Our browser client defaults to PKCE and won't auto-process that hash,
+      // so parse it and establish the session manually.
+      const rawHash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
+      const params = new URLSearchParams(rawHash)
+      const accessToken  = params.get('access_token')
+      const refreshToken = params.get('refresh_token')
+      const hashError     = params.get('error_description') || params.get('error')
+
+      if (hashError) {
+        if (!cancelled) setLinkError(decodeURIComponent(hashError.replace(/\+/g, ' ')))
+        return
+      }
+
+      if (accessToken && refreshToken) {
+        const { error: setErr } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        // setSession only validates the token's local shape, not that it's a
+        // genuine, unexpired session — confirm with a server round-trip.
+        if (!setErr) {
+          const { data: { user }, error: getErr } = await supabase.auth.getUser()
+          if (user && !getErr) { markReady(); return }
+        }
+      }
+
+      // Fall back to a session that may already exist (e.g. a PKCE ?code= was
+      // already exchanged elsewhere on this page load).
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) markReady()
+    }
+
+    establishSession()
 
     // Also listen in case the event fires after mount.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
-        setReady(true)
+        markReady()
       }
     })
-    return () => subscription.unsubscribe()
+
+    // Don't spin forever if the link is invalid/expired and nothing above fires.
+    const timeout = setTimeout(() => {
+      if (!cancelled && !readyRef.current) {
+        setLinkError(prev => prev ?? 'This link is invalid or has expired. Please ask the admin to resend your invite.')
+      }
+    }, 8000)
+
+    return () => { cancelled = true; subscription.unsubscribe(); clearTimeout(timeout) }
   }, [])
 
   async function handleSubmit() {
@@ -64,7 +110,9 @@ export default function SetPasswordPage() {
             Choose a password to access your therapist portal.
           </p>
 
-          {!ready ? (
+          {linkError ? (
+            <p className="text-sm text-red-600 text-center py-4">{linkError}</p>
+          ) : !ready ? (
             <p className="text-sm text-[#8C7B70] text-center py-4">Verifying your invite link…</p>
           ) : (
             <div className="flex flex-col gap-4">
