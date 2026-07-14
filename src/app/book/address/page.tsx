@@ -25,9 +25,11 @@ export default function AddressPage() {
   const [barangay,   setBarangay]   = useState<Barangay | null>(null)
   const [address,    setAddress]    = useState(draft.address   ?? '')
   const [unitNotes,  setUnitNotes]  = useState(draft.unitNotes ?? '')
-  const [waitlist,   setWaitlist]   = useState(false)
-  const [waitEmail,  setWaitEmail]  = useState('')
-  const [waitSent,   setWaitSent]   = useState(false)
+  const [waitlist,    setWaitlist]    = useState(false)
+  const [waitEmail,   setWaitEmail]   = useState('')
+  const [waitSent,    setWaitSent]    = useState(false)
+  const [waitLoading, setWaitLoading] = useState(false)
+  const [waitError,   setWaitError]   = useState('')
   const [errors,     setErrors]     = useState<{ cityId?: string; barangay?: string; address?: string }>({})
 
   useEffect(() => {
@@ -75,6 +77,26 @@ export default function AddressPage() {
         setBgyLoading(false)
       })
   }, [cityId, cities])
+
+  async function submitWaitlist() {
+    if (!waitEmail.includes('@')) { setWaitError('Enter a valid email address.'); return }
+    setWaitLoading(true)
+    setWaitError('')
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: waitEmail.trim(), source: 'book-address' }),
+      })
+      const data = await res.json()
+      if (data.ok || data.alreadyJoined) setWaitSent(true)
+      else setWaitError(data.error ?? 'Something went wrong.')
+    } catch {
+      setWaitError('Something went wrong. Please try again.')
+    } finally {
+      setWaitLoading(false)
+    }
+  }
 
   function validate() {
     const e: typeof errors = {}
@@ -173,13 +195,14 @@ export default function AddressPage() {
               <input
                 type="email"
                 value={waitEmail}
-                onChange={e => setWaitEmail(e.target.value)}
+                onChange={e => { setWaitEmail(e.target.value); setWaitError('') }}
                 placeholder="your@email.com"
                 className="w-full border border-[#EDE5DF] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]"
               />
+              {waitError && <p className="text-xs text-red-500">{waitError}</p>}
               <div className="flex gap-2">
-                <Button size="sm" onClick={async () => { if (!waitEmail.includes('@')) return; setWaitSent(true) }}>
-                  Notify me
+                <Button size="sm" disabled={waitLoading} onClick={submitWaitlist}>
+                  {waitLoading ? 'Joining…' : 'Notify me'}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => setWaitlist(false)}>Cancel</Button>
               </div>

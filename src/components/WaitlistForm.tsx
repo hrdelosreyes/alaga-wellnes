@@ -1,20 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowRight, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
+
+type City = { id: string; name: string; region: string; province: string | null }
 
 export default function WaitlistForm({ source = 'homepage' }: { source?: string }) {
   const [email,     setEmail]     = useState('')
   const [city,      setCity]      = useState('')
+  const [cities,    setCities]    = useState<City[]>([])
   const [loading,   setLoading]   = useState(false)
   const [state,     setState]     = useState<'idle' | 'success' | 'already' | 'error'>('idle')
   const [errorMsg,  setErrorMsg]  = useState('')
+
+  useEffect(() => {
+    createClient()
+      .from('cities')
+      .select('id, name, region, province')
+      .order('region').order('name')
+      .then(({ data }) => setCities((data ?? []) as City[]))
+  }, [])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim()) { setErrorMsg('Please enter your email.'); return }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setErrorMsg('Enter a valid email address.'); return }
+    if (!city) { setErrorMsg('Please select your city.'); return }
 
     setLoading(true)
     setErrorMsg('')
@@ -23,7 +36,7 @@ export default function WaitlistForm({ source = 'homepage' }: { source?: string 
       const res  = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), city: city.trim() || null, source }),
+        body: JSON.stringify({ email: email.trim(), city, source }),
       })
       const data = await res.json()
 
@@ -73,13 +86,28 @@ export default function WaitlistForm({ source = 'homepage' }: { source?: string 
             errorMsg ? 'border-red-400' : 'border-[#EDE5DF]',
           )}
         />
-        <input
-          type="text"
+        <select
           value={city}
-          onChange={e => setCity(e.target.value)}
-          placeholder="Your city (optional)"
-          className="flex-1 sm:max-w-[160px] px-4 py-3 rounded-xl border border-[#EDE5DF] text-sm focus:outline-none focus:border-[#C4714A] transition-colors bg-white"
-        />
+          onChange={e => { setCity(e.target.value); setErrorMsg('') }}
+          disabled={cities.length === 0}
+          className="flex-1 sm:max-w-[180px] px-4 py-3 rounded-xl border border-[#EDE5DF] text-sm focus:outline-none focus:border-[#C4714A] transition-colors bg-white disabled:opacity-50"
+        >
+          <option value="">{cities.length === 0 ? 'Loading cities…' : 'Your city…'}</option>
+          {Object.entries(
+            cities.reduce<Record<string, City[]>>((acc, c) => {
+              (acc[c.region] ??= []).push(c)
+              return acc
+            }, {})
+          ).map(([region, regionCities]) => (
+            <optgroup key={region} label={region}>
+              {regionCities.map(c => (
+                <option key={c.id} value={c.name}>
+                  {c.name}{c.province ? ` — ${c.province}` : ''}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
         <button
           type="submit"
           disabled={loading}
