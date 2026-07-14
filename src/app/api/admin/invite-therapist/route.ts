@@ -22,8 +22,12 @@ export async function POST(req: NextRequest) {
     const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY!
     const redirectTo  = `${process.env.NEXT_PUBLIC_APP_URL}/therapist/set-password`
 
+    // GoTrue reads redirect_to from the QUERY STRING, not the JSON body — it's
+    // silently ignored (falls back to the Site URL) if only passed in the body.
+    const redirectQuery = `redirect_to=${encodeURIComponent(redirectTo)}`
+
     // Try invite first; if user already exists, send a password reset instead
-    const inviteRes = await fetch(`${supabaseUrl}/auth/v1/invite`, {
+    const inviteRes = await fetch(`${supabaseUrl}/auth/v1/invite?${redirectQuery}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (!inviteRes.ok) {
       // User already exists — send a password reset link instead
       if (inviteRes.status === 422) {
-        const resetRes = await fetch(`${supabaseUrl}/auth/v1/recover`, {
+        const resetRes = await fetch(`${supabaseUrl}/auth/v1/recover?${redirectQuery}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
