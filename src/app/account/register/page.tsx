@@ -88,8 +88,11 @@ function RegisterPage() {
             <div className="text-center">
               <p className="text-3xl mb-3">📧</p>
               <h1 className="text-xl font-bold text-[#2C2420] mb-2">Check your email</h1>
-              <p className="text-sm text-[#8C7B70] mb-6">
+              <p className="text-sm text-[#8C7B70] mb-2">
                 We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.
+              </p>
+              <p className="text-xs text-[#8C7B70] mb-6">
+                Don&apos;t see it? Check your spam or junk folder — it can take a minute to arrive.
               </p>
               <Link
                 href={`/account/login${redirectTo !== '/account' ? `?next=${encodeURIComponent(redirectTo)}` : ''}`}
