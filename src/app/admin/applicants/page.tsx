@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { generateReferralCode } from '@/lib/referral'
 import { cn } from '@/lib/utils'
-import { ShieldCheck, FileText, ChevronDown, ChevronUp, ExternalLink, RefreshCw } from 'lucide-react'
+import { ShieldCheck, FileText, ChevronDown, ChevronUp, ExternalLink, RefreshCw, CheckCircle, XCircle } from 'lucide-react'
 import { AdminNav } from '@/components/layout/admin-nav'
 
 type Extracted = {
@@ -54,6 +54,12 @@ export default function AdminApplicantsPage() {
   const [inviting,    setInviting]    = useState<string | null>(null)
   const [inviteSent,  setInviteSent]  = useState<Record<string, boolean>>({})
   const [docUrls,     setDocUrls]     = useState<Record<string, { nbi?: string; tesda?: string; photo?: string }>>({})
+  const [toast,       setToast]       = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  function showToast(type: 'success' | 'error', message: string) {
+    setToast({ type, message })
+    setTimeout(() => setToast(null), 4000)
+  }
 
   useEffect(() => { fetchApplicants() }, [filter])
 
@@ -117,7 +123,7 @@ export default function AdminApplicantsPage() {
       referralCode = code
     }
 
-    await supabase
+    const { error } = await supabase
       .from('therapists')
       .update({
         application_status: status,
@@ -127,6 +133,14 @@ export default function AdminApplicantsPage() {
         ...(referralCode ? { referral_code: referralCode } : {}),
       })
       .eq('id', id)
+
+    if (error) {
+      showToast('error', `Couldn't ${status === 'approved' ? 'approve' : 'reject'} ${applicant?.name ?? 'applicant'} — ${error.message}`)
+      setUpdating(null)
+      return
+    }
+
+    showToast('success', `${applicant?.name ?? 'Applicant'} ${status === 'approved' ? 'approved' : 'rejected'}.`)
     setApplicants(prev => prev.filter(a => a.id !== id))
     setExpanded(null)
     setUpdating(null)
@@ -157,13 +171,32 @@ export default function AdminApplicantsPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ therapistId: a.id, email: a.email, name: a.name }),
     })
-    if (res.ok) setInviteSent(prev => ({ ...prev, [a.id]: true }))
+    if (res.ok) {
+      setInviteSent(prev => ({ ...prev, [a.id]: true }))
+      showToast('success', `Invite sent to ${a.email}.`)
+    } else {
+      const { error } = await res.json().catch(() => ({ error: 'Something went wrong.' }))
+      showToast('error', `Couldn't send invite to ${a.email} — ${error ?? 'Something went wrong.'}`)
+    }
     setInviting(null)
   }
 
   return (
     <div className="min-h-screen bg-[#F7F2EE]">
       <AdminNav onRefresh={fetchApplicants} refreshing={loading} />
+
+      {/* Toast */}
+      {toast && (
+        <div
+          className={cn(
+            'fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold max-w-sm',
+            toast.type === 'success' ? 'bg-[#EBF3EC] text-[#3E5A41] border border-[#B8D9BB]' : 'bg-red-50 text-red-700 border border-red-200',
+          )}
+        >
+          {toast.type === 'success' ? <CheckCircle size={16} className="flex-shrink-0" /> : <XCircle size={16} className="flex-shrink-0" />}
+          {toast.message}
+        </div>
+      )}
 
       <div className="max-w-4xl mx-auto px-4 py-8">
 
