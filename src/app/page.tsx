@@ -6,6 +6,7 @@ import type { Therapist } from '@/types'
 import WaitlistForm from '@/components/WaitlistForm'
 import { ServicesSection } from '@/components/home/services-section'
 import { CityBadge } from '@/components/home/city-badge'
+import { BookLink } from '@/components/home/book-link'
 
 async function getTopTherapists(): Promise<Therapist[]> {
   const supabase = await createClient()
@@ -61,12 +62,12 @@ export default async function HomePage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/book">
+              <BookLink>
                 <Button size="lg" className="w-full sm:w-auto shadow-lg">
                   Book a Session
                   <ArrowRight size={18} className="ml-2" />
                 </Button>
-              </Link>
+              </BookLink>
               <Link href="#how-it-works">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/80 backdrop-blur-sm">
                   How It Works
@@ -202,12 +203,12 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-8 text-center">
-            <Link href="/book">
+            <BookLink>
               <Button variant="outline">
                 Browse all therapists when booking
                 <ArrowRight size={16} className="ml-2" />
               </Button>
-            </Link>
+            </BookLink>
           </div>
         </div>
       </section>
@@ -313,11 +314,11 @@ export default async function HomePage() {
               <p className="text-[#C8BDB8] text-sm leading-relaxed mb-6">
                 Whether you need to unwind after a long week or recover from an intense workout — your verified Alaga therapist is ready.
               </p>
-              <Link href="/book">
+              <BookLink>
                 <Button size="lg">
                   Book a session <ArrowRight size={18} className="ml-2" />
                 </Button>
-              </Link>
+              </BookLink>
             </div>
           </div>
         </div>
@@ -354,12 +355,12 @@ export default async function HomePage() {
                 Book a verified wellness professional today. Available in select cities, 9AM–10PM daily.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link href="/book">
+                <BookLink>
                   <Button size="lg" className="w-full sm:w-auto">
                     Book Now — From ₱899
                     <ArrowRight size={18} className="ml-2" />
                   </Button>
-                </Link>
+                </BookLink>
               </div>
               <div className="flex justify-center gap-6 mt-8 text-sm text-[#8C7B70]">
                 <span className="flex items-center gap-1.5">

@@ -76,7 +76,7 @@ export function ServicesSection() {
                       </>
                     )}
                   </div>
-                  <Link href="/book">
+                  <Link href={isLive ? '/book' : '/#waitlist'}>
                     <Button size="sm" variant="outline" className="group-hover:bg-[#C4714A] group-hover:text-white group-hover:border-[#C4714A] transition-colors">
                       Book
                     </Button>

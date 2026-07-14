@@ -67,12 +67,12 @@ export function Navbar() {
                 Sign out
               </button>
             </div>
-          ) : (
+          ) : isLive ? (
             <Link href="/account/login">
               <Button variant="ghost" size="sm">Sign in</Button>
             </Link>
-          )}
-          <Link href="/book">
+          ) : null}
+          <Link href={isLive ? '/book' : '/#waitlist'}>
             <Button size="sm">Book Now</Button>
           </Link>
         </div>
@@ -109,10 +109,10 @@ export function Navbar() {
                 Sign out
               </button>
             </>
-          ) : (
+          ) : isLive ? (
             <Link href="/account/login" onClick={() => setOpen(false)} className="text-sm font-medium text-[#2C2420]">Sign in</Link>
-          )}
-          <Link href="/book" onClick={() => setOpen(false)}>
+          ) : null}
+          <Link href={isLive ? '/book' : '/#waitlist'} onClick={() => setOpen(false)}>
             <Button className="w-full">Book Now</Button>
           </Link>
         </div>

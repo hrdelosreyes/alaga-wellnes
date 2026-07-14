@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff } from 'lucide-react'
+import { useGeoCity } from '@/components/geo/city-context'
 
 function RegisterPage() {
   const router     = useRouter()
   const params     = useSearchParams()
   const redirectTo = params.get('next') ?? '/account'
+  const { isLive, loading: geoLoading } = useGeoCity()
 
   const [name,     setName]     = useState('')
   const [email,    setEmail]    = useState('')
@@ -21,6 +23,13 @@ function RegisterPage() {
   const [errors,   setErrors]   = useState<Record<string, string>>({})
   const [error,    setError]    = useState<string | null>(null)
   const [sent,     setSent]     = useState(false)
+
+  // Booking isn't available in this city yet — nothing to register for.
+  useEffect(() => {
+    if (!geoLoading && !isLive) router.replace('/')
+  }, [geoLoading, isLive, router])
+
+  if (geoLoading || !isLive) return null
 
   function validate() {
     const e: Record<string, string> = {}

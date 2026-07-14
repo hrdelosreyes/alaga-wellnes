@@ -7,6 +7,7 @@ import { CheckCircle, Clock, MapPin, Calendar, User, AlertCircle, Loader2 } from
 import { SERVICES } from '@/lib/constants'
 import { formatPrice, formatDate, formatTime } from '@/lib/utils'
 import { ChatThread } from '@/components/chat/chat-thread'
+import { useGeoCity } from '@/components/geo/city-context'
 
 type BookingRow = {
   id: string
@@ -51,6 +52,7 @@ function BookingConfirmationPage() {
   const { id }          = useParams<{ id: string }>()
   const searchParams    = useSearchParams()
   const justPaid        = searchParams.get('payment') === 'success'
+  const { isLive }      = useGeoCity()
 
   const [booking, setBooking] = useState<BookingRow | null>(null)
   const [loading, setLoading] = useState(true)
@@ -228,7 +230,7 @@ function BookingConfirmationPage() {
           </Link>
         )}
         <Link
-          href="/book"
+          href={isLive ? '/book' : '/#waitlist'}
           className="w-full text-center py-3.5 rounded-xl bg-[#C4714A] text-white font-semibold hover:bg-[#A05938] transition-colors"
         >
           Book another session

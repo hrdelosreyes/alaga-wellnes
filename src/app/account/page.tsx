@@ -8,6 +8,7 @@ import { SERVICES } from '@/lib/constants'
 import { formatPrice, formatDate, formatTime } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { LogOut, ChevronRight } from 'lucide-react'
+import { useGeoCity } from '@/components/geo/city-context'
 
 type Customer = { id: string; name: string; phone: string | null; email: string | null }
 
@@ -44,6 +45,7 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default function AccountPage() {
   const router = useRouter()
+  const { isLive } = useGeoCity()
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading,  setLoading]  = useState(true)
@@ -108,7 +110,7 @@ export default function AccountPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-8">
 
-        <Link href="/book">
+        <Link href={isLive ? '/book' : '/#waitlist'}>
           <div className="bg-[#C4714A] text-white rounded-2xl p-5 mb-8 flex items-center justify-between hover:bg-[#b36540] transition-colors">
             <div>
               <p className="font-bold text-base">Book a session</p>
