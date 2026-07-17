@@ -91,7 +91,7 @@ export default function AdminPayoutsPage() {
           <Wallet size={20} className="text-[#C4714A]" />
           <h1 className="text-2xl font-bold text-[#2C2420]">Therapist payouts</h1>
         </div>
-        <p className="text-sm text-[#8C7B70] mb-6">
+        <p className="text-sm text-[#6E5F55] mb-6">
           Take-home is 75% of each completed booking. Pay weekly via the therapist&rsquo;s saved method,
           then record the transaction reference here. Suggested minimum per payout: {formatPrice(MIN_PAYOUT)}.
         </p>
@@ -100,22 +100,22 @@ export default function AdminPayoutsPage() {
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4 text-center">
             <p className="text-xl font-bold text-[#2C2420]">{formatPrice(totalEarned)}</p>
-            <p className="text-[10px] text-[#8C7B70] mt-1">Total earned (all)</p>
+            <p className="text-[10px] text-[#6E5F55] mt-1">Total earned (all)</p>
           </div>
           <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4 text-center">
             <p className="text-xl font-bold text-[#6B8C6E]">{formatPrice(totalPaid)}</p>
-            <p className="text-[10px] text-[#8C7B70] mt-1">Total paid out</p>
+            <p className="text-[10px] text-[#6E5F55] mt-1">Total paid out</p>
           </div>
           <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4 text-center">
             <p className="text-xl font-bold text-[#C4714A]">{formatPrice(totalPending)}</p>
-            <p className="text-[10px] text-[#8C7B70] mt-1">Total pending</p>
+            <p className="text-[10px] text-[#6E5F55] mt-1">Total pending</p>
           </div>
         </div>
 
         {loading ? (
           <div className="text-center py-20"><Loader2 className="animate-spin text-[#C4714A] mx-auto" size={28} /></div>
         ) : rows.length === 0 ? (
-          <div className="text-center py-20 text-[#8C7B70]">No therapist earnings yet.</div>
+          <div className="text-center py-20 text-[#6E5F55]">No therapist earnings yet.</div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#EDE5DF] overflow-hidden divide-y divide-[#F2EBE6]">
             {rows.map(row => {
@@ -124,7 +124,7 @@ export default function AdminPayoutsPage() {
                 <div key={row.therapist_id} className="flex items-center gap-4 px-5 py-4">
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-[#2C2420] truncate">{row.name}</p>
-                    <p className="text-xs text-[#8C7B70] mt-0.5">
+                    <p className="text-xs text-[#6E5F55] mt-0.5">
                       Earned {formatPrice(row.earned)} · Paid {formatPrice(row.paidOut)}
                     </p>
                     {dest ? (
@@ -137,7 +137,7 @@ export default function AdminPayoutsPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-bold text-[#C4714A]">{formatPrice(row.pending)}</p>
-                    <p className="text-[10px] text-[#8C7B70]">pending</p>
+                    <p className="text-[10px] text-[#6E5F55]">pending</p>
                   </div>
                   <button
                     onClick={() => openModal(row)}
@@ -159,9 +159,9 @@ export default function AdminPayoutsPage() {
           <div className="bg-white rounded-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-1">
               <h2 className="text-lg font-bold text-[#2C2420]">Record payout</h2>
-              <button onClick={() => !paying && setActive(null)} className="text-[#8C7B70] hover:text-[#2C2420]"><X size={18} /></button>
+              <button onClick={() => !paying && setActive(null)} className="text-[#6E5F55] hover:text-[#2C2420]"><X size={18} /></button>
             </div>
-            <p className="text-sm text-[#8C7B70] mb-4">{active.name} · pending {formatPrice(active.pending)}</p>
+            <p className="text-sm text-[#6E5F55] mb-4">{active.name} · pending {formatPrice(active.pending)}</p>
 
             {/* Destination */}
             {destinationLabel(active) ? (
@@ -187,7 +187,7 @@ export default function AdminPayoutsPage() {
             />
 
             <label className="text-sm font-semibold text-[#2C2420] mb-1.5 block">
-              Reference number <span className="text-[#8C7B70] font-normal">(from GCash/bank receipt)</span>
+              Reference number <span className="text-[#6E5F55] font-normal">(from GCash/bank receipt)</span>
             </label>
             <input
               value={reference}
@@ -208,7 +208,7 @@ export default function AdminPayoutsPage() {
             >
               {paying ? 'Saving…' : 'Mark as paid'}
             </button>
-            <p className="text-[11px] text-[#8C7B70] text-center mt-2">
+            <p className="text-[11px] text-[#6E5F55] text-center mt-2">
               This records that you sent the money. It does not transfer funds automatically.
             </p>
           </div>

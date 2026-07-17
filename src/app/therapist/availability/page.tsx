@@ -94,7 +94,7 @@ export default function TherapistAvailabilityPage() {
 
       <div className="max-w-lg mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-[#2C2420] mb-1">My availability</h1>
-        <p className="text-sm text-[#8C7B70] mb-6">
+        <p className="text-sm text-[#6E5F55] mb-6">
           You&rsquo;re available for bookings every day by default. Tap any day to mark it as a <strong>day off</strong> — you won&rsquo;t receive bookings then.
         </p>
 
@@ -126,7 +126,7 @@ export default function TherapistAvailabilityPage() {
                 </div>
                 <span className={cn(
                   'flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full shrink-0',
-                  saving === date ? 'text-[#8C7B70]'
+                  saving === date ? 'text-[#6E5F55]'
                     : isOff ? 'bg-[#FEE2E2] text-[#B91C1C]' : 'bg-[#EBF3EC] text-[#2C4A2E]',
                 )}>
                   {saving === date

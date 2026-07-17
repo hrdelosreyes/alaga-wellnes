@@ -53,7 +53,7 @@ function LoginPage() {
 
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-8">
           <h1 className="text-xl font-bold text-[#2C2420] mb-1">Sign in</h1>
-          <p className="text-sm text-[#8C7B70] mb-6">Welcome back — your bookings are waiting.</p>
+          <p className="text-sm text-[#6E5F55] mb-6">Welcome back — your bookings are waiting.</p>
 
           <form onSubmit={submit} className="flex flex-col gap-4">
             <div>
@@ -82,7 +82,7 @@ function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPw(p => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C7B70] hover:text-[#2C2420]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6E5F55] hover:text-[#2C2420]"
                 >
                   {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -99,12 +99,12 @@ function LoginPage() {
           </form>
 
           <p className="text-center text-sm mt-4">
-            <Link href="/account/forgot-password" className="text-[#8C7B70] hover:text-[#C4714A] transition-colors">
+            <Link href="/account/forgot-password" className="text-[#6E5F55] hover:text-[#C4714A] transition-colors">
               Forgot password?
             </Link>
           </p>
 
-          <p className="text-center text-sm text-[#8C7B70] mt-4">
+          <p className="text-center text-sm text-[#6E5F55] mt-4">
             No account?{' '}
             <Link
               href={`/account/register${redirectTo !== '/account' ? `?next=${encodeURIComponent(redirectTo)}` : ''}`}
@@ -115,7 +115,7 @@ function LoginPage() {
           </p>
         </div>
 
-        <p className="text-center text-sm text-[#8C7B70] mt-6">
+        <p className="text-center text-sm text-[#6E5F55] mt-6">
           <Link href={redirectTo.startsWith('/book') ? redirectTo : '/book'} className="hover:underline">
             Continue as guest instead
           </Link>

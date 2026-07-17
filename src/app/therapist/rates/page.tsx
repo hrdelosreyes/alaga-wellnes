@@ -103,7 +103,7 @@ function TherapistRatesPage() {
 
       <div className="max-w-lg mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-[#2C2420] mb-1">My rates</h1>
-        <p className="text-sm text-[#8C7B70] mb-6">
+        <p className="text-sm text-[#6E5F55] mb-6">
           Your rates must stay within the range set for your city. Clients see your rate before booking.
         </p>
 
@@ -120,7 +120,7 @@ function TherapistRatesPage() {
                 <div className="flex items-start justify-between mb-1">
                   <div>
                     <p className="font-bold text-[#2C2420]">{svc.label}</p>
-                    <p className="text-xs text-[#8C7B70]">{svc.duration} · {svc.description}</p>
+                    <p className="text-xs text-[#6E5F55]">{svc.duration} · {svc.description}</p>
                   </div>
                   <div className="text-right">
                     <span className="text-2xl font-bold text-[#2C2420]">₱{rate.toLocaleString()}</span>
@@ -138,11 +138,11 @@ function TherapistRatesPage() {
                     onChange={e => setRates(prev => ({ ...prev, [svc.id]: parseInt(e.target.value) }))}
                     className="w-full accent-[#C4714A]"
                   />
-                  <div className="flex justify-between text-xs text-[#8C7B70] mt-1">
+                  <div className="flex justify-between text-xs text-[#6E5F55] mt-1">
                     <span>Min ₱{band.min_rate.toLocaleString()}</span>
                     <span className={cn(
                       'font-semibold',
-                      rate === band.base_rate ? 'text-[#C4714A]' : 'text-[#8C7B70]',
+                      rate === band.base_rate ? 'text-[#C4714A]' : 'text-[#6E5F55]',
                     )}>
                       {rate === band.base_rate ? 'Suggested ₱' + band.base_rate.toLocaleString() : `${pct}% of range`}
                     </span>
@@ -152,7 +152,7 @@ function TherapistRatesPage() {
 
                 {/* Manual input */}
                 <div className="flex items-center gap-2 mt-3">
-                  <span className="text-sm text-[#8C7B70]">Or type:</span>
+                  <span className="text-sm text-[#6E5F55]">Or type:</span>
                   <input
                     type="number"
                     min={band.min_rate}
@@ -181,7 +181,7 @@ function TherapistRatesPage() {
           {saved ? '✓ Rates saved!' : 'Save my rates'}
         </Button>
 
-        <p className="text-center text-xs text-[#8C7B70] mt-3">
+        <p className="text-center text-xs text-[#6E5F55] mt-3">
           You can update your rates anytime. Changes apply to new bookings only.
         </p>
       </div>

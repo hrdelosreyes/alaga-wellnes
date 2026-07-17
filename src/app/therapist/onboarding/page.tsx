@@ -68,7 +68,7 @@ export default function TherapistOnboardingPage() {
   if (screen === 'loading') {
     return (
       <div className="min-h-screen bg-[#FBF6F0] flex items-center justify-center">
-        <p className="text-[#8C7B70] text-sm">Loading…</p>
+        <p className="text-[#6E5F55] text-sm">Loading…</p>
       </div>
     )
   }
@@ -90,13 +90,13 @@ export default function TherapistOnboardingPage() {
             <h1 className="text-xl font-bold text-[#2C2420] mb-2">
               You&rsquo;re approved, {name}! 🎉
             </h1>
-            <p className="text-sm text-[#8C7B70] mb-5">
+            <p className="text-sm text-[#6E5F55] mb-5">
               {cityName ? <>You&rsquo;re a <strong>founding therapist</strong> for {cityName}.</> : <>You&rsquo;re a <strong>founding therapist</strong>.</>}{' '}
               We&rsquo;re still gathering enough therapists in your area to open it for bookings.
             </p>
 
             <div className="bg-[#FBF6F0] rounded-2xl p-5 mb-6 text-left">
-              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">What happens next</p>
+              <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3">What happens next</p>
               <ul className="flex flex-col gap-2.5 text-sm text-[#5C4B45]">
                 <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-[#6B8C6E] mt-0.5 flex-shrink-0" /> Your spot is reserved — no need to register again.</li>
                 <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-[#6B8C6E] mt-0.5 flex-shrink-0" /> We&rsquo;ll email you the moment {cityName || 'your city'} goes live.</li>
@@ -104,7 +104,7 @@ export default function TherapistOnboardingPage() {
               </ul>
             </div>
 
-            <p className="text-xs text-[#8C7B70]">
+            <p className="text-xs text-[#6E5F55]">
               Want to help your city open sooner? Invite other therapists near you — the more who join, the faster {cityName || 'it'} launches.
             </p>
           </div>
@@ -123,13 +123,13 @@ export default function TherapistOnboardingPage() {
         <h1 className="text-xl font-bold text-[#2C2420] text-center mb-1">
           Welcome, {name}! Here's how you get paid.
         </h1>
-        <p className="text-sm text-[#8C7B70] text-center mb-6">
+        <p className="text-sm text-[#6E5F55] text-center mb-6">
           You're approved. Before you go live, let's make sure you understand your earnings.
         </p>
 
         {/* Breakdown */}
         <div className="bg-[#FBF6F0] rounded-2xl p-5 mb-4">
-          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">Every time a client pays</p>
+          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3">Every time a client pays</p>
           <div className="flex flex-col gap-3">
             <EarningsRow color="bg-[#C4714A]" width="75%" label="You" sublabel="take-home" value="75%" highlight />
             <EarningsRow color="bg-[#C9A84C]" width="5%"  label="Alaga Bonus Pool" sublabel="quarterly bonus" value="5%" />
@@ -139,15 +139,15 @@ export default function TherapistOnboardingPage() {
         </div>
 
         <div className="bg-white border border-[#EDE5DF] rounded-2xl p-5 mb-6">
-          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">Example booking at ₱1,000</p>
+          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3">Example booking at ₱1,000</p>
           <div className="flex flex-col gap-2 text-sm">
             <div className="flex justify-between items-center">
-              <span className="text-[#8C7B70]">Client pays</span>
+              <span className="text-[#6E5F55]">Client pays</span>
               <span className="font-bold text-[#2C2420]">₱1,000</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[#8C7B70]">Platform share (25%)</span>
-              <span className="text-[#8C7B70]">− ₱250</span>
+              <span className="text-[#6E5F55]">Platform share (25%)</span>
+              <span className="text-[#6E5F55]">− ₱250</span>
             </div>
             <div className="h-px bg-[#EDE5DF] my-1" />
             <div className="flex justify-between items-center">
@@ -157,7 +157,7 @@ export default function TherapistOnboardingPage() {
           </div>
         </div>
 
-        <p className="text-xs text-[#8C7B70] text-center mb-6">
+        <p className="text-xs text-[#6E5F55] text-center mb-6">
           You set your own rate per service. The city admin sets a fair price range — you choose any amount within it.
         </p>
 
@@ -175,43 +175,43 @@ export default function TherapistOnboardingPage() {
           <Users size={22} className="text-[#6B8C6E]" />
         </div>
         <h1 className="text-xl font-bold text-[#2C2420] text-center mb-1">Earn when your friends earn</h1>
-        <p className="text-sm text-[#8C7B70] text-center mb-6">
+        <p className="text-sm text-[#6E5F55] text-center mb-6">
           Once you're live, you'll get a personal referral code. Share it with other therapists.
         </p>
 
         <div className="bg-[#FBF6F0] rounded-2xl p-5 mb-4">
-          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-4">Your 2-level network</p>
+          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-4">Your 2-level network</p>
           <div className="flex flex-col gap-4">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-[#6B8C6E] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">1</div>
               <div>
                 <p className="text-sm font-semibold text-[#2C2420]">You invite Therapist B</p>
-                <p className="text-xs text-[#8C7B70] mt-0.5">You earn <strong className="text-[#6B8C6E]">5% commission</strong> for every booking B completes — for their first 100 bookings.</p>
+                <p className="text-xs text-[#6E5F55] mt-0.5">You earn <strong className="text-[#6B8C6E]">5% commission</strong> for every booking B completes — for their first 100 bookings.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-[#6B8C6E]/50 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">2</div>
               <div>
                 <p className="text-sm font-semibold text-[#2C2420]">B invites Therapist C</p>
-                <p className="text-xs text-[#8C7B70] mt-0.5">You <em>and</em> B each earn <strong className="text-[#6B8C6E]">5% commission</strong> for every booking C completes — for C's first 100 bookings.</p>
+                <p className="text-xs text-[#6E5F55] mt-0.5">You <em>and</em> B each earn <strong className="text-[#6B8C6E]">5% commission</strong> for every booking C completes — for C's first 100 bookings.</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="bg-white border border-[#EDE5DF] rounded-2xl p-5 mb-6">
-          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">Example — B completes a ₱1,000 booking</p>
+          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3">Example — B completes a ₱1,000 booking</p>
           <div className="flex flex-col gap-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-[#8C7B70]">B's booking value</span>
+              <span className="text-[#6E5F55]">B's booking value</span>
               <span className="font-bold text-[#2C2420]">₱1,000</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#8C7B70]">Your referral (5%)</span>
+              <span className="text-[#6E5F55]">Your referral (5%)</span>
               <span className="font-bold text-[#6B8C6E]">+ ₱50</span>
             </div>
           </div>
-          <p className="text-xs text-[#8C7B70] mt-3">Commissions accumulate and are paid out by Alaga separately from your session earnings.</p>
+          <p className="text-xs text-[#6E5F55] mt-3">Commissions accumulate and are paid out by Alaga separately from your session earnings.</p>
         </div>
 
         <Button size="lg" className="w-full" onClick={() => setScreen('bonus')}>
@@ -228,12 +228,12 @@ export default function TherapistOnboardingPage() {
           <Gift size={22} className="text-[#C9A84C]" />
         </div>
         <h1 className="text-xl font-bold text-[#2C2420] text-center mb-1">The Alaga Bonus</h1>
-        <p className="text-sm text-[#8C7B70] text-center mb-6">
+        <p className="text-sm text-[#6E5F55] text-center mb-6">
           A quarterly reward for therapists who show up consistently.
         </p>
 
         <div className="bg-[#FBF6F0] rounded-2xl p-5 mb-4">
-          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">How it works</p>
+          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3">How it works</p>
           <div className="flex flex-col gap-4">
             {[
               { n: '1', title: 'Pool builds every booking', body: '5% of every booking across all therapists on Alaga goes into a shared pool each quarter.' },
@@ -244,7 +244,7 @@ export default function TherapistOnboardingPage() {
                 <div className="w-7 h-7 rounded-full bg-[#C9A84C] flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">{n}</div>
                 <div>
                   <p className="text-sm font-semibold text-[#2C2420]">{title}</p>
-                  <p className="text-xs text-[#8C7B70] mt-0.5">{body}</p>
+                  <p className="text-xs text-[#6E5F55] mt-0.5">{body}</p>
                 </div>
               </div>
             ))}
@@ -253,7 +253,7 @@ export default function TherapistOnboardingPage() {
 
         <div className="bg-[#FDF3D8] border border-[#C9A84C]/30 rounded-2xl p-4 mb-6 text-center">
           <p className="text-sm font-semibold text-[#2C2420]">Stay consistent, earn more</p>
-          <p className="text-xs text-[#8C7B70] mt-1">The Alaga Bonus is paid on top of your session earnings and referral commissions — it's our way of rewarding therapists who commit to the platform.</p>
+          <p className="text-xs text-[#6E5F55] mt-1">The Alaga Bonus is paid on top of your session earnings and referral commissions — it's our way of rewarding therapists who commit to the platform.</p>
         </div>
 
         <Button size="lg" className="w-full" onClick={() => setScreen('setup')}>
@@ -277,7 +277,7 @@ export default function TherapistOnboardingPage() {
           </div>
 
           <h1 className="text-xl font-bold text-[#2C2420] text-center mb-2">Almost there!</h1>
-          <p className="text-sm text-[#8C7B70] text-center mb-8">
+          <p className="text-sm text-[#6E5F55] text-center mb-8">
             Two quick steps and clients will start finding you.
           </p>
 
@@ -288,7 +288,7 @@ export default function TherapistOnboardingPage() {
               </div>
               <div>
                 <p className="font-semibold text-[#2C2420] text-sm">Set your rates</p>
-                <p className="text-xs text-[#8C7B70] mt-0.5">Choose your price for each service within your city's allowed range.</p>
+                <p className="text-xs text-[#6E5F55] mt-0.5">Choose your price for each service within your city's allowed range.</p>
               </div>
             </div>
 
@@ -298,12 +298,12 @@ export default function TherapistOnboardingPage() {
               </div>
               <div>
                 <p className="font-semibold text-[#2C2420] text-sm">Set your service area</p>
-                <p className="text-xs text-[#8C7B70] mt-0.5">Choose the barangays you're willing to travel to.</p>
+                <p className="text-xs text-[#6E5F55] mt-0.5">Choose the barangays you're willing to travel to.</p>
               </div>
             </div>
           </div>
 
-          <p className="text-xs text-[#8C7B70] text-center mb-6">Takes about 2 minutes. You can update both anytime from your dashboard.</p>
+          <p className="text-xs text-[#6E5F55] text-center mb-6">Takes about 2 minutes. You can update both anytime from your dashboard.</p>
 
           <Button
             size="lg"
@@ -341,7 +341,7 @@ function OnboardingShell({
         </div>
 
         {onBack && (
-          <button onClick={onBack} className="mt-4 w-full text-center text-sm text-[#8C7B70] hover:text-[#2C2420] transition-colors">
+          <button onClick={onBack} className="mt-4 w-full text-center text-sm text-[#6E5F55] hover:text-[#2C2420] transition-colors">
             ← Back
           </button>
         )}
@@ -357,8 +357,8 @@ function EarningsRow({ color, width, label, sublabel, value, highlight }: {
     <div className="flex items-center gap-3">
       <div className="flex-1">
         <div className="flex justify-between mb-1">
-          <span className={`text-xs font-semibold ${highlight ? 'text-[#2C2420]' : 'text-[#8C7B70]'}`}>{label}</span>
-          <span className={`text-xs font-bold ${highlight ? 'text-[#C4714A]' : 'text-[#8C7B70]'}`}>{value}</span>
+          <span className={`text-xs font-semibold ${highlight ? 'text-[#2C2420]' : 'text-[#6E5F55]'}`}>{label}</span>
+          <span className={`text-xs font-bold ${highlight ? 'text-[#C4714A]' : 'text-[#6E5F55]'}`}>{value}</span>
         </div>
         <div className="h-2 bg-[#EDE5DF] rounded-full overflow-hidden">
           <div className={`h-full rounded-full ${color}`} style={{ width }} />

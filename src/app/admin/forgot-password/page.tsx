@@ -30,7 +30,7 @@ export default function AdminForgotPasswordPage() {
           <a href="/">
             <img src="/logo-vertical.png" alt="Alaga Wellness" style={{ height: '80px', width: 'auto', margin: '0 auto' }} />
           </a>
-          <p className="text-sm text-[#8C7B70] mt-3">Admin portal</p>
+          <p className="text-sm text-[#6E5F55] mt-3">Admin portal</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-7">
@@ -38,14 +38,14 @@ export default function AdminForgotPasswordPage() {
             <div className="text-center">
               <p className="text-2xl mb-3">📧</p>
               <h2 className="text-lg font-bold text-[#2C2420] mb-2">Check your inbox</h2>
-              <p className="text-sm text-[#8C7B70]">
+              <p className="text-sm text-[#6E5F55]">
                 We sent a password reset link to <strong>{email}</strong>. It expires in 1 hour.
               </p>
             </div>
           ) : (
             <>
               <h2 className="text-lg font-bold text-[#2C2420] mb-1">Forgot password?</h2>
-              <p className="text-sm text-[#8C7B70] mb-6">Enter your email and we'll send you a reset link.</p>
+              <p className="text-sm text-[#6E5F55] mb-6">Enter your email and we'll send you a reset link.</p>
 
               <label className="block text-sm font-semibold text-[#2C2420] mb-2">Email</label>
               <input
@@ -66,7 +66,7 @@ export default function AdminForgotPasswordPage() {
           )}
         </div>
 
-        <p className="text-center text-sm text-[#8C7B70] mt-6">
+        <p className="text-center text-sm text-[#6E5F55] mt-6">
           <a href="/admin/login" className="hover:text-[#C4714A] transition-colors">← Back to sign in</a>
         </p>
       </div>

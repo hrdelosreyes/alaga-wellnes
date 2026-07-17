@@ -29,13 +29,13 @@ export function ProgressBar({ current }: { current: number }) {
                     'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
                     done   && 'bg-[#C4714A] text-white',
                     active && 'bg-[#2C2420] text-white',
-                    !done && !active && 'bg-[#EDE5DF] text-[#8C7B70]',
+                    !done && !active && 'bg-[#EDE5DF] text-[#6E5F55]',
                   )}>
                     {done ? '✓' : stepNum}
                   </div>
                   <span className={cn(
                     'text-[10px] font-medium hidden sm:block',
-                    active ? 'text-[#2C2420]' : 'text-[#8C7B70]',
+                    active ? 'text-[#2C2420]' : 'text-[#6E5F55]',
                   )}>
                     {step.label}
                   </span>

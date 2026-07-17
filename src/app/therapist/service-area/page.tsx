@@ -101,8 +101,8 @@ function ServiceAreaPage() {
 
       <div className="max-w-lg mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-[#2C2420] mb-1">My service area</h1>
-        <p className="text-xs text-[#8C7B70] mb-3">{cityName}</p>
-        <p className="text-sm text-[#8C7B70] mb-4">
+        <p className="text-xs text-[#6E5F55] mb-3">{cityName}</p>
+        <p className="text-sm text-[#6E5F55] mb-4">
           Tick every barangay you're willing to travel to. Your selection will be reviewed by our admin before going live.
         </p>
 
@@ -113,12 +113,12 @@ function ServiceAreaPage() {
         )}
 
         {barangays.length === 0 ? (
-          <p className="text-sm text-[#8C7B70] text-center py-12">No barangay data available for {cityName}.</p>
+          <p className="text-sm text-[#6E5F55] text-center py-12">No barangay data available for {cityName}.</p>
         ) : (
           <>
             {/* Search */}
             <div className="relative mb-3">
-              <Search size={14} className="absolute left-3 top-3 text-[#8C7B70]" />
+              <Search size={14} className="absolute left-3 top-3 text-[#6E5F55]" />
               <input
                 type="text"
                 value={search}
@@ -141,7 +141,7 @@ function ServiceAreaPage() {
                 <button
                   type="button"
                   onClick={() => setSelected(new Set())}
-                  className="text-xs text-[#8C7B70] hover:underline"
+                  className="text-xs text-[#6E5F55] hover:underline"
                 >
                   Clear
                 </button>
@@ -174,7 +174,7 @@ function ServiceAreaPage() {
                 </label>
               ))}
               {visible.length === 0 && (
-                <p className="text-sm text-[#8C7B70] text-center py-8">No barangays match "{search}"</p>
+                <p className="text-sm text-[#6E5F55] text-center py-8">No barangays match "{search}"</p>
               )}
             </div>
 

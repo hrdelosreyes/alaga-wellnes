@@ -11,7 +11,7 @@ export default function PrivacyPage() {
   return (
     <div className="container-alaga py-16 max-w-3xl">
       <h1 className="text-3xl md:text-4xl font-bold text-[#2C2420] mb-2">Privacy Policy</h1>
-      <p className="text-sm text-[#8C7B70] mb-10">Last updated: {UPDATED}</p>
+      <p className="text-sm text-[#6E5F55] mb-10">Last updated: {UPDATED}</p>
 
       <div className="flex flex-col gap-8 text-[#5C5048] text-[15px] leading-relaxed">
 

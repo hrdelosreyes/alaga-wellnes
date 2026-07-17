@@ -126,13 +126,13 @@ export default function TherapistPage() {
       <div className="container-alaga py-12 max-w-2xl">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-[#8C7B70] hover:text-[#2C2420] mb-6 transition-colors"
+          className="flex items-center gap-1 text-sm text-[#6E5F55] hover:text-[#2C2420] mb-6 transition-colors"
         >
           <ChevronLeft size={16} /> Back
         </button>
 
         <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Choose your therapist</h1>
-        <p className="text-[#8C7B70] mb-6">All therapists are NBI-cleared and TESDA-certified.</p>
+        <p className="text-[#6E5F55] mb-6">All therapists are NBI-cleared and TESDA-certified.</p>
 
         {/* Gender filter */}
         <div className="flex gap-2 mb-6">
@@ -144,7 +144,7 @@ export default function TherapistPage() {
                 'px-4 py-1.5 rounded-full text-sm font-medium border transition-colors capitalize',
                 filter === g
                   ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                  : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#C4714A]',
+                  : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#C4714A]',
               )}
             >
               {g === 'any' ? 'Any gender' : g.charAt(0).toUpperCase() + g.slice(1)}
@@ -156,12 +156,12 @@ export default function TherapistPage() {
 
           {/* Therapist list */}
           {loading ? (
-            <div className="text-center py-10 text-[#8C7B70] text-sm">Finding available therapists…</div>
+            <div className="text-center py-10 text-[#6E5F55] text-sm">Finding available therapists…</div>
           ) : therapists.length === 0 ? (
             <div className="text-center py-10 bg-white rounded-2xl border border-[#EDE5DF] p-8">
               <CalendarX size={36} className="text-[#C4714A] mx-auto mb-3" />
               <p className="font-semibold text-[#2C2420] mb-1">No therapists available for this slot</p>
-              <p className="text-sm text-[#8C7B70] mb-5">All our therapists are booked for this date and time. Please try a different schedule.</p>
+              <p className="text-sm text-[#6E5F55] mb-5">All our therapists are booked for this date and time. Please try a different schedule.</p>
               <button
                 onClick={() => router.push('/book/schedule')}
                 className="text-sm font-semibold text-[#C4714A] hover:underline"
@@ -206,21 +206,21 @@ export default function TherapistPage() {
                         </div>
                       </div>
 
-                      <p className="text-xs text-[#8C7B70] mt-0.5 mb-2">
+                      <p className="text-xs text-[#6E5F55] mt-0.5 mb-2">
                         {t.total_bookings} sessions · {t.zone}
                         {' · '}
                         {t.gender === 'female' ? 'Female' : 'Male'}
                       </p>
 
                       {t.bio && (
-                        <p className="text-sm text-[#8C7B70] leading-relaxed mb-3 line-clamp-2">
+                        <p className="text-sm text-[#6E5F55] leading-relaxed mb-3 line-clamp-2">
                           &ldquo;{t.bio}&rdquo;
                         </p>
                       )}
 
                       <div className="flex flex-wrap items-center gap-1.5">
                         {t.specialties.slice(0, 3).map(s => (
-                          <span key={s} className="text-xs bg-[#F2EBE6] text-[#8C7B70] px-2 py-0.5 rounded-full">
+                          <span key={s} className="text-xs bg-[#F2EBE6] text-[#6E5F55] px-2 py-0.5 rounded-full">
                             {s}
                           </span>
                         ))}
@@ -253,7 +253,7 @@ export default function TherapistPage() {
             Continue
           </Button>
           {selected && (
-            <p className="text-center text-xs text-[#8C7B70] mt-3">
+            <p className="text-center text-xs text-[#6E5F55] mt-3">
               Your slot will be held for 10 minutes while you complete the booking.
             </p>
           )}

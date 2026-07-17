@@ -124,7 +124,7 @@ export default function AdminBookingsPage() {
             { label: 'GMV (paid, gross)', value: formatPrice(revenue) },
           ].map(stat => (
             <div key={stat.label} className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-              <p className="text-xs text-[#8C7B70] mb-1">{stat.label}</p>
+              <p className="text-xs text-[#6E5F55] mb-1">{stat.label}</p>
               <p className="text-2xl font-bold text-[#2C2420]">{stat.value}</p>
             </div>
           ))}
@@ -132,7 +132,7 @@ export default function AdminBookingsPage() {
             href="/admin/applicants"
             className="bg-white rounded-2xl border border-[#EDE5DF] p-5 hover:border-[#C4714A] transition-colors group"
           >
-            <p className="text-xs text-[#8C7B70] mb-1 flex items-center gap-1">
+            <p className="text-xs text-[#6E5F55] mb-1 flex items-center gap-1">
               <Users size={11} /> Pending applicants
             </p>
             <p className={cn('text-2xl font-bold', pendingApps > 0 ? 'text-[#C4714A]' : 'text-[#2C2420]')}>
@@ -151,7 +151,7 @@ export default function AdminBookingsPage() {
                 'px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors capitalize',
                 filter === s
                   ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                  : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#2C2420] bg-white',
+                  : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#2C2420] bg-white',
               )}
             >
               {s === 'all' ? `All (${bookings.length})` : STATUS_LABEL[s]}
@@ -161,9 +161,9 @@ export default function AdminBookingsPage() {
 
         {/* Bookings table */}
         {loading ? (
-          <div className="text-center py-20 text-[#8C7B70]">Loading…</div>
+          <div className="text-center py-20 text-[#6E5F55]">Loading…</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-[#8C7B70]">No bookings found.</div>
+          <div className="text-center py-20 text-[#6E5F55]">No bookings found.</div>
         ) : (
           <div className="flex flex-col gap-3">
             {filtered.map(booking => {
@@ -190,11 +190,11 @@ export default function AdminBookingsPage() {
                         )}
                       </div>
 
-                      <p className="text-sm text-[#8C7B70] mb-0.5">
+                      <p className="text-sm text-[#6E5F55] mb-0.5">
                         {formatDate(booking.booking_date)} · {formatTime(booking.time_slot)}
                       </p>
-                      <p className="text-sm text-[#8C7B70] truncate mb-0.5">{booking.address}</p>
-                      <p className="text-sm text-[#8C7B70]">
+                      <p className="text-sm text-[#6E5F55] truncate mb-0.5">{booking.address}</p>
+                      <p className="text-sm text-[#6E5F55]">
                         Therapist:{' '}
                         {booking.therapists?.name ?? (
                           booking.therapist_selection_mode === 'best_available'
@@ -219,7 +219,7 @@ export default function AdminBookingsPage() {
                             <option key={s} value={s}>{STATUS_LABEL[s]}</option>
                           ))}
                         </select>
-                        <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8C7B70] pointer-events-none" />
+                        <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#6E5F55] pointer-events-none" />
                       </div>
 
                       <span className="text-[10px] text-[#C8BDB8]">

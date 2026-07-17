@@ -30,7 +30,7 @@ export default function BookServicePage() {
 
       <div className="container-alaga py-12 max-w-2xl">
         <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Choose your service</h1>
-        <p className="text-[#8C7B70] mb-8">All sessions include a verified therapist, premium oils, and towels. Prices show the range for your area — each therapist sets their exact rate within it.</p>
+        <p className="text-[#6E5F55] mb-8">All sessions include a verified therapist, premium oils, and towels. Prices show the range for your area — each therapist sets their exact rate within it.</p>
 
         <div className="flex flex-col gap-4">
           {SERVICES.map((service) => {
@@ -57,8 +57,8 @@ export default function BookServicePage() {
                         <span className="badge-tag">{service.tag}</span>
                       )}
                     </div>
-                    <p className="text-[#8C7B70] text-sm leading-relaxed mb-3">{service.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-[#8C7B70]">
+                    <p className="text-[#6E5F55] text-sm leading-relaxed mb-3">{service.description}</p>
+                    <div className="flex items-center gap-4 text-sm text-[#6E5F55]">
                       <span className="flex items-center gap-1">
                         <Clock size={14} />
                         {service.duration} minutes
@@ -76,12 +76,12 @@ export default function BookServicePage() {
                     {hasRange ? (
                       <>
                         <div className="text-xl font-bold text-[#2C2420] whitespace-nowrap">{formatPrice(p!.price_min)}–{formatPrice(p!.price_max)}</div>
-                        <div className="text-xs text-[#8C7B70]">price range</div>
+                        <div className="text-xs text-[#6E5F55]">price range</div>
                       </>
                     ) : (
                       <>
                         <div className="text-2xl font-bold text-[#2C2420]">{formatPrice(p ? p.price_min : service.price)}</div>
-                        <div className="text-xs text-[#8C7B70]">guide price</div>
+                        <div className="text-xs text-[#6E5F55]">guide price</div>
                       </>
                     )}
                     {/* Radio indicator */}
@@ -113,7 +113,7 @@ export default function BookServicePage() {
           >
             Continue
           </Button>
-          <p className="text-center text-xs text-[#8C7B70] mt-3">
+          <p className="text-center text-xs text-[#6E5F55] mt-3">
             Transport fee of ₱100 applies. Cashless payment only.
           </p>
         </div>

@@ -58,12 +58,12 @@ export default function TherapistLoginPage() {
           <a href="/">
             <img src="/logo-vertical.png" alt="Alaga Wellness" style={{ height: '80px', width: 'auto', margin: '0 auto' }} />
           </a>
-          <p className="text-sm text-[#8C7B70] mt-3">Therapist portal</p>
+          <p className="text-sm text-[#6E5F55] mt-3">Therapist portal</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-7">
           <h2 className="text-lg font-bold text-[#2C2420] mb-1">Welcome back</h2>
-          <p className="text-sm text-[#8C7B70] mb-6">Sign in to your therapist account.</p>
+          <p className="text-sm text-[#6E5F55] mb-6">Sign in to your therapist account.</p>
 
           <div className="flex flex-col gap-4">
             <div>
@@ -98,13 +98,13 @@ export default function TherapistLoginPage() {
           </Button>
 
           <p className="text-center text-sm mt-4">
-            <a href="/therapist/forgot-password" className="text-[#8C7B70] hover:text-[#C4714A] transition-colors">
+            <a href="/therapist/forgot-password" className="text-[#6E5F55] hover:text-[#C4714A] transition-colors">
               Forgot password?
             </a>
           </p>
         </div>
 
-        <p className="text-center text-xs text-[#8C7B70] mt-6">
+        <p className="text-center text-xs text-[#6E5F55] mt-6">
           Not yet a therapist?{' '}
           <a href="/therapist/register" className="text-[#C4714A] hover:underline">Apply here</a>
         </p>

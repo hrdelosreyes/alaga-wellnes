@@ -39,7 +39,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: 'Ilang porsyento ang napupunta sa akin?',
-        a: 'You keep the majority of what the client pays. Alaga takes a small platform share to cover operations, booking technology, payment processing, and client support. The exact breakdown is shared with you during onboarding, before you accept your first booking.',
+        a: 'You keep 75% of what the client pays for every completed session. Alaga’s 25% share covers operations, booking technology, payment processing, and client support — no hidden deductions, no surprise fees.',
       },
       {
         q: 'Paano ako mababayaran?',

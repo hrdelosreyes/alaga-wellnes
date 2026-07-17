@@ -16,10 +16,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed',
           {
-            // variants
-            'bg-[#C4714A] hover:bg-[#A05938] text-white shadow-sm': variant === 'primary',
-            'border-2 border-[#C4714A] text-[#C4714A] hover:bg-[#F2D9CC] bg-transparent': variant === 'outline',
-            'text-[#8C7B70] hover:text-[#2C2420] hover:bg-[#F2D9CC] bg-transparent': variant === 'ghost',
+            // variants — terracotta shades chosen for WCAG AA contrast:
+            // #B05C33 gives white text 4.75:1; #A85A38 gives 4.56:1 on cream
+            'bg-[#B05C33] hover:bg-[#A05938] text-white shadow-sm': variant === 'primary',
+            'border-2 border-[#C4714A] text-[#A85A38] hover:bg-[#F2D9CC] bg-transparent': variant === 'outline',
+            'text-[#6E5F55] hover:text-[#2C2420] hover:bg-[#F2D9CC] bg-transparent': variant === 'ghost',
             'bg-red-500 hover:bg-red-600 text-white': variant === 'danger',
             // sizes
             'px-3 py-1.5 text-sm': size === 'sm',

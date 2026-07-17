@@ -138,13 +138,13 @@ export default function AddressPage() {
       <div className="container-alaga py-12 max-w-2xl">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-[#8C7B70] hover:text-[#2C2420] mb-6 transition-colors"
+          className="flex items-center gap-1 text-sm text-[#6E5F55] hover:text-[#2C2420] mb-6 transition-colors"
         >
           <ChevronLeft size={16} /> Back
         </button>
 
         <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Where should we come?</h1>
-        <p className="text-[#8C7B70] mb-8">Select your city and enter your address.</p>
+        <p className="text-[#6E5F55] mb-8">Select your city and enter your address.</p>
 
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-6 flex flex-col gap-5">
 
@@ -154,7 +154,7 @@ export default function AddressPage() {
               City <span className="text-red-400">*</span>
             </label>
             {cities.length === 0 ? (
-              <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#8C7B70]">
+              <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#6E5F55]">
                 Loading available cities…
               </div>
             ) : (
@@ -178,7 +178,7 @@ export default function AddressPage() {
             {errors.cityId && <p className="text-xs text-red-500 mt-1">{errors.cityId}</p>}
 
             {!waitlist && (
-              <p className="text-xs text-[#8C7B70] mt-2">
+              <p className="text-xs text-[#6E5F55] mt-2">
                 Don't see your city?{' '}
                 <button onClick={() => setWaitlist(true)} className="text-[#C4714A] underline font-medium">
                   Join the waitlist
@@ -221,11 +221,11 @@ export default function AddressPage() {
                 Barangay <span className="text-red-400">*</span>
               </label>
               {bgyLoading ? (
-                <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#8C7B70]">
+                <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#6E5F55]">
                   Loading barangays for {selectedCity?.name}…
                 </div>
               ) : barangays.length === 0 ? (
-                <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#8C7B70]">
+                <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#6E5F55]">
                   No barangay data available for {selectedCity?.name} — type it in your address below.
                 </div>
               ) : (
@@ -254,7 +254,7 @@ export default function AddressPage() {
               Street address / building <span className="text-red-400">*</span>
             </label>
             <div className="relative">
-              <MapPin size={16} className="absolute left-3 top-3.5 text-[#8C7B70]" />
+              <MapPin size={16} className="absolute left-3 top-3.5 text-[#6E5F55]" />
               <input
                 type="text"
                 value={address}
@@ -269,7 +269,7 @@ export default function AddressPage() {
           {/* Unit notes */}
           <div>
             <label className="block text-sm font-semibold text-[#2C2420] mb-2">
-              Unit / floor / access notes <span className="text-[#8C7B70] font-normal">(optional)</span>
+              Unit / floor / access notes <span className="text-[#6E5F55] font-normal">(optional)</span>
             </label>
             <input
               type="text"
@@ -285,7 +285,7 @@ export default function AddressPage() {
             <div className="bg-[#F7F2EE] rounded-xl px-4 py-3 text-xs text-[#5C4B45]">
               <span className="font-semibold text-[#2C2420]">Full address: </span>
               {[address.trim(), barangay?.name, selectedCity?.name].filter(Boolean).join(', ')}
-              {unitNotes && <span className="text-[#8C7B70]"> · {unitNotes}</span>}
+              {unitNotes && <span className="text-[#6E5F55]"> · {unitNotes}</span>}
             </div>
           )}
         </div>
@@ -294,7 +294,7 @@ export default function AddressPage() {
           <Button size="lg" className="w-full" onClick={next}>
             Continue
           </Button>
-          <p className="text-center text-xs text-[#8C7B70] mt-3">
+          <p className="text-center text-xs text-[#6E5F55] mt-3">
             A ₱100 transport fee will be added at checkout.
           </p>
         </div>

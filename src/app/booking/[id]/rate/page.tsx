@@ -88,7 +88,7 @@ export default function RatePage() {
       <div className="container-alaga py-20 max-w-md text-center">
         <CheckCircle size={56} className="text-[#6B8C6E] mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Thank you!</h1>
-        <p className="text-[#8C7B70] mb-8">
+        <p className="text-[#6E5F55] mb-8">
           Your feedback helps us maintain the quality of every session.
         </p>
         <Button size="lg" className="w-full" onClick={() => router.push('/book')}>
@@ -103,7 +103,7 @@ export default function RatePage() {
   return (
     <div className="container-alaga py-12 max-w-md">
       <h1 className="text-2xl font-bold text-[#2C2420] mb-1">How was your session?</h1>
-      <p className="text-[#8C7B70] mb-8">
+      <p className="text-[#6E5F55] mb-8">
         Rate your experience with {therapistName}.
       </p>
 
@@ -144,7 +144,7 @@ export default function RatePage() {
       {stars > 0 && (
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-6 mb-5">
           <p className="text-sm font-semibold text-[#2C2420] mb-3">
-            What stood out? <span className="text-[#8C7B70] font-normal">(optional)</span>
+            What stood out? <span className="text-[#6E5F55] font-normal">(optional)</span>
           </p>
           <div className="flex flex-wrap gap-2">
             {RATING_TAGS.map(tag => (
@@ -155,7 +155,7 @@ export default function RatePage() {
                   'px-3 py-1.5 rounded-full text-sm border font-medium transition-all',
                   tags.includes(tag)
                     ? 'bg-[#C4714A] text-white border-[#C4714A]'
-                    : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#C4714A]',
+                    : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#C4714A]',
                 )}
               >
                 {tag}
@@ -169,7 +169,7 @@ export default function RatePage() {
       {stars > 0 && (
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-6 mb-6">
           <label className="block text-sm font-semibold text-[#2C2420] mb-2">
-            Anything else to share? <span className="text-[#8C7B70] font-normal">(optional)</span>
+            Anything else to share? <span className="text-[#6E5F55] font-normal">(optional)</span>
           </label>
           <textarea
             value={review}

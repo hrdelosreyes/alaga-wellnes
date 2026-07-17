@@ -43,12 +43,12 @@ export default function ResetPasswordPage() {
             <div className="text-center">
               <p className="text-2xl mb-3">✅</p>
               <h2 className="text-lg font-bold text-[#2C2420] mb-2">Password updated</h2>
-              <p className="text-sm text-[#8C7B70]">Redirecting you to sign in…</p>
+              <p className="text-sm text-[#6E5F55]">Redirecting you to sign in…</p>
             </div>
           ) : (
             <>
               <h2 className="text-lg font-bold text-[#2C2420] mb-1">Set new password</h2>
-              <p className="text-sm text-[#8C7B70] mb-6">Choose a strong password for your account.</p>
+              <p className="text-sm text-[#6E5F55] mb-6">Choose a strong password for your account.</p>
 
               <div className="flex flex-col gap-4">
                 <div>
@@ -64,7 +64,7 @@ export default function ResetPasswordPage() {
                     <button
                       type="button"
                       onClick={() => setShowPw(p => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C7B70] hover:text-[#2C2420]"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6E5F55] hover:text-[#2C2420]"
                     >
                       {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>

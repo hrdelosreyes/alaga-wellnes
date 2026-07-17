@@ -36,9 +36,9 @@ type Overview = {
 function Stat({ label, value, sub, accent, hint }: { label: string; value: string; sub?: React.ReactNode; accent?: string; hint?: string }) {
   return (
     <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4">
-      <p className="text-[10px] text-[#8C7B70] uppercase tracking-wider font-semibold">{label}</p>
+      <p className="text-[10px] text-[#6E5F55] uppercase tracking-wider font-semibold">{label}</p>
       <p className={cn('text-2xl font-bold mt-1', accent ?? 'text-[#2C2420]')}>{value}</p>
-      {sub && <div className="text-[11px] text-[#8C7B70] mt-0.5">{sub}</div>}
+      {sub && <div className="text-[11px] text-[#6E5F55] mt-0.5">{sub}</div>}
       {hint && <p className="text-[10px] text-[#B0A399] mt-1 leading-snug">{hint}</p>}
     </div>
   )
@@ -66,7 +66,7 @@ export default function AdminOverviewPage() {
     return (
       <div className="min-h-screen bg-[#F7F2EE]">
         <AdminNav />
-        <div className="max-w-5xl mx-auto px-4 py-20 text-center text-[#8C7B70]">Loading overview…</div>
+        <div className="max-w-5xl mx-auto px-4 py-20 text-center text-[#6E5F55]">Loading overview…</div>
       </div>
     )
   }
@@ -74,7 +74,7 @@ export default function AdminOverviewPage() {
     return (
       <div className="min-h-screen bg-[#F7F2EE]">
         <AdminNav />
-        <div className="max-w-5xl mx-auto px-4 py-20 text-center text-[#8C7B70]">Couldn&rsquo;t load the dashboard.</div>
+        <div className="max-w-5xl mx-auto px-4 py-20 text-center text-[#6E5F55]">Couldn&rsquo;t load the dashboard.</div>
       </div>
     )
   }
@@ -143,19 +143,19 @@ export default function AdminOverviewPage() {
           </div>
           {/* 25% breakdown */}
           <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4 mt-3">
-            <p className="text-[10px] text-[#8C7B70] uppercase tracking-wider font-semibold mb-3">Where the platform&rsquo;s 25% goes (realized on completed sessions)</p>
+            <p className="text-[10px] text-[#6E5F55] uppercase tracking-wider font-semibold mb-3">Where the platform&rsquo;s 25% goes (realized on completed sessions)</p>
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
                 <p className="text-xl font-bold text-[#6B8C6E]">{formatPrice(money.netProfit)}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-0.5">Net profit (~10%)</p>
+                <p className="text-[10px] text-[#6E5F55] mt-0.5">Net profit (~10%)</p>
               </div>
               <div>
                 <p className="text-xl font-bold text-[#2C2420]">{formatPrice(money.referralPool)}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-0.5">Referral commissions</p>
+                <p className="text-[10px] text-[#6E5F55] mt-0.5">Referral commissions</p>
               </div>
               <div>
                 <p className="text-xl font-bold text-[#C9A84C]">{formatPrice(money.bonusPool)}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-0.5">Alaga Bonus pool</p>
+                <p className="text-[10px] text-[#6E5F55] mt-0.5">Alaga Bonus pool</p>
               </div>
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function AdminOverviewPage() {
             <Star size={18} className="text-[#C9A84C]" fill="#C9A84C" />
             <div>
               <span className="text-xl font-bold text-[#2C2420]">{health.avgRating ?? '—'}</span>
-              <span className="text-sm text-[#8C7B70]"> avg rating across {health.reviewCount} review{health.reviewCount === 1 ? '' : 's'}</span>
+              <span className="text-sm text-[#6E5F55]"> avg rating across {health.reviewCount} review{health.reviewCount === 1 ? '' : 's'}</span>
             </div>
           </div>
         </section>
@@ -207,7 +207,7 @@ export default function AdminOverviewPage() {
           <h2 className="text-sm font-bold text-[#2C2420] mb-3 flex items-center gap-1.5"><MapPin size={15} /> Where demand is (waitlist)</h2>
           <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
             {waitlistByCity.length === 0 ? (
-              <p className="text-sm text-[#8C7B70]">No waitlist sign-ups yet.</p>
+              <p className="text-sm text-[#6E5F55]">No waitlist sign-ups yet.</p>
             ) : (
               <div className="flex flex-col gap-2.5">
                 {waitlistByCity.map(c => (
@@ -219,7 +219,7 @@ export default function AdminOverviewPage() {
                     <span className="text-sm font-semibold text-[#2C2420] w-8 text-right">{c.count}</span>
                   </div>
                 ))}
-                <p className="text-[11px] text-[#8C7B70] mt-2 flex items-center gap-1">
+                <p className="text-[11px] text-[#6E5F55] mt-2 flex items-center gap-1">
                   <Users size={11} /> Cities with the most sign-ups are your strongest expansion candidates.
                 </p>
               </div>

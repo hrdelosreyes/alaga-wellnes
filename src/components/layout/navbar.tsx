@@ -1,11 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useGeoCity } from '@/components/geo/city-context'
+import logo from '../../../public/logo.png'
 
 export function Navbar() {
   const [open,       setOpen]       = useState(false)
@@ -35,12 +37,11 @@ export function Navbar() {
       <div className="container-alaga flex items-center justify-between h-16">
         {/* Logo */}
         <Link href="/" className="flex items-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Alaga Wellness" style={{ height: '48px', width: 'auto' }} />
+          <Image src={logo} alt="Alaga Wellness" priority style={{ height: '48px', width: 'auto' }} />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#8C7B70]">
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#6E5F55]">
           <Link href="/#services" className="hover:text-[#2C2420] transition-colors">Services</Link>
           <Link href="/#how-it-works" className="hover:text-[#2C2420] transition-colors">How It Works</Link>
           {isLive && <Link href="/#therapists" className="hover:text-[#2C2420] transition-colors">Our Therapists</Link>}
@@ -48,7 +49,7 @@ export function Navbar() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/therapist/register" className="text-sm font-medium text-[#8C7B70] hover:text-[#2C2420] transition-colors">
+          <Link href="/therapist/register" className="text-sm font-medium text-[#6E5F55] hover:text-[#2C2420] transition-colors">
             Join as Therapist
           </Link>
           {customerName ? (
@@ -62,7 +63,7 @@ export function Navbar() {
                   await supabase.auth.signOut()
                   setCustomerName(null)
                 }}
-                className="text-sm text-[#8C7B70] hover:text-[#2C2420] transition-colors"
+                className="text-sm text-[#6E5F55] hover:text-[#2C2420] transition-colors"
               >
                 Sign out
               </button>
@@ -79,7 +80,7 @@ export function Navbar() {
           ) : (
             // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
             <a href="/#waitlist">
-              <Button size="sm">Book Now</Button>
+              <Button size="sm">Join Waitlist</Button>
             </a>
           )}
         </div>
@@ -111,7 +112,7 @@ export function Navbar() {
                   setCustomerName(null)
                   setOpen(false)
                 }}
-                className="text-sm font-medium text-[#8C7B70] text-left hover:text-[#2C2420] transition-colors"
+                className="text-sm font-medium text-[#6E5F55] text-left hover:text-[#2C2420] transition-colors"
               >
                 Sign out
               </button>
@@ -126,7 +127,7 @@ export function Navbar() {
           ) : (
             // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
             <a href="/#waitlist" onClick={() => setOpen(false)}>
-              <Button className="w-full">Book Now</Button>
+              <Button className="w-full">Join Waitlist</Button>
             </a>
           )}
         </div>

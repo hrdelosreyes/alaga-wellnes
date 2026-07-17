@@ -316,7 +316,7 @@ export default function StaffPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FBF6F0] flex items-center justify-center">
-        <p className="text-[#8C7B70] text-sm">Loading…</p>
+        <p className="text-[#6E5F55] text-sm">Loading…</p>
       </div>
     )
   }
@@ -382,7 +382,7 @@ export default function StaffPage() {
                     'px-4 py-2 rounded-full text-sm font-semibold border capitalize transition-colors',
                     appFilter === s
                       ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                      : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#2C2420] bg-white',
+                      : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#2C2420] bg-white',
                   )}
                 >
                   {s}
@@ -391,7 +391,7 @@ export default function StaffPage() {
             </div>
 
             {applicants.length === 0 ? (
-              <div className="text-center py-20 text-[#8C7B70]">No {appFilter} applications.</div>
+              <div className="text-center py-20 text-[#6E5F55]">No {appFilter} applications.</div>
             ) : (
               <div className="flex flex-col gap-4">
                 {applicants.map(a => {
@@ -416,7 +416,7 @@ export default function StaffPage() {
                               {a.application_status}
                             </span>
                           </div>
-                          <p className="text-sm text-[#8C7B70]">
+                          <p className="text-sm text-[#6E5F55]">
                             {a.gender.charAt(0).toUpperCase() + a.gender.slice(1)}
                             {a.cities ? ` · ${a.cities.name}, ${a.cities.region}` : ''}
                             {a.years_experience ? ` · ${a.years_experience} yrs exp` : ''}
@@ -425,7 +425,7 @@ export default function StaffPage() {
                             Applied {new Date(a.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>
                         </div>
-                        <div className="flex-shrink-0 text-[#8C7B70]">
+                        <div className="flex-shrink-0 text-[#6E5F55]">
                           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                         </div>
                       </button>
@@ -434,29 +434,29 @@ export default function StaffPage() {
                         <div className="border-t border-[#F2EBE6] p-5 flex flex-col gap-5">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Specialties</p>
+                              <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Specialties</p>
                               <div className="flex flex-wrap gap-1.5">
                                 {a.specialties.map(s => (
-                                  <span key={s} className="text-xs bg-[#F2EBE6] text-[#8C7B70] px-2 py-0.5 rounded-full">{s}</span>
+                                  <span key={s} className="text-xs bg-[#F2EBE6] text-[#6E5F55] px-2 py-0.5 rounded-full">{s}</span>
                                 ))}
                               </div>
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Contact</p>
+                              <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Contact</p>
                               <p className="text-sm text-[#2C2420]">{a.phone}</p>
-                              {a.referral_source && <p className="text-xs text-[#8C7B70] mt-1">Referred via: {a.referral_source}</p>}
+                              {a.referral_source && <p className="text-xs text-[#6E5F55] mt-1">Referred via: {a.referral_source}</p>}
                             </div>
                           </div>
 
                           {a.bio && (
                             <div>
-                              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Bio</p>
+                              <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Bio</p>
                               <p className="text-sm text-[#2C2420] leading-relaxed">"{a.bio}"</p>
                             </div>
                           )}
 
                           <div className="flex flex-col gap-4">
-                            <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider">Documents</p>
+                            <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider">Documents</p>
                             <ExtractedDoc
                               label="NBI Clearance"
                               docUrl={docs?.nbi}
@@ -524,7 +524,7 @@ export default function StaffPage() {
           <div>
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <div className="relative flex-1">
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8C7B70]" />
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6E5F55]" />
                 <input
                   type="text"
                   placeholder="Search by name or phone…"
@@ -542,7 +542,7 @@ export default function StaffPage() {
                       'px-3 py-2 rounded-xl text-sm font-semibold border capitalize transition-colors',
                       thFilter === f
                         ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                        : 'border-[#EDE5DF] text-[#8C7B70] bg-white hover:border-[#2C2420]',
+                        : 'border-[#EDE5DF] text-[#6E5F55] bg-white hover:border-[#2C2420]',
                     )}
                   >
                     {f}
@@ -552,7 +552,7 @@ export default function StaffPage() {
             </div>
 
             {filteredTherapists.length === 0 ? (
-              <div className="text-center py-20 text-[#8C7B70]">No therapists found.</div>
+              <div className="text-center py-20 text-[#6E5F55]">No therapists found.</div>
             ) : (
               <div className="flex flex-col gap-3">
                 {filteredTherapists.map(t => {
@@ -576,13 +576,13 @@ export default function StaffPage() {
                               {t.is_active ? 'Active' : 'Inactive'}
                             </span>
                           </div>
-                          <p className="text-xs text-[#8C7B70] mt-0.5">
+                          <p className="text-xs text-[#6E5F55] mt-0.5">
                             {t.cities ? `${t.cities.name}` : 'No city'}
                             {t.rating_avg > 0 && <> · <Star size={10} className="inline mb-0.5" /> {t.rating_avg.toFixed(1)}</>}
                             {t.total_bookings > 0 && ` · ${t.total_bookings} bookings`}
                           </p>
                         </div>
-                        <div className="flex-shrink-0 text-[#8C7B70]">
+                        <div className="flex-shrink-0 text-[#6E5F55]">
                           {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
                       </button>
@@ -613,16 +613,16 @@ export default function StaffPage() {
                               </div>
                               {t.bio && (
                                 <div>
-                                  <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1">Bio</p>
+                                  <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1">Bio</p>
                                   <p className="text-sm text-[#2C2420]">"{t.bio}"</p>
                                 </div>
                               )}
                               {t.specialties?.length > 0 && (
                                 <div>
-                                  <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Specialties</p>
+                                  <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Specialties</p>
                                   <div className="flex flex-wrap gap-1.5">
                                     {t.specialties.map(s => (
-                                      <span key={s} className="text-xs bg-[#F2EBE6] text-[#8C7B70] px-2 py-0.5 rounded-full">{s}</span>
+                                      <span key={s} className="text-xs bg-[#F2EBE6] text-[#6E5F55] px-2 py-0.5 rounded-full">{s}</span>
                                     ))}
                                   </div>
                                 </div>
@@ -637,7 +637,7 @@ export default function StaffPage() {
                           ) : editState && (
                             <div className="flex flex-col gap-3">
                               <div>
-                                <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1 block">City</label>
+                                <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1 block">City</label>
                                 <select
                                   value={editState.cityId}
                                   onChange={e => setEditState(s => s && ({ ...s, cityId: e.target.value }))}
@@ -648,7 +648,7 @@ export default function StaffPage() {
                                 </select>
                               </div>
                               <div>
-                                <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1 block">Years Experience</label>
+                                <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1 block">Years Experience</label>
                                 <input
                                   type="number"
                                   value={editState.yearsExperience}
@@ -657,7 +657,7 @@ export default function StaffPage() {
                                 />
                               </div>
                               <div>
-                                <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1 block">Bio</label>
+                                <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1 block">Bio</label>
                                 <textarea
                                   rows={3}
                                   value={editState.bio}
@@ -666,7 +666,7 @@ export default function StaffPage() {
                                 />
                               </div>
                               <div>
-                                <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2 block">Specialties</label>
+                                <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2 block">Specialties</label>
                                 <div className="flex flex-wrap gap-2">
                                   {SPECIALTIES_OPTIONS.map(s => (
                                     <button
@@ -681,7 +681,7 @@ export default function StaffPage() {
                                         'text-xs px-2.5 py-1 rounded-full border transition-colors',
                                         editState.specialties.includes(s)
                                           ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                                          : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#2C2420]',
+                                          : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#2C2420]',
                                       )}
                                     >
                                       {s}
@@ -699,7 +699,7 @@ export default function StaffPage() {
                                 </button>
                                 <button
                                   onClick={() => { setEditing(null); setEditState(null) }}
-                                  className="px-4 py-2.5 rounded-xl border border-[#EDE5DF] text-sm text-[#8C7B70] hover:border-[#2C2420] transition-colors"
+                                  className="px-4 py-2.5 rounded-xl border border-[#EDE5DF] text-sm text-[#6E5F55] hover:border-[#2C2420] transition-colors"
                                 >
                                   Cancel
                                 </button>
@@ -721,7 +721,7 @@ export default function StaffPage() {
           <div>
             <h1 className="text-lg font-bold text-[#2C2420] mb-4">Recent Bookings</h1>
             {bookings.length === 0 ? (
-              <p className="text-sm text-[#8C7B70]">No bookings yet.</p>
+              <p className="text-sm text-[#6E5F55]">No bookings yet.</p>
             ) : (
               <div className="flex flex-col gap-3">
                 {bookings.map(b => {
@@ -736,11 +736,11 @@ export default function StaffPage() {
                               {BOOKING_STATUS_LABEL[b.status] ?? b.status}
                             </span>
                           </div>
-                          <p className="text-xs text-[#8C7B70]">
+                          <p className="text-xs text-[#6E5F55]">
                             {formatDate(b.booking_date)} · {formatTime(b.time_slot)}
                             {b.therapists && <> · <span className="text-[#2C2420]">{b.therapists.name}</span></>}
                           </p>
-                          <p className="text-xs text-[#8C7B70] flex items-center gap-1 mt-1">
+                          <p className="text-xs text-[#6E5F55] flex items-center gap-1 mt-1">
                             <MapPin size={10} />{b.address}
                           </p>
                         </div>
@@ -764,7 +764,7 @@ export default function StaffPage() {
 function InfoField({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-0.5">{label}</p>
+      <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-0.5">{label}</p>
       <p className="text-sm text-[#2C2420]">{value}</p>
     </div>
   )
@@ -795,14 +795,14 @@ function ExtractedDoc({
     <div className="rounded-xl border border-[#EDE5DF] overflow-hidden">
       <div className="flex items-center justify-between gap-3 px-4 py-3 bg-[#F7F2EE]">
         <span className="text-sm font-semibold text-[#2C2420] flex items-center gap-1.5">
-          <FileText size={14} className="text-[#8C7B70]" /> {label}
+          <FileText size={14} className="text-[#6E5F55]" /> {label}
         </span>
         <div className="flex items-center gap-2">
           {onReExtract && (
             <button
               onClick={handleReExtract}
               disabled={reExtracting}
-              className="text-xs text-[#8C7B70] hover:text-[#C4714A] transition-colors disabled:opacity-40"
+              className="text-xs text-[#6E5F55] hover:text-[#C4714A] transition-colors disabled:opacity-40"
             >
               {reExtracting ? 'Extracting…' : '↺ Re-extract'}
             </button>
@@ -828,7 +828,7 @@ function ExtractedDoc({
           <div className="grid grid-cols-2 gap-x-6 gap-y-2">
             {fields.map(f => (
               <div key={f.key}>
-                <p className="text-[10px] font-semibold text-[#8C7B70] uppercase tracking-wider">{f.label}</p>
+                <p className="text-[10px] font-semibold text-[#6E5F55] uppercase tracking-wider">{f.label}</p>
                 <p className="text-sm text-[#2C2420] font-medium">
                   {extracted[f.key] ?? <span className="text-[#C8BDB8] italic">not found</span>}
                 </p>

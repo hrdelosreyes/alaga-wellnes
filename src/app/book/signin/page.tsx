@@ -28,7 +28,7 @@ export default function BookSignInPage() {
 
       <div className="container-alaga py-12 max-w-md">
         <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Before we start</h1>
-        <p className="text-[#8C7B70] mb-8">Sign in to save your details and track your bookings — or continue as a guest.</p>
+        <p className="text-[#6E5F55] mb-8">Sign in to save your details and track your bookings — or continue as a guest.</p>
 
         <div className="flex flex-col gap-4">
           {/* Sign in */}
@@ -39,7 +39,7 @@ export default function BookSignInPage() {
               </div>
               <div className="flex-1">
                 <p className="font-bold text-[#2C2420]">Sign in</p>
-                <p className="text-sm text-[#8C7B70] mt-0.5">Your details will be pre-filled automatically.</p>
+                <p className="text-sm text-[#6E5F55] mt-0.5">Your details will be pre-filled automatically.</p>
               </div>
             </div>
           </Link>
@@ -52,7 +52,7 @@ export default function BookSignInPage() {
               </div>
               <div className="flex-1">
                 <p className="font-bold text-[#2C2420]">Create account</p>
-                <p className="text-sm text-[#8C7B70] mt-0.5">Save your details for next time. Takes 30 seconds.</p>
+                <p className="text-sm text-[#6E5F55] mt-0.5">Save your details for next time. Takes 30 seconds.</p>
               </div>
             </div>
           </Link>

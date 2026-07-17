@@ -11,7 +11,8 @@
   --alaga-terracotta-light: #F2D9CC;
   --alaga-cream:        #FBF6F0;  /* page background */
   --alaga-warm-white:   #FFFFFF;
-  --alaga-stone:        #8C7B70;  /* secondary text */
+  --alaga-stone:        #6E5F55;  /* secondary text — AA on cream/white */
+  --alaga-stone-soft:   #8C7B70;  /* decorative only (fails AA for body text on cream) */
   --alaga-charcoal:     #2C2420;  /* headings */
   --alaga-sage:         #6B8C6E;  /* accent, verified badges */
   --alaga-gold:         #C9A84C;  /* star ratings */
@@ -87,4 +88,78 @@ body {
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   MOTION
+   ============================================================ */
+
+/* Scroll-in reveal (driven by <Reveal>) */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  will-change: opacity, transform;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero entrance — staggered fade-up on first paint */
+@keyframes alaga-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.hero-enter {
+  opacity: 0;
+  animation: alaga-fade-up 0.7s ease forwards;
+}
+
+.hero-enter-1 { animation-delay: 0.05s; }
+.hero-enter-2 { animation-delay: 0.15s; }
+.hero-enter-3 { animation-delay: 0.25s; }
+.hero-enter-4 { animation-delay: 0.35s; }
+
+/* Slow ambient zoom on hero imagery */
+@keyframes alaga-slow-zoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+
+.hero-zoom {
+  animation: alaga-slow-zoom 18s ease-in-out infinite alternate;
+}
+
+/* Hover lift for cards */
+.card-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px -8px rgba(44, 36, 32, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .hero-enter {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+  .hero-zoom {
+    animation: none;
+  }
+  .card-lift,
+  .card-lift:hover {
+    transform: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }

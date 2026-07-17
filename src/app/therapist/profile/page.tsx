@@ -126,7 +126,7 @@ export default function TherapistProfilePage() {
       <div className="max-w-lg mx-auto px-4 py-6 flex flex-col gap-5">
         <div>
           <h1 className="text-2xl font-bold text-[#2C2420]">My profile</h1>
-          <p className="text-sm text-[#8C7B70] mt-1">This is how you appear to customers. Keep it polished — it helps you get booked.</p>
+          <p className="text-sm text-[#6E5F55] mt-1">This is how you appear to customers. Keep it polished — it helps you get booked.</p>
         </div>
 
         {/* Public preview card */}
@@ -151,7 +151,7 @@ export default function TherapistProfilePage() {
               {ro.nbi_cleared && <span className="flex items-center gap-0.5 text-[10px] font-semibold bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded-full"><ShieldCheck size={9}/> NBI</span>}
               {ro.tesda_certified && <span className="flex items-center gap-0.5 text-[10px] font-semibold bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded-full"><ShieldCheck size={9}/> TESDA</span>}
             </div>
-            <p className="text-xs text-[#8C7B70] mt-0.5">
+            <p className="text-xs text-[#6E5F55] mt-0.5">
               <span className="text-[#C9A84C]">★ {ro.rating_avg}</span> · {ro.total_bookings} sessions
               {ro.city_name ? ` · ${ro.city_name}` : ''}
             </p>
@@ -165,12 +165,12 @@ export default function TherapistProfilePage() {
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5 flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1.5 block">Full name</label>
+              <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1.5 block">Full name</label>
               <input value={form.name} onChange={e => setForm(p => p ? { ...p, name: e.target.value } : p)}
                 className="w-full border border-[#EDE5DF] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]" />
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1.5 block">Gender</label>
+              <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1.5 block">Gender</label>
               <select value={form.gender} onChange={e => setForm(p => p ? { ...p, gender: e.target.value } : p)}
                 className="w-full border border-[#EDE5DF] rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:border-[#C4714A]">
                 <option value="">Select…</option>
@@ -179,12 +179,12 @@ export default function TherapistProfilePage() {
               </select>
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1.5 block">Mobile number</label>
+              <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1.5 block">Mobile number</label>
               <input type="tel" value={form.phone} onChange={e => setForm(p => p ? { ...p, phone: e.target.value } : p)}
                 className="w-full border border-[#EDE5DF] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]" />
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1.5 block">Years experience</label>
+              <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1.5 block">Years experience</label>
               <input type="number" min={0} max={50} value={form.years_experience ?? ''}
                 onChange={e => setForm(p => p ? { ...p, years_experience: e.target.value ? parseInt(e.target.value) : null } : p)}
                 className="w-full border border-[#EDE5DF] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#C4714A]" />
@@ -192,7 +192,7 @@ export default function TherapistProfilePage() {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1.5 block">Bio</label>
+            <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1.5 block">Bio</label>
             <textarea value={form.bio} rows={3}
               onChange={e => setForm(p => p ? { ...p, bio: e.target.value } : p)}
               placeholder="Tell customers about your style, training, and what makes your sessions special."
@@ -200,12 +200,12 @@ export default function TherapistProfilePage() {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2 block">Specialties</label>
+            <label className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2 block">Specialties</label>
             <div className="flex flex-wrap gap-2">
               {SPECIALTIES_OPTIONS.map(s => (
                 <button key={s} type="button" onClick={() => toggleSpecialty(s)}
                   className={cn('text-xs px-3 py-1.5 rounded-full border transition-colors',
-                    form.specialties.includes(s) ? 'bg-[#2C2420] text-white border-[#2C2420]' : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#C4714A]')}>
+                    form.specialties.includes(s) ? 'bg-[#2C2420] text-white border-[#2C2420]' : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#C4714A]')}>
                   {s}
                 </button>
               ))}
@@ -221,7 +221,7 @@ export default function TherapistProfilePage() {
 
         {/* Admin-controlled (read-only) */}
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-          <h2 className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <h2 className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <Lock size={12} /> Managed by Alaga
           </h2>
           <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
@@ -230,7 +230,7 @@ export default function TherapistProfilePage() {
             <RoField label="City" value={ro.city_name ? `${ro.city_name}${ro.region ? ', ' + ro.region : ''}` : '—'} />
             <RoField label="Verification" value={[ro.nbi_cleared && 'NBI', ro.tesda_certified && 'TESDA'].filter(Boolean).join(' · ') || 'Pending'} />
           </div>
-          <p className="text-[11px] text-[#8C7B70] mt-3">
+          <p className="text-[11px] text-[#6E5F55] mt-3">
             To change your email, referral code, city, or verification status, please contact Alaga support.
           </p>
         </div>
@@ -242,7 +242,7 @@ export default function TherapistProfilePage() {
 function RoField({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold text-[#8C7B70] uppercase tracking-wider">{label}</p>
+      <p className="text-[10px] font-semibold text-[#6E5F55] uppercase tracking-wider">{label}</p>
       <p className={cn('text-sm text-[#2C2420] mt-0.5 font-medium break-words', mono && 'font-mono tracking-widest text-[#C4714A]')}>{value}</p>
     </div>
   )

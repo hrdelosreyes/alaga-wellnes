@@ -25,27 +25,27 @@ export function CityBadge() {
           Now serving {city.name}
         </div>
       ) : (
-        <div className="inline-flex flex-col gap-1">
-          <div className="inline-flex items-center gap-2 bg-[#EDE5DF] text-[#8C7B70] text-xs font-semibold px-3 py-1.5 rounded-full">
+        <div className="inline-flex flex-col">
+          <div className="inline-flex items-center gap-2 bg-[#EDE5DF] text-[#6E5F55] text-xs font-semibold px-3 py-1.5 rounded-full">
             <MapPin size={12} />
             Coming soon in {city.name}!
           </div>
           <a
             href="#waitlist"
-            className="text-xs text-[#C4714A] hover:underline underline-offset-2 pl-1"
+            className="text-xs font-medium text-[#A85A38] hover:underline underline-offset-2 pl-1 py-2.5 inline-flex items-center"
           >
             Join the waitlist →
           </a>
         </div>
       )}
       {gpsLoading ? (
-        <span className="text-xs text-[#C4714A] flex items-center gap-1 pl-1">
+        <span className="text-xs text-[#A85A38] flex items-center gap-1 pl-1 py-2.5">
           <Loader2 size={10} className="animate-spin" /> Detecting…
         </span>
       ) : (
         <button
           onClick={detectByGPS}
-          className="text-xs text-[#C4714A] hover:underline underline-offset-2 pl-1"
+          className="text-xs font-medium text-[#A85A38] hover:underline underline-offset-2 pl-1 py-2.5 inline-flex items-center"
         >
           Not your city? Click here.
         </button>

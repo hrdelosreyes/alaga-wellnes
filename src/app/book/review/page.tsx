@@ -102,24 +102,24 @@ export default function ReviewPage() {
       <div className="container-alaga py-12 max-w-2xl">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-[#8C7B70] hover:text-[#2C2420] mb-6 transition-colors"
+          className="flex items-center gap-1 text-sm text-[#6E5F55] hover:text-[#2C2420] mb-6 transition-colors"
         >
           <ChevronLeft size={16} /> Back
         </button>
 
         <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Review your booking</h1>
-        <p className="text-[#8C7B70] mb-8">Make sure everything looks right before you pay.</p>
+        <p className="text-[#6E5F55] mb-8">Make sure everything looks right before you pay.</p>
 
         {/* Summary card */}
         <div className="bg-white rounded-2xl border border-[#EDE5DF] divide-y divide-[#F2EBE6] mb-6">
 
           {/* Service */}
           <div className="p-5">
-            <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Service</p>
+            <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Service</p>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-bold text-[#2C2420]">{service.name}</p>
-                <p className="text-sm text-[#8C7B70]">{service.duration} minutes</p>
+                <p className="text-sm text-[#6E5F55]">{service.duration} minutes</p>
               </div>
               <span className="font-bold text-[#2C2420]">
                 {priceLoading ? '…' : subtotal ? formatPrice(subtotal) : '—'}
@@ -133,7 +133,7 @@ export default function ReviewPage() {
               <Calendar size={16} className="text-[#C4714A] flex-shrink-0" />
               <div>
                 <p className="font-semibold text-[#2C2420] text-sm">{formatDate(draft.date)}</p>
-                <p className="text-sm text-[#8C7B70]">{formatTime(draft.timeSlot)}</p>
+                <p className="text-sm text-[#6E5F55]">{formatTime(draft.timeSlot)}</p>
               </div>
             </div>
           )}
@@ -145,7 +145,7 @@ export default function ReviewPage() {
               <div>
                 <p className="font-semibold text-[#2C2420] text-sm">{draft.address}</p>
                 {draft.unitNotes && (
-                  <p className="text-sm text-[#8C7B70]">{draft.unitNotes}</p>
+                  <p className="text-sm text-[#6E5F55]">{draft.unitNotes}</p>
                 )}
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function ReviewPage() {
                 ? 'Best available therapist (assigned after booking)'
                 : `Specific therapist selected`}
               {draft.genderPreference !== 'any' && (
-                <span className="text-[#8C7B70]"> · {draft.genderPreference} preferred</span>
+                <span className="text-[#6E5F55]"> · {draft.genderPreference} preferred</span>
               )}
             </p>
           </div>
@@ -167,7 +167,7 @@ export default function ReviewPage() {
           {/* Notes */}
           {draft.customerNotes && (
             <div className="p-5">
-              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1">Your notes</p>
+              <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1">Your notes</p>
               <p className="text-sm text-[#2C2420]">{draft.customerNotes}</p>
             </div>
           )}
@@ -175,14 +175,14 @@ export default function ReviewPage() {
 
         {/* Price breakdown */}
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5 mb-6">
-          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-4">Price breakdown</p>
+          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-4">Price breakdown</p>
           <div className="flex flex-col gap-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-[#8C7B70]">{service.name}</span>
+              <span className="text-[#6E5F55]">{service.name}</span>
               <span className="text-[#2C2420]">{subtotal ? formatPrice(subtotal) : '…'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#8C7B70]">Transport fee</span>
+              <span className="text-[#6E5F55]">Transport fee</span>
               <span className="text-[#2C2420]">{formatPrice(TRANSPORT_FEE)}</span>
             </div>
             <div className="border-t border-[#F2EBE6] pt-2 mt-1 flex justify-between font-bold text-base">
@@ -193,7 +193,7 @@ export default function ReviewPage() {
         </div>
 
         {/* Payment methods */}
-        <div className="flex items-center gap-3 mb-6 text-sm text-[#8C7B70]">
+        <div className="flex items-center gap-3 mb-6 text-sm text-[#6E5F55]">
           <span className="font-medium">Pay with:</span>
           <span className="bg-white border border-[#EDE5DF] px-3 py-1 rounded-lg font-semibold text-[#2C2420]">GCash</span>
           <span className="bg-white border border-[#EDE5DF] px-3 py-1 rounded-lg font-semibold text-[#2C2420]">Maya</span>
@@ -210,7 +210,7 @@ export default function ReviewPage() {
           {loading ? 'Redirecting to payment…' : total ? `Pay ${formatPrice(total)}` : 'Loading price…'}
         </Button>
 
-        <p className="text-center text-xs text-[#8C7B70] mt-3">
+        <p className="text-center text-xs text-[#6E5F55] mt-3">
           Secure payment via HitPay · GCash, Maya &amp; cards accepted
         </p>
       </div>

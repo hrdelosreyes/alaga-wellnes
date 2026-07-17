@@ -95,7 +95,7 @@ export default function TherapistPayoutPage() {
           <Banknote size={22} className="text-[#C4714A]" />
           <h1 className="text-2xl font-bold text-[#2C2420]">Payout details</h1>
         </div>
-        <p className="text-sm text-[#8C7B70] mb-6">
+        <p className="text-sm text-[#6E5F55] mb-6">
           This is where Alaga sends your earnings. Payouts are processed weekly. Make sure the account
           name matches your registered name to avoid delays.
         </p>
@@ -114,7 +114,7 @@ export default function TherapistPayoutPage() {
                     'py-2.5 rounded-xl text-sm font-semibold border transition-colors',
                     method === m.id
                       ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                      : 'bg-white text-[#8C7B70] border-[#EDE5DF] hover:border-[#C4714A]',
+                      : 'bg-white text-[#6E5F55] border-[#EDE5DF] hover:border-[#C4714A]',
                   )}
                 >
                   {m.label}
@@ -167,7 +167,7 @@ export default function TherapistPayoutPage() {
           </Button>
         </div>
 
-        <p className="text-center text-xs text-[#8C7B70] mt-4">
+        <p className="text-center text-xs text-[#6E5F55] mt-4">
           Your earnings are 75% of each completed session. See your balance on the dashboard.
         </p>
 
@@ -175,7 +175,7 @@ export default function TherapistPayoutPage() {
         <div className="mt-2">
           <h2 className="text-sm font-bold text-[#2C2420] mb-3">Payout history</h2>
           {history.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5 text-center text-sm text-[#8C7B70]">
+            <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5 text-center text-sm text-[#6E5F55]">
               No payouts yet. Once Alaga sends your earnings, each payment will appear here with its reference number.
             </div>
           ) : (
@@ -186,7 +186,7 @@ export default function TherapistPayoutPage() {
                     <p className="text-sm font-semibold text-[#2C2420]">
                       {p.sent_at ? formatDate(p.sent_at.slice(0, 10)) : formatDate(p.created_at.slice(0, 10))}
                     </p>
-                    <p className="text-xs text-[#8C7B70] truncate mt-0.5">
+                    <p className="text-xs text-[#6E5F55] truncate mt-0.5">
                       {p.destination || (p.method ? p.method.toUpperCase() : 'Manual')}
                       {p.reference_no && <span> · Ref {p.reference_no}</span>}
                     </p>

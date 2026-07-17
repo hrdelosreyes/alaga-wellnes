@@ -97,7 +97,7 @@ export default function AdminCommissionsPage() {
                 'px-4 py-2 rounded-full text-sm font-semibold border capitalize transition-colors',
                 tab === t
                   ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                  : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#2C2420] bg-white',
+                  : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#2C2420] bg-white',
               )}
             >
               {t}
@@ -108,7 +108,7 @@ export default function AdminCommissionsPage() {
         {tab === 'pending' && summaries.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider">
+              <h2 className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider">
                 By therapist — total pending: {formatPrice(totalPending)}
               </h2>
               <button
@@ -124,7 +124,7 @@ export default function AdminCommissionsPage() {
                 <div key={s.therapist_id} className="bg-white rounded-xl border border-[#EDE5DF] p-4">
                   <p className="font-bold text-[#2C2420] text-sm truncate">{s.name}</p>
                   <p className="text-2xl font-bold text-[#C4714A] mt-1">{formatPrice(s.total_pending)}</p>
-                  <p className="text-xs text-[#8C7B70] mt-0.5">{s.count_pending} commission{s.count_pending !== 1 ? 's' : ''}</p>
+                  <p className="text-xs text-[#6E5F55] mt-0.5">{s.count_pending} commission{s.count_pending !== 1 ? 's' : ''}</p>
                 </div>
               ))}
             </div>
@@ -132,14 +132,14 @@ export default function AdminCommissionsPage() {
         )}
 
         {loading ? (
-          <div className="text-center py-20 text-[#8C7B70]">Loading…</div>
+          <div className="text-center py-20 text-[#6E5F55]">Loading…</div>
         ) : commissions.length === 0 ? (
-          <div className="text-center py-20 text-[#8C7B70]">No {tab} commissions.</div>
+          <div className="text-center py-20 text-[#6E5F55]">No {tab} commissions.</div>
         ) : (
           <div className="bg-white rounded-2xl border border-[#EDE5DF] overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#F2EBE6] text-xs text-[#8C7B70] uppercase tracking-wider">
+                <tr className="border-b border-[#F2EBE6] text-xs text-[#6E5F55] uppercase tracking-wider">
                   <th className="text-left px-5 py-3">Earner</th>
                   <th className="text-left px-5 py-3">From booking by</th>
                   <th className="text-left px-5 py-3">Date</th>
@@ -152,8 +152,8 @@ export default function AdminCommissionsPage() {
                 {commissions.map(c => (
                   <tr key={c.id} className="hover:bg-[#FBF6F0] transition-colors">
                     <td className="px-5 py-3 font-semibold text-[#2C2420]">{c.beneficiary?.name ?? '—'}</td>
-                    <td className="px-5 py-3 text-[#8C7B70]">{c.source_therapist?.name ?? '—'}</td>
-                    <td className="px-5 py-3 text-[#8C7B70]">
+                    <td className="px-5 py-3 text-[#6E5F55]">{c.source_therapist?.name ?? '—'}</td>
+                    <td className="px-5 py-3 text-[#6E5F55]">
                       {c.bookings?.booking_date ? formatDate(c.bookings.booking_date) : '—'}
                     </td>
                     <td className="px-5 py-3 text-center">

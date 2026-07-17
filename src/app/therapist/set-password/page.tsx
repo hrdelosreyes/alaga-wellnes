@@ -101,19 +101,19 @@ export default function SetPasswordPage() {
           <a href="/">
             <img src="/logo-vertical.png" alt="Alaga Wellness" style={{ height: '80px', width: 'auto', margin: '0 auto' }} />
           </a>
-          <p className="text-sm text-[#8C7B70] mt-3">Therapist portal</p>
+          <p className="text-sm text-[#6E5F55] mt-3">Therapist portal</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-7">
           <h2 className="text-lg font-bold text-[#2C2420] mb-1">Set your password</h2>
-          <p className="text-sm text-[#8C7B70] mb-6">
+          <p className="text-sm text-[#6E5F55] mb-6">
             Choose a password to access your therapist portal.
           </p>
 
           {linkError ? (
             <p className="text-sm text-red-600 text-center py-4">{linkError}</p>
           ) : !ready ? (
-            <p className="text-sm text-[#8C7B70] text-center py-4">Verifying your invite link…</p>
+            <p className="text-sm text-[#6E5F55] text-center py-4">Verifying your invite link…</p>
           ) : (
             <div className="flex flex-col gap-4">
               <div>

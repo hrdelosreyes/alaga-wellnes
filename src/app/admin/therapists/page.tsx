@@ -298,7 +298,7 @@ export default function AdminTherapistsPage() {
             { label: 'Avg rating',      value: `★ ${avgRating}`, color: 'text-[#C9A84C]' },
           ].map(s => (
             <div key={s.label} className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-              <p className="text-xs text-[#8C7B70] mb-1">{s.label}</p>
+              <p className="text-xs text-[#6E5F55] mb-1">{s.label}</p>
               <p className={cn('text-2xl font-bold', s.color ?? 'text-[#2C2420]')}>{s.value}</p>
             </div>
           ))}
@@ -307,7 +307,7 @@ export default function AdminTherapistsPage() {
         {/* Search + filter */}
         <div className="flex gap-3 mb-5 flex-wrap">
           <div className="relative flex-1 min-w-48">
-            <Search size={14} className="absolute left-3 top-3.5 text-[#8C7B70]" />
+            <Search size={14} className="absolute left-3 top-3.5 text-[#6E5F55]" />
             <input
               type="text"
               value={search}
@@ -324,7 +324,7 @@ export default function AdminTherapistsPage() {
                 'px-4 py-2 rounded-xl text-sm font-semibold border capitalize transition-colors',
                 filter === f
                   ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                  : 'border-[#EDE5DF] bg-white text-[#8C7B70] hover:border-[#2C2420]',
+                  : 'border-[#EDE5DF] bg-white text-[#6E5F55] hover:border-[#2C2420]',
               )}
             >
               {f} {f === 'active' ? `(${activeCount})` : f === 'inactive' ? `(${inactiveCount})` : `(${therapists.length})`}
@@ -334,9 +334,9 @@ export default function AdminTherapistsPage() {
 
         {/* Therapist list */}
         {loading ? (
-          <div className="text-center py-20 text-[#8C7B70]">Loading…</div>
+          <div className="text-center py-20 text-[#6E5F55]">Loading…</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-[#8C7B70]">No therapists found.</div>
+          <div className="text-center py-20 text-[#6E5F55]">No therapists found.</div>
         ) : (
           <div className="flex flex-col gap-3">
             {filtered.map(t => {
@@ -376,7 +376,7 @@ export default function AdminTherapistsPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-[#8C7B70] mt-0.5 truncate">
+                      <p className="text-sm text-[#6E5F55] mt-0.5 truncate">
                         {t.gender.charAt(0).toUpperCase() + t.gender.slice(1)}
                         {t.cities ? ` · ${t.cities.name}` : ''}
                         {t.years_experience ? ` · ${t.years_experience} yrs` : ''}
@@ -393,7 +393,7 @@ export default function AdminTherapistsPage() {
                         onClick={() => toggleActive(t)}
                         disabled={toggling === t.id}
                         title={t.is_active ? 'Deactivate therapist' : 'Activate therapist'}
-                        className="text-[#8C7B70] hover:text-[#2C2420] transition-colors disabled:opacity-40"
+                        className="text-[#6E5F55] hover:text-[#2C2420] transition-colors disabled:opacity-40"
                       >
                         {t.is_active
                           ? <ToggleRight size={28} className="text-[#6B8C6E]" />
@@ -409,7 +409,7 @@ export default function AdminTherapistsPage() {
                           setEditing(null)
                           if (next) loadServiceArea(next)
                         }}
-                        className="text-[#8C7B70] hover:text-[#2C2420] transition-colors p-1"
+                        className="text-[#6E5F55] hover:text-[#2C2420] transition-colors p-1"
                       >
                         {isExpanded ? <ChevronUp size={18}/> : <ChevronDown size={18}/>}
                       </button>
@@ -437,10 +437,10 @@ export default function AdminTherapistsPage() {
 
                           {/* Specialties */}
                           <div>
-                            <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Specialties</p>
+                            <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Specialties</p>
                             <div className="flex flex-wrap gap-1.5">
                               {t.specialties.map(s => (
-                                <span key={s} className="text-xs bg-[#F2EBE6] text-[#8C7B70] px-2 py-0.5 rounded-full">{s}</span>
+                                <span key={s} className="text-xs bg-[#F2EBE6] text-[#6E5F55] px-2 py-0.5 rounded-full">{s}</span>
                               ))}
                             </div>
                           </div>
@@ -448,18 +448,18 @@ export default function AdminTherapistsPage() {
                           {/* Bio */}
                           {t.bio && (
                             <div>
-                              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1">Bio</p>
+                              <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1">Bio</p>
                               <p className="text-sm text-[#2C2420] leading-relaxed">"{t.bio}"</p>
                             </div>
                           )}
 
                           {/* Service area */}
                           <div>
-                            <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Service Area</p>
+                            <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Service Area</p>
                             {!serviceAreas[t.id] ? (
-                              <p className="text-xs text-[#8C7B70]">Loading…</p>
+                              <p className="text-xs text-[#6E5F55]">Loading…</p>
                             ) : serviceAreas[t.id].length === 0 ? (
-                              <p className="text-xs text-[#8C7B70]">No barangays set — therapist hasn't configured their service area yet.</p>
+                              <p className="text-xs text-[#6E5F55]">No barangays set — therapist hasn't configured their service area yet.</p>
                             ) : (
                               <div className="flex flex-col gap-1.5">
                                 {serviceAreas[t.id].some(b => b.status === 'pending') && (
@@ -483,7 +483,7 @@ export default function AdminTherapistsPage() {
                                       </>
                                     )}
                                     {b.status === 'approved' && (
-                                      <button disabled={saUpdating === b.psgc_code} onClick={() => removeBarangay(t.id, b.psgc_code)} className="ml-1 text-[#8C7B70] hover:text-red-600 disabled:opacity-40 transition-colors px-1" title="Remove">✕</button>
+                                      <button disabled={saUpdating === b.psgc_code} onClick={() => removeBarangay(t.id, b.psgc_code)} className="ml-1 text-[#6E5F55] hover:text-red-600 disabled:opacity-40 transition-colors px-1" title="Remove">✕</button>
                                     )}
                                     {b.status === 'rejected' && (
                                       <button disabled={saUpdating === b.psgc_code} onClick={() => updateBarangayStatus(t.id, b.psgc_code, 'approved')} className="ml-1 text-[#6B8C6E] hover:underline disabled:opacity-40 text-[10px]">Re-approve</button>
@@ -504,7 +504,7 @@ export default function AdminTherapistsPage() {
                             </button>
                             <Link
                               href={`/admin/applicants`}
-                              className="flex items-center gap-1 text-xs font-semibold border border-[#EDE5DF] px-4 py-2 rounded-xl hover:border-[#2C2420] transition-colors text-[#8C7B70]"
+                              className="flex items-center gap-1 text-xs font-semibold border border-[#EDE5DF] px-4 py-2 rounded-xl hover:border-[#2C2420] transition-colors text-[#6E5F55]"
                             >
                               View documents <ExternalLink size={11}/>
                             </Link>
@@ -530,7 +530,7 @@ export default function AdminTherapistsPage() {
                           <div className="grid grid-cols-2 gap-4">
                             {/* Name */}
                             <div>
-                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Full name</label>
+                              <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Full name</label>
                               <input
                                 type="text"
                                 value={editState?.name ?? ''}
@@ -541,7 +541,7 @@ export default function AdminTherapistsPage() {
 
                             {/* Gender */}
                             <div>
-                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Gender</label>
+                              <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Gender</label>
                               <select
                                 value={editState?.gender ?? ''}
                                 onChange={e => setEditState(p => p ? { ...p, gender: e.target.value } : p)}
@@ -555,7 +555,7 @@ export default function AdminTherapistsPage() {
 
                             {/* Phone */}
                             <div>
-                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Mobile number</label>
+                              <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Mobile number</label>
                               <input
                                 type="tel"
                                 value={editState?.phone ?? ''}
@@ -566,7 +566,7 @@ export default function AdminTherapistsPage() {
 
                             {/* Email */}
                             <div>
-                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Email</label>
+                              <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Email</label>
                               <input
                                 type="email"
                                 value={editState?.email ?? ''}
@@ -579,7 +579,7 @@ export default function AdminTherapistsPage() {
                           {/* Home address: barangay (from city) + street */}
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Home barangay</label>
+                              <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Home barangay</label>
                               <select
                                 value={editState?.addressBarangayPsgc ?? ''}
                                 onChange={e => setEditState(p => p ? { ...p, addressBarangayPsgc: e.target.value } : p)}
@@ -592,7 +592,7 @@ export default function AdminTherapistsPage() {
                               </select>
                             </div>
                             <div>
-                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Street address</label>
+                              <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Street address</label>
                               <input
                                 type="text"
                                 value={editState?.address ?? ''}
@@ -606,7 +606,7 @@ export default function AdminTherapistsPage() {
                           <div className="grid grid-cols-2 gap-4">
                             {/* City */}
                             <div>
-                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">City</label>
+                              <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">City</label>
                               <select
                                 value={editState?.cityId ?? ''}
                                 onChange={e => setEditState(p => p ? { ...p, cityId: e.target.value } : p)}
@@ -621,7 +621,7 @@ export default function AdminTherapistsPage() {
 
                             {/* Years experience */}
                             <div>
-                              <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Years experience</label>
+                              <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Years experience</label>
                               <input
                                 type="number"
                                 min={0}
@@ -635,7 +635,7 @@ export default function AdminTherapistsPage() {
 
                           {/* Bio */}
                           <div>
-                            <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Bio</label>
+                            <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Bio</label>
                             <textarea
                               value={editState?.bio ?? ''}
                               onChange={e => setEditState(p => p ? { ...p, bio: e.target.value } : p)}
@@ -646,7 +646,7 @@ export default function AdminTherapistsPage() {
 
                           {/* Specialties */}
                           <div>
-                            <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Specialties</label>
+                            <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Specialties</label>
                             <div className="flex flex-wrap gap-2">
                               {SPECIALTIES_OPTIONS.map(s => (
                                 <button
@@ -657,7 +657,7 @@ export default function AdminTherapistsPage() {
                                     'text-xs px-3 py-1.5 rounded-full border transition-colors',
                                     editState?.specialties.includes(s)
                                       ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                                      : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#C4714A]',
+                                      : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#C4714A]',
                                   )}
                                 >
                                   {s}
@@ -668,11 +668,11 @@ export default function AdminTherapistsPage() {
 
                           {/* Service area barangays */}
                           <div>
-                            <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">
+                            <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">
                               Service Area — {saSelected.size} barangay{saSelected.size !== 1 ? 's' : ''} selected
                             </label>
                             {saAllBarangays.length === 0 ? (
-                              <p className="text-xs text-[#8C7B70]">No barangay data available for this city.</p>
+                              <p className="text-xs text-[#6E5F55]">No barangay data available for this city.</p>
                             ) : (
                               <div className="border border-[#EDE5DF] rounded-xl overflow-hidden">
                                 <div className="p-2 border-b border-[#F2EBE6] flex gap-2 items-center bg-[#FAFAFA]">
@@ -684,7 +684,7 @@ export default function AdminTherapistsPage() {
                                     className="flex-1 border border-[#EDE5DF] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#C4714A] bg-white"
                                   />
                                   <button type="button" onClick={() => setSaSelected(new Set(saAllBarangays.map(b => b.psgc_code)))} className="text-xs text-[#C4714A] hover:underline whitespace-nowrap">All</button>
-                                  <button type="button" onClick={() => setSaSelected(new Set())} className="text-xs text-[#8C7B70] hover:underline whitespace-nowrap">Clear</button>
+                                  <button type="button" onClick={() => setSaSelected(new Set())} className="text-xs text-[#6E5F55] hover:underline whitespace-nowrap">Clear</button>
                                 </div>
                                 <div className="max-h-48 overflow-y-auto divide-y divide-[#F2EBE6]">
                                   {saAllBarangays
@@ -719,7 +719,7 @@ export default function AdminTherapistsPage() {
                             </button>
                             <button
                               onClick={() => { setEditing(null); setEditState(null) }}
-                              className="px-5 py-2.5 border border-[#EDE5DF] text-[#8C7B70] font-semibold text-sm rounded-xl hover:border-[#2C2420] transition-colors"
+                              className="px-5 py-2.5 border border-[#EDE5DF] text-[#6E5F55] font-semibold text-sm rounded-xl hover:border-[#2C2420] transition-colors"
                             >
                               Cancel
                             </button>
@@ -741,7 +741,7 @@ export default function AdminTherapistsPage() {
 function InfoField({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold text-[#8C7B70] uppercase tracking-wider">{label}</p>
+      <p className="text-[10px] font-semibold text-[#6E5F55] uppercase tracking-wider">{label}</p>
       <p className={cn('text-sm text-[#2C2420] mt-0.5 font-medium', mono && 'font-mono tracking-widest text-[#C4714A]')}>
         {value}
       </p>

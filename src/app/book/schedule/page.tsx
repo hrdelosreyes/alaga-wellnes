@@ -194,13 +194,13 @@ export default function SchedulePage() {
       <div className="container-alaga py-12 max-w-2xl">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-[#8C7B70] hover:text-[#2C2420] mb-6 transition-colors"
+          className="flex items-center gap-1 text-sm text-[#6E5F55] hover:text-[#2C2420] mb-6 transition-colors"
         >
           <ChevronLeft size={16} /> Back
         </button>
 
         <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Pick a date &amp; time</h1>
-        <p className="text-[#8C7B70] mb-8">Sessions are available daily, 9AM – 10PM.</p>
+        <p className="text-[#6E5F55] mb-8">Sessions are available daily, 9AM – 10PM.</p>
 
         {/* Date picker */}
         <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5 mb-6">
@@ -296,7 +296,7 @@ export default function SchedulePage() {
               })}
             </div>
             {isToday(selectedDate) && (
-              <p className="text-xs text-[#8C7B70] mt-4">
+              <p className="text-xs text-[#6E5F55] mt-4">
                 Showing slots at least {LEAD_HOURS} hours from now. Greyed-out times are no longer available today.
               </p>
             )}

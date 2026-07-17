@@ -74,7 +74,7 @@ export default function PreferencesPage() {
       <div className="container-alaga py-12 max-w-2xl">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-[#8C7B70] hover:text-[#2C2420] mb-6 transition-colors"
+          className="flex items-center gap-1 text-sm text-[#6E5F55] hover:text-[#2C2420] mb-6 transition-colors"
         >
           <ChevronLeft size={16} /> Back
         </button>
@@ -86,7 +86,7 @@ export default function PreferencesPage() {
             <span>Pre-filled from your account. You can edit if needed.</span>
           </div>
         ) : (
-          <p className="text-[#8C7B70] mb-6">
+          <p className="text-[#6E5F55] mb-6">
             So your therapist knows who to look for.{' '}
             {!customerId && (
               <Link href="/account/login?next=/book/preferences" className="text-[#C4714A] font-medium hover:underline">
@@ -126,12 +126,12 @@ export default function PreferencesPage() {
                 className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
               />
               {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
-              <p className="text-xs text-[#8C7B70] mt-1">Shared with your therapist after they accept the booking.</p>
+              <p className="text-xs text-[#6E5F55] mt-1">Shared with your therapist after they accept the booking.</p>
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-[#2C2420] mb-2">
-                Email <span className="text-[#8C7B70] font-normal">(optional)</span>
+                Email <span className="text-[#6E5F55] font-normal">(optional)</span>
               </label>
               <input
                 type="email"
@@ -141,16 +141,16 @@ export default function PreferencesPage() {
                 className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
               />
               {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
-              <p className="text-xs text-[#8C7B70] mt-1">For booking confirmation and reminders.</p>
+              <p className="text-xs text-[#6E5F55] mt-1">For booking confirmation and reminders.</p>
             </div>
           </div>
 
           {/* Notes */}
           <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
             <label className="block font-semibold text-[#2C2420] mb-1">
-              Notes for your therapist <span className="text-[#8C7B70] font-normal">(optional)</span>
+              Notes for your therapist <span className="text-[#6E5F55] font-normal">(optional)</span>
             </label>
-            <p className="text-sm text-[#8C7B70] mb-3">
+            <p className="text-sm text-[#6E5F55] mb-3">
               Areas to focus on, pressure preference, allergies, or anything else.
             </p>
             <textarea

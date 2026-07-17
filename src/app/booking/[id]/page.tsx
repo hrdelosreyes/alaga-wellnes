@@ -90,9 +90,9 @@ function BookingConfirmationPage() {
   if (notFound || !booking) {
     return (
       <div className="container-alaga py-20 max-w-lg text-center">
-        <AlertCircle size={40} className="text-[#8C7B70] mx-auto mb-4" />
+        <AlertCircle size={40} className="text-[#6E5F55] mx-auto mb-4" />
         <h1 className="text-xl font-bold text-[#2C2420] mb-2">Booking not found</h1>
-        <p className="text-[#8C7B70] mb-6">This link may be invalid or expired.</p>
+        <p className="text-[#6E5F55] mb-6">This link may be invalid or expired.</p>
         <Link href="/book" className="text-[#C4714A] font-semibold hover:underline">
           Start a new booking
         </Link>
@@ -116,7 +116,7 @@ function BookingConfirmationPage() {
             <h1 className="text-2xl font-bold text-[#2C2420] mb-1">
               {justPaid ? 'Payment received!' : 'Booking confirmed'}
             </h1>
-            <p className="text-[#8C7B70]">
+            <p className="text-[#6E5F55]">
               {justPaid
                 ? 'Your session is booked. We\'ll send a confirmation shortly.'
                 : 'Here are your booking details.'}
@@ -126,13 +126,13 @@ function BookingConfirmationPage() {
           <>
             <AlertCircle size={56} className="text-red-400 mx-auto mb-3" />
             <h1 className="text-2xl font-bold text-[#2C2420] mb-1">Booking cancelled</h1>
-            <p className="text-[#8C7B70]">This booking has been cancelled.</p>
+            <p className="text-[#6E5F55]">This booking has been cancelled.</p>
           </>
         ) : (
           <>
             <Clock size={56} className="text-amber-400 mx-auto mb-3" />
             <h1 className="text-2xl font-bold text-[#2C2420] mb-1">Awaiting payment</h1>
-            <p className="text-[#8C7B70]">Your booking is reserved but not yet paid.</p>
+            <p className="text-[#6E5F55]">Your booking is reserved but not yet paid.</p>
           </>
         )}
       </div>
@@ -144,7 +144,7 @@ function BookingConfirmationPage() {
 
       {/* Booking ref */}
       <div className="text-center mb-6">
-        <span className="text-xs text-[#8C7B70] uppercase tracking-widest">Booking reference</span>
+        <span className="text-xs text-[#6E5F55] uppercase tracking-widest">Booking reference</span>
         <p className="text-lg font-bold text-[#2C2420] tracking-widest">{shortRef}</p>
       </div>
 
@@ -155,7 +155,7 @@ function BookingConfirmationPage() {
           <div className="p-5 flex items-center justify-between">
             <div>
               <p className="font-bold text-[#2C2420]">{service.name}</p>
-              <p className="text-sm text-[#8C7B70]">{service.duration} minutes</p>
+              <p className="text-sm text-[#6E5F55]">{service.duration} minutes</p>
             </div>
             <span className="font-bold text-[#2C2420]">{formatPrice(booking.subtotal)}</span>
           </div>
@@ -165,7 +165,7 @@ function BookingConfirmationPage() {
           <Calendar size={16} className="text-[#C4714A] flex-shrink-0" />
           <div>
             <p className="font-semibold text-[#2C2420] text-sm">{formatDate(booking.booking_date)}</p>
-            <p className="text-sm text-[#8C7B70]">{formatTime(booking.time_slot)}</p>
+            <p className="text-sm text-[#6E5F55]">{formatTime(booking.time_slot)}</p>
           </div>
         </div>
 
@@ -174,7 +174,7 @@ function BookingConfirmationPage() {
           <div>
             <p className="font-semibold text-[#2C2420] text-sm">{booking.address}</p>
             {booking.unit_notes && (
-              <p className="text-sm text-[#8C7B70]">{booking.unit_notes}</p>
+              <p className="text-sm text-[#6E5F55]">{booking.unit_notes}</p>
             )}
           </div>
         </div>
@@ -188,14 +188,14 @@ function BookingConfirmationPage() {
                 ? 'Being assigned — you\'ll be notified'
                 : 'Therapist to be confirmed'}
             {booking.therapist_gender_pref !== 'any' && (
-              <span className="text-[#8C7B70]"> · {booking.therapist_gender_pref} preferred</span>
+              <span className="text-[#6E5F55]"> · {booking.therapist_gender_pref} preferred</span>
             )}
           </p>
         </div>
 
         {booking.customer_notes && (
           <div className="p-5">
-            <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1">Your notes</p>
+            <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1">Your notes</p>
             <p className="text-sm text-[#2C2420]">{booking.customer_notes}</p>
           </div>
         )}
@@ -205,11 +205,11 @@ function BookingConfirmationPage() {
       <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5 mb-8">
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-[#8C7B70]">Service</span>
+            <span className="text-[#6E5F55]">Service</span>
             <span className="text-[#2C2420]">{formatPrice(booking.subtotal)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[#8C7B70]">Transport fee</span>
+            <span className="text-[#6E5F55]">Transport fee</span>
             <span className="text-[#2C2420]">{formatPrice(booking.transport_fee)}</span>
           </div>
           <div className="border-t border-[#F2EBE6] pt-2 mt-1 flex justify-between font-bold text-base">
@@ -240,14 +240,14 @@ function BookingConfirmationPage() {
           // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
           <a
             href="/#waitlist"
-            className="w-full text-center py-3.5 rounded-xl bg-[#C4714A] text-white font-semibold hover:bg-[#A05938] transition-colors"
+            className="w-full text-center py-3.5 rounded-xl bg-[#B05C33] text-white font-semibold hover:bg-[#A05938] transition-colors"
           >
-            Book another session
+            Join the waitlist
           </a>
         )}
         <Link
           href="/"
-          className="w-full text-center py-3.5 rounded-xl border-2 border-[#EDE5DF] text-[#8C7B70] font-semibold hover:border-[#C4714A] hover:text-[#C4714A] transition-colors"
+          className="w-full text-center py-3.5 rounded-xl border-2 border-[#EDE5DF] text-[#6E5F55] font-semibold hover:border-[#C4714A] hover:text-[#C4714A] transition-colors"
         >
           Back to home
         </Link>
@@ -269,7 +269,7 @@ function BookingConfirmationPage() {
 
       {/* Live update note */}
       {isPaid && !isCancelled && (
-        <p className="text-center text-xs text-[#8C7B70] mt-6">
+        <p className="text-center text-xs text-[#6E5F55] mt-6">
           This page updates live as your booking status changes.
         </p>
       )}

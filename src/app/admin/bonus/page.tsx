@@ -102,7 +102,7 @@ export default function AdminBonusPage() {
           {(['current', 'payouts'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={cn('px-4 py-2 rounded-full text-sm font-semibold border capitalize transition-colors',
-                tab === t ? 'bg-[#2C2420] text-white border-[#2C2420]' : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#2C2420] bg-white'
+                tab === t ? 'bg-[#2C2420] text-white border-[#2C2420]' : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#2C2420] bg-white'
               )}
             >
               {t === 'current' ? `${quarter} (Live)` : 'Payout history'}
@@ -115,24 +115,24 @@ export default function AdminBonusPage() {
             {/* Pool summary */}
             <div className="grid grid-cols-4 gap-4 mb-8">
               <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-                <p className="text-xs text-[#8C7B70] mb-1">Pool this quarter</p>
+                <p className="text-xs text-[#6E5F55] mb-1">Pool this quarter</p>
                 <p className="text-2xl font-bold text-[#C4714A]">{formatPrice(totalPool)}</p>
                 <p className="text-xs text-[#C8BDB8] mt-1">{start} – {end}</p>
               </div>
               <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-                <p className="text-xs text-[#8C7B70] mb-1">Qualified therapists</p>
+                <p className="text-xs text-[#6E5F55] mb-1">Qualified therapists</p>
                 <p className="text-2xl font-bold text-[#6B8C6E]">{qualified.length}</p>
                 <p className="text-xs text-[#C8BDB8] mt-1">≥ {BONUS_MIN_BOOKINGS} bookings</p>
               </div>
               <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-                <p className="text-xs text-[#8C7B70] mb-1">Platform profit</p>
+                <p className="text-xs text-[#6E5F55] mb-1">Platform profit</p>
                 <p className="text-2xl font-bold text-[#2C2420]">
                   {formatPrice(notQualified.reduce((s, t) => s + t.contribution, 0))}
                 </p>
                 <p className="text-xs text-[#C8BDB8] mt-1">from non-qualified therapists</p>
               </div>
               <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-                <p className="text-xs text-[#8C7B70] mb-1">Highest est. share</p>
+                <p className="text-xs text-[#6E5F55] mb-1">Highest est. share</p>
                 <p className="text-2xl font-bold text-[#2C2420]">
                   {qualified.length > 0
                     ? formatPrice(Math.floor(totalPool * (Math.max(...qualified.map(s => s.bookingCount)) / qualified.reduce((s, q) => s + q.bookingCount, 0))))
@@ -167,7 +167,7 @@ export default function AdminBonusPage() {
                 <div className="flex flex-col gap-2">
                   {calcResults.map(r => (
                     <div key={r.name} className="flex justify-between text-sm">
-                      <span className="text-[#2C2420]">{r.name} <span className="text-[#8C7B70]">({r.bookingCount} bookings)</span></span>
+                      <span className="text-[#2C2420]">{r.name} <span className="text-[#6E5F55]">({r.bookingCount} bookings)</span></span>
                       <span className="font-bold text-[#6B8C6E]">{formatPrice(r.share)}</span>
                     </div>
                   ))}
@@ -177,14 +177,14 @@ export default function AdminBonusPage() {
 
             {/* Therapist breakdown */}
             {loading ? (
-              <div className="text-center py-10 text-[#8C7B70]">Loading…</div>
+              <div className="text-center py-10 text-[#6E5F55]">Loading…</div>
             ) : stats.length === 0 ? (
-              <div className="text-center py-10 text-[#8C7B70]">No completed bookings this quarter yet.</div>
+              <div className="text-center py-10 text-[#6E5F55]">No completed bookings this quarter yet.</div>
             ) : (
               <div className="bg-white rounded-2xl border border-[#EDE5DF] overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#F2EBE6] text-xs text-[#8C7B70] uppercase tracking-wider">
+                    <tr className="border-b border-[#F2EBE6] text-xs text-[#6E5F55] uppercase tracking-wider">
                       <th className="text-left px-5 py-3">Therapist</th>
                       <th className="text-center px-5 py-3">Bookings</th>
                       <th className="text-right px-5 py-3">Contributed</th>
@@ -196,7 +196,7 @@ export default function AdminBonusPage() {
                       <tr key={s.therapistId} className="hover:bg-[#FBF6F0]">
                         <td className="px-5 py-3 font-semibold text-[#2C2420]">{s.name}</td>
                         <td className="px-5 py-3 text-center font-bold text-[#2C2420]">{s.bookingCount}</td>
-                        <td className="px-5 py-3 text-right text-[#8C7B70]">{formatPrice(s.contribution)}</td>
+                        <td className="px-5 py-3 text-right text-[#6E5F55]">{formatPrice(s.contribution)}</td>
                         <td className="px-5 py-3 text-center">
                           {s.bookingCount >= BONUS_MIN_BOOKINGS ? (
                             <span className="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Qualified</span>
@@ -222,7 +222,7 @@ export default function AdminBonusPage() {
                     {pendingPayouts.length} pending payout{pendingPayouts.length !== 1 ? 's' : ''} —{' '}
                     {formatPrice(pendingPayouts.reduce((s, p) => s + p.pool_share, 0))} total
                   </p>
-                  <p className="text-xs text-[#8C7B70] mt-0.5">Mark all as paid once transfers are done.</p>
+                  <p className="text-xs text-[#6E5F55] mt-0.5">Mark all as paid once transfers are done.</p>
                 </div>
                 <button
                   onClick={() => markAllPaid(pendingPayouts[0].quarter)}
@@ -235,9 +235,9 @@ export default function AdminBonusPage() {
             )}
 
             {loading ? (
-              <div className="text-center py-10 text-[#8C7B70]">Loading…</div>
+              <div className="text-center py-10 text-[#6E5F55]">Loading…</div>
             ) : payouts.length === 0 ? (
-              <div className="text-center py-10 text-[#8C7B70]">No payouts yet. Run the quarterly calculation first.</div>
+              <div className="text-center py-10 text-[#6E5F55]">No payouts yet. Run the quarterly calculation first.</div>
             ) : (
               quarters.map(q => {
                 const qPayouts = payouts.filter(p => p.quarter === q)
@@ -245,13 +245,13 @@ export default function AdminBonusPage() {
                 return (
                   <div key={q} className="mb-6">
                     <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider">{q}</h2>
+                      <h2 className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider">{q}</h2>
                       <span className="text-sm font-bold text-[#2C2420]">{formatPrice(qTotal)} distributed</span>
                     </div>
                     <div className="bg-white rounded-2xl border border-[#EDE5DF] overflow-hidden">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-[#F2EBE6] text-xs text-[#8C7B70] uppercase tracking-wider">
+                          <tr className="border-b border-[#F2EBE6] text-xs text-[#6E5F55] uppercase tracking-wider">
                             <th className="text-left px-5 py-3">Therapist</th>
                             <th className="text-center px-5 py-3">Bookings</th>
                             <th className="text-right px-5 py-3">Bonus</th>
@@ -262,7 +262,7 @@ export default function AdminBonusPage() {
                           {qPayouts.map(p => (
                             <tr key={p.id} className="hover:bg-[#FBF6F0]">
                               <td className="px-5 py-3 font-semibold text-[#2C2420]">{(p.therapists as any)?.name ?? '—'}</td>
-                              <td className="px-5 py-3 text-center text-[#8C7B70]">{p.booking_count}</td>
+                              <td className="px-5 py-3 text-center text-[#6E5F55]">{p.booking_count}</td>
                               <td className="px-5 py-3 text-right font-bold text-[#C4714A]">{formatPrice(p.pool_share)}</td>
                               <td className="px-5 py-3 text-center">
                                 {p.status === 'paid'

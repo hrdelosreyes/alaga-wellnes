@@ -8,14 +8,26 @@ import { useGeoCity } from '@/components/geo/city-context'
 // and everyone else to the waitlist section instead. Uses a plain <a> for the
 // waitlist case: Next's <Link> doesn't reliably scroll to a same-page hash
 // target, while a native anchor tag does.
-export function BookLink({ children, className }: { children: ReactNode; className?: string }) {
+//
+// Pass `waitlistChildren` to show different content (e.g. a "Join the
+// waitlist" label) when the visitor's city isn't live — a "Book Now" button
+// that lands on a waitlist form reads as bait-and-switch.
+export function BookLink({
+  children,
+  waitlistChildren,
+  className,
+}: {
+  children: ReactNode
+  waitlistChildren?: ReactNode
+  className?: string
+}) {
   const { isLive } = useGeoCity()
 
   if (!isLive) {
     return (
       // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
       <a href="/#waitlist" className={className}>
-        {children}
+        {waitlistChildren ?? children}
       </a>
     )
   }

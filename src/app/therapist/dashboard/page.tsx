@@ -411,36 +411,36 @@ export default function TherapistDashboard() {
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-white rounded-2xl border border-[#EDE5DF] px-4 py-4 text-center">
                 <p className="text-2xl font-bold text-[#C9A84C]">★ {therapist?.rating_avg || '—'}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-1">Rating</p>
+                <p className="text-[10px] text-[#6E5F55] mt-1">Rating</p>
               </div>
               <div className="bg-white rounded-2xl border border-[#EDE5DF] px-4 py-4 text-center">
                 <p className="text-2xl font-bold text-[#2C2420]">{therapist?.total_bookings ?? 0}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-1">Sessions</p>
+                <p className="text-[10px] text-[#6E5F55] mt-1">Sessions</p>
               </div>
               <div className="bg-white rounded-2xl border border-[#EDE5DF] px-4 py-4 text-center">
                 <p className="text-2xl font-bold text-[#6B8C6E]">{formatPrice(monthEarned)}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-1">Earned this month</p>
+                <p className="text-[10px] text-[#6E5F55] mt-1">Earned this month</p>
               </div>
             </div>
 
             {/* Earnings card */}
             <div className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-              <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">Your earnings (sessions)</p>
+              <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3">Your earnings (sessions)</p>
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div>
                   <p className="text-xl font-bold text-[#2C2420]">{formatPrice(earnings.earned)}</p>
-                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Total earned</p>
+                  <p className="text-[10px] text-[#6E5F55] mt-0.5">Total earned</p>
                 </div>
                 <div>
                   <p className="text-xl font-bold text-[#6B8C6E]">{formatPrice(earnings.paidOut)}</p>
-                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Paid out</p>
+                  <p className="text-[10px] text-[#6E5F55] mt-0.5">Paid out</p>
                 </div>
                 <div>
                   <p className="text-xl font-bold text-[#C4714A]">{formatPrice(earnings.pending)}</p>
-                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Pending payout</p>
+                  <p className="text-[10px] text-[#6E5F55] mt-0.5">Pending payout</p>
                 </div>
               </div>
-              <p className="text-[10px] text-[#8C7B70] mt-3 text-center">
+              <p className="text-[10px] text-[#6E5F55] mt-3 text-center">
                 Your take-home is 75% of each completed session. Referral &amp; bonus earnings are shown below.
               </p>
             </div>
@@ -544,13 +544,13 @@ export default function TherapistDashboard() {
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
               <p className="text-2xl font-bold text-[#2C2420]">{bonusStats.quarterBookings}</p>
-              <p className="text-[10px] text-[#8C7B70] mt-0.5">Bookings this quarter</p>
+              <p className="text-[10px] text-[#6E5F55] mt-0.5">Bookings this quarter</p>
             </div>
             <div>
               <p className={cn('text-2xl font-bold', bonusStats.quarterBookings >= BONUS_MIN_BOOKINGS ? 'text-[#6B8C6E]' : 'text-[#C8BDB8]')}>
                 {bonusStats.quarterBookings >= BONUS_MIN_BOOKINGS ? '✓' : `${BONUS_MIN_BOOKINGS - bonusStats.quarterBookings} more`}
               </p>
-              <p className="text-[10px] text-[#8C7B70] mt-0.5">
+              <p className="text-[10px] text-[#6E5F55] mt-0.5">
                 {bonusStats.quarterBookings >= BONUS_MIN_BOOKINGS ? 'Qualified!' : `to qualify`}
               </p>
             </div>
@@ -558,23 +558,23 @@ export default function TherapistDashboard() {
               {bonusStats.pendingBonus > 0 ? (
                 <>
                   <p className="text-2xl font-bold text-[#C9A84C]">₱{bonusStats.pendingBonus.toLocaleString()}</p>
-                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Bonus queued</p>
+                  <p className="text-[10px] text-[#6E5F55] mt-0.5">Bonus queued</p>
                 </>
               ) : bonusStats.quarterBookings >= BONUS_MIN_BOOKINGS ? (
                 <>
                   <p className="text-2xl font-bold text-[#6B8C6E]">✓</p>
-                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Qualified · pending</p>
+                  <p className="text-[10px] text-[#6E5F55] mt-0.5">Qualified · pending</p>
                 </>
               ) : (
                 <>
                   <p className="text-2xl">🔒</p>
-                  <p className="text-[10px] text-[#8C7B70] mt-0.5">Unlock at {BONUS_MIN_BOOKINGS}</p>
+                  <p className="text-[10px] text-[#6E5F55] mt-0.5">Unlock at {BONUS_MIN_BOOKINGS}</p>
                 </>
               )}
             </div>
           </div>
           {bonusStats.quarterBookings < BONUS_MIN_BOOKINGS ? (
-            <p className="text-xs text-[#8C7B70] mt-3 text-center">
+            <p className="text-xs text-[#6E5F55] mt-3 text-center">
               You&rsquo;re <strong>{BONUS_MIN_BOOKINGS - bonusStats.quarterBookings}</strong> booking{BONUS_MIN_BOOKINGS - bonusStats.quarterBookings === 1 ? '' : 's'} away from unlocking your Alaga Bonus this quarter. Keep going! 💪
             </p>
           ) : (
@@ -598,7 +598,7 @@ export default function TherapistDashboard() {
                 'flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors capitalize',
                 tab === t
                   ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                  : 'bg-white border-[#EDE5DF] text-[#8C7B70]',
+                  : 'bg-white border-[#EDE5DF] text-[#6E5F55]',
               )}
             >
               {t === 'today'
@@ -610,7 +610,7 @@ export default function TherapistDashboard() {
 
         {/* Booking cards */}
         {displayed.length === 0 ? (
-          <div className="text-center py-16 text-[#8C7B70]">
+          <div className="text-center py-16 text-[#6E5F55]">
             <CheckCircle2 size={36} className="mx-auto mb-3 text-[#EDE5DF]" />
             <p className="font-semibold text-[#2C2420]">
               {tab === 'today' ? 'No bookings today' : 'No upcoming bookings'}
@@ -630,18 +630,18 @@ export default function TherapistDashboard() {
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div>
                       <p className="font-bold text-[#2C2420]">{service?.name ?? booking.service_id}</p>
-                      <p className="text-xs text-[#8C7B70]">{service?.duration} minutes</p>
+                      <p className="text-xs text-[#6E5F55]">{service?.duration} minutes</p>
                     </div>
                     <span className={cn(
                       'text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0',
-                      STATUS_COLOR[booking.status] ?? 'bg-[#F2EBE6] text-[#8C7B70]'
+                      STATUS_COLOR[booking.status] ?? 'bg-[#F2EBE6] text-[#6E5F55]'
                     )}>
                       {STATUS_LABEL[booking.status] ?? booking.status}
                     </span>
                   </div>
 
                   {/* Date / time */}
-                  <div className="flex items-center gap-4 text-sm text-[#8C7B70] mb-2">
+                  <div className="flex items-center gap-4 text-sm text-[#6E5F55] mb-2">
                     <span className="flex items-center gap-1">
                       <Calendar size={13} />
                       {formatDate(booking.booking_date)}
@@ -655,7 +655,7 @@ export default function TherapistDashboard() {
                   {/* Address + client — only shown after accepting */}
                   {['assigned','en_route','checked_in','completed'].includes(booking.status) ? (
                     <>
-                      <div className="flex items-start gap-1.5 text-sm text-[#8C7B70] mb-1">
+                      <div className="flex items-start gap-1.5 text-sm text-[#6E5F55] mb-1">
                         <MapPin size={13} className="mt-0.5 flex-shrink-0" />
                         <span>
                           {booking.unit_notes && `${booking.unit_notes}, `}{booking.address}
@@ -676,7 +676,7 @@ export default function TherapistDashboard() {
                       )}
                     </>
                   ) : (
-                    <div className="flex items-start gap-1.5 text-sm text-[#8C7B70] mb-1">
+                    <div className="flex items-start gap-1.5 text-sm text-[#6E5F55] mb-1">
                       <MapPin size={13} className="mt-0.5 flex-shrink-0" />
                       <span className="italic">Address shown after accepting</span>
                     </div>
@@ -684,14 +684,14 @@ export default function TherapistDashboard() {
 
                   {/* Customer notes */}
                   {booking.customer_notes && ['assigned','en_route','checked_in','completed'].includes(booking.status) && (
-                    <p className="text-xs text-[#8C7B70] italic mt-2 bg-[#FBF6F0] rounded-lg px-3 py-2">
+                    <p className="text-xs text-[#6E5F55] italic mt-2 bg-[#FBF6F0] rounded-lg px-3 py-2">
                       "{booking.customer_notes}"
                     </p>
                   )}
 
                   {/* Earnings */}
                   <div className="mt-3 pt-3 border-t border-[#F2EBE6] flex items-center justify-between">
-                    <span className="text-xs text-[#8C7B70]">Your payout</span>
+                    <span className="text-xs text-[#6E5F55]">Your payout</span>
                     <span className="font-bold text-[#2C2420]">
                       {formatPrice(Math.round((booking.subtotal ?? 0) * THERAPIST_PAYOUT_RATE))}
                     </span>
@@ -744,7 +744,7 @@ export default function TherapistDashboard() {
                     <div className="mt-3 border-t border-[#F2EBE6] pt-3">
                       <button
                         onClick={() => setOpenChat(openChat === booking.id ? null : booking.id)}
-                        className="w-full flex items-center justify-between text-sm font-semibold text-[#8C7B70] hover:text-[#2C2420] transition-colors"
+                        className="w-full flex items-center justify-between text-sm font-semibold text-[#6E5F55] hover:text-[#2C2420] transition-colors"
                       >
                         <span className="flex items-center gap-2">
                           <MessageCircle size={15} />

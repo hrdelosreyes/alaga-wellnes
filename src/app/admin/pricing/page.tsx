@@ -129,7 +129,7 @@ export default function AdminPricingPage() {
         // Hilot rates are ₱50–₱100 above Relax within each tier
           ].map(t => (
             <div key={t.tier} className="bg-white rounded-xl border border-[#EDE5DF] p-3">
-              <p className="text-[10px] font-bold text-[#8C7B70] uppercase tracking-wider">{t.tier} — {t.label}</p>
+              <p className="text-[10px] font-bold text-[#6E5F55] uppercase tracking-wider">{t.tier} — {t.label}</p>
               <p className="text-sm font-bold text-[#2C2420] mt-0.5">{t.rates}</p>
               <p className="text-[10px] text-[#C8A88A]">Relax 60 min range</p>
             </div>
@@ -148,7 +148,7 @@ export default function AdminPricingPage() {
                   'px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors',
                   service === s.id
                     ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                    : 'bg-white border-[#EDE5DF] text-[#8C7B70]',
+                    : 'bg-white border-[#EDE5DF] text-[#6E5F55]',
                 )}
               >{s.label} <span className="opacity-60">{s.duration}</span></button>
             ))}
@@ -172,7 +172,7 @@ export default function AdminPricingPage() {
         </div>
 
         {/* Table header */}
-        <div className="grid grid-cols-[1fr_80px_100px_100px_100px_80px] gap-2 px-4 pb-2 text-xs font-semibold text-[#8C7B70] uppercase tracking-wide">
+        <div className="grid grid-cols-[1fr_80px_100px_100px_100px_80px] gap-2 px-4 pb-2 text-xs font-semibold text-[#6E5F55] uppercase tracking-wide">
           <span>City</span>
           <span>Class</span>
           <span className="text-center">Min (₱)</span>
@@ -182,7 +182,7 @@ export default function AdminPricingPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-16 text-[#8C7B70]">Loading…</div>
+          <div className="text-center py-16 text-[#6E5F55]">Loading…</div>
         ) : (
           <div className="flex flex-col gap-2">
             {filtered.map(city => {
@@ -196,10 +196,10 @@ export default function AdminPricingPage() {
                 >
                   <div>
                     <p className="font-semibold text-sm text-[#2C2420]">{city.name}</p>
-                    <p className="text-xs text-[#8C7B70]">{city.region}</p>
+                    <p className="text-xs text-[#6E5F55]">{city.region}</p>
                   </div>
 
-                  <span className="text-xs font-semibold px-2 py-1 rounded bg-[#F2EBE6] text-[#8C7B70] text-center">
+                  <span className="text-xs font-semibold px-2 py-1 rounded bg-[#F2EBE6] text-[#6E5F55] text-center">
                     {TIER_LABEL[city.city_class] ?? city.city_class}
                   </span>
 

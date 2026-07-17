@@ -116,7 +116,7 @@ export default function AdminUsersPage() {
             <h3 className="font-bold text-[#2C2420] mb-4">New portal user</h3>
             <div className="flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1.5">Email</label>
+                <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1.5">Email</label>
                 <input
                   type="email"
                   value={newEmail}
@@ -126,7 +126,7 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1.5">Temporary password</label>
+                <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1.5">Temporary password</label>
                 <input
                   type="password"
                   value={newPass}
@@ -136,7 +136,7 @@ export default function AdminUsersPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-1.5">Role</label>
+                <label className="block text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-1.5">Role</label>
                 <div className="flex gap-3">
                   {(['staff', 'admin'] as const).map(r => (
                     <button
@@ -146,14 +146,14 @@ export default function AdminUsersPage() {
                         'flex-1 py-3 rounded-xl border text-sm font-semibold capitalize transition-colors',
                         newRole === r
                           ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                          : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#2C2420]'
+                          : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#2C2420]'
                       )}
                     >
                       {r === 'admin' ? '🔑 Admin' : '👤 Staff'}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-[#8C7B70] mt-2">
+                <p className="text-xs text-[#6E5F55] mt-2">
                   {newRole === 'admin'
                     ? 'Full access — bookings, therapists, payments, users.'
                     : 'Therapist management only — no payments or user management.'}
@@ -172,7 +172,7 @@ export default function AdminUsersPage() {
                 </button>
                 <button
                   onClick={() => { setShowAdd(false); setError(null) }}
-                  className="px-5 py-3 border border-[#EDE5DF] text-[#8C7B70] rounded-xl text-sm hover:border-[#2C2420] transition-colors"
+                  className="px-5 py-3 border border-[#EDE5DF] text-[#6E5F55] rounded-xl text-sm hover:border-[#2C2420] transition-colors"
                 >
                   Cancel
                 </button>
@@ -183,9 +183,9 @@ export default function AdminUsersPage() {
 
         {/* Users list */}
         {loading ? (
-          <div className="text-center py-20 text-[#8C7B70]">Loading…</div>
+          <div className="text-center py-20 text-[#6E5F55]">Loading…</div>
         ) : users.length === 0 ? (
-          <div className="text-center py-20 text-[#8C7B70]">No portal users yet.</div>
+          <div className="text-center py-20 text-[#6E5F55]">No portal users yet.</div>
         ) : (
           <div className="flex flex-col gap-3">
             {users.map(u => (
@@ -195,7 +195,7 @@ export default function AdminUsersPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-[#2C2420] truncate">{u.email ?? u.user_id}</p>
-                  <p className="text-xs text-[#8C7B70] mt-0.5">
+                  <p className="text-xs text-[#6E5F55] mt-0.5">
                     Added {new Date(u.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>

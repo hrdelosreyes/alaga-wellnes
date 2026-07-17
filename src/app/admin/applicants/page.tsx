@@ -239,7 +239,7 @@ export default function AdminApplicantsPage() {
                 'px-4 py-2 rounded-full text-sm font-semibold border capitalize transition-colors',
                 filter === s
                   ? 'bg-[#2C2420] text-white border-[#2C2420]'
-                  : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#2C2420] bg-white',
+                  : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#2C2420] bg-white',
               )}
             >
               {s}
@@ -248,9 +248,9 @@ export default function AdminApplicantsPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-20 text-[#8C7B70]">Loading…</div>
+          <div className="text-center py-20 text-[#6E5F55]">Loading…</div>
         ) : applicants.length === 0 ? (
-          <div className="text-center py-20 text-[#8C7B70]">
+          <div className="text-center py-20 text-[#6E5F55]">
             No {filter} applications.
           </div>
         ) : (
@@ -282,7 +282,7 @@ export default function AdminApplicantsPage() {
                           {a.application_status}
                         </span>
                       </div>
-                      <p className="text-sm text-[#8C7B70]">
+                      <p className="text-sm text-[#6E5F55]">
                         {a.gender.charAt(0).toUpperCase() + a.gender.slice(1)}
                         {a.cities ? ` · ${a.cities.name}, ${a.cities.region}` : ''}
                         {a.years_experience ? ` · ${a.years_experience} yrs exp` : ''}
@@ -292,7 +292,7 @@ export default function AdminApplicantsPage() {
                       </p>
                     </div>
 
-                    <div className="flex-shrink-0 text-[#8C7B70]">
+                    <div className="flex-shrink-0 text-[#6E5F55]">
                       {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                     </div>
                   </button>
@@ -304,33 +304,33 @@ export default function AdminApplicantsPage() {
                       {/* Specialties + bio */}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Specialties</p>
+                          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Specialties</p>
                           <div className="flex flex-wrap gap-1.5">
                             {a.specialties.map(s => (
-                              <span key={s} className="text-xs bg-[#F2EBE6] text-[#8C7B70] px-2 py-0.5 rounded-full">{s}</span>
+                              <span key={s} className="text-xs bg-[#F2EBE6] text-[#6E5F55] px-2 py-0.5 rounded-full">{s}</span>
                             ))}
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Contact</p>
+                          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Contact</p>
                           <p className="text-sm text-[#2C2420]">{a.phone}</p>
                           {a.email && <p className="text-sm text-[#2C2420]">{a.email}</p>}
                           {a.referral_source && (
-                            <p className="text-xs text-[#8C7B70] mt-1">Referred via: {a.referral_source}</p>
+                            <p className="text-xs text-[#6E5F55] mt-1">Referred via: {a.referral_source}</p>
                           )}
                         </div>
                       </div>
 
                       {a.bio && (
                         <div>
-                          <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-2">Bio</p>
+                          <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-2">Bio</p>
                           <p className="text-sm text-[#2C2420] leading-relaxed">"{a.bio}"</p>
                         </div>
                       )}
 
                       {/* Documents + extracted data */}
                       <div className="flex flex-col gap-4">
-                        <p className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider">Documents</p>
+                        <p className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider">Documents</p>
 
                         {/* NBI */}
                         <ExtractedDoc
@@ -411,7 +411,7 @@ export default function AdminApplicantsPage() {
                               {inviting === a.id ? 'Sending…' : '✉ Send portal invite'}
                             </button>
                           )}
-                          <p className="text-xs text-[#8C7B70] text-center mt-1.5">
+                          <p className="text-xs text-[#6E5F55] text-center mt-1.5">
                             Emails {a.email} a link to set their password and access the therapist portal.
                           </p>
                         </div>
@@ -454,14 +454,14 @@ function ExtractedDoc({
       {/* Header row */}
       <div className="flex items-center justify-between gap-3 px-4 py-3 bg-[#F7F2EE]">
         <span className="text-sm font-semibold text-[#2C2420] flex items-center gap-1.5">
-          <FileText size={14} className="text-[#8C7B70]" /> {label}
+          <FileText size={14} className="text-[#6E5F55]" /> {label}
         </span>
         <div className="flex items-center gap-2">
           {onReExtract && (
             <button
               onClick={handleReExtract}
               disabled={reExtracting}
-              className="text-xs text-[#8C7B70] hover:text-[#C4714A] transition-colors disabled:opacity-40"
+              className="text-xs text-[#6E5F55] hover:text-[#C4714A] transition-colors disabled:opacity-40"
               title="Re-run AI extraction"
             >
               {reExtracting ? 'Extracting…' : '↺ Re-extract'}
@@ -494,7 +494,7 @@ function ExtractedDoc({
           <div className="grid grid-cols-2 gap-x-6 gap-y-2">
             {fields.map(f => (
               <div key={f.key}>
-                <p className="text-[10px] font-semibold text-[#8C7B70] uppercase tracking-wider">{f.label}</p>
+                <p className="text-[10px] font-semibold text-[#6E5F55] uppercase tracking-wider">{f.label}</p>
                 <p className="text-sm text-[#2C2420] font-medium">
                   {extracted[f.key] ?? <span className="text-[#C8BDB8] italic">not found</span>}
                 </p>

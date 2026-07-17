@@ -165,7 +165,7 @@ export default function AdminCitiesPage() {
             { label: 'Waitlist nationwide',   value: waitlistTotal },
           ].map(s => (
             <div key={s.label} className="bg-white rounded-2xl border border-[#EDE5DF] p-5">
-              <p className="text-xs text-[#8C7B70] mb-1">{s.label}</p>
+              <p className="text-xs text-[#6E5F55] mb-1">{s.label}</p>
               <p className="text-2xl font-bold text-[#2C2420]">{s.value}</p>
             </div>
           ))}
@@ -214,16 +214,16 @@ export default function AdminCitiesPage() {
             className="flex-1 min-w-48 border border-[#EDE5DF] rounded-xl px-4 py-2 text-sm bg-white focus:outline-none focus:border-[#C4714A] transition-colors"
           />
 
-          <span className="text-xs text-[#8C7B70]">
+          <span className="text-xs text-[#6E5F55]">
             {filtered.length} of {cities.length} cities
           </span>
         </div>
 
         {/* City list */}
         {loading ? (
-          <div className="text-center py-20 text-[#8C7B70]">Loading…</div>
+          <div className="text-center py-20 text-[#6E5F55]">Loading…</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-[#8C7B70]">No cities match your filter.</div>
+          <div className="text-center py-20 text-[#6E5F55]">No cities match your filter.</div>
         ) : (
           <div className="flex flex-col gap-3">
             {filtered.map(city => {
@@ -242,7 +242,7 @@ export default function AdminCitiesPage() {
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
                         <span className="font-bold text-[#2C2420]">{city.name}</span>
                         {city.city_class && (
-                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#F2EBE6] text-[#8C7B70]">
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#F2EBE6] text-[#6E5F55]">
                             {city.city_class}
                           </span>
                         )}
@@ -257,7 +257,7 @@ export default function AdminCitiesPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-[#8C7B70] mb-3">
+                      <p className="text-xs text-[#6E5F55] mb-3">
                         {REGION_LABELS[city.region] ?? city.region}
                         {city.province && ` · ${city.province}`}
                         {city.population != null && ` · Pop. ${city.population.toLocaleString()}`}
@@ -274,13 +274,13 @@ export default function AdminCitiesPage() {
                             style={{ width: `${pct}%` }}
                           />
                         </div>
-                        <span className="text-xs text-[#8C7B70] flex-shrink-0 flex items-center gap-1">
+                        <span className="text-xs text-[#6E5F55] flex-shrink-0 flex items-center gap-1">
                           <Users size={11} />
                           {therapistCount} / {threshold}
                         </span>
                       </div>
 
-                      <p className="text-xs text-[#8C7B70] flex items-center gap-1 mt-2">
+                      <p className="text-xs text-[#6E5F55] flex items-center gap-1 mt-2">
                         <Mail size={11} />
                         {waitlistCount} on waitlist
                       </p>
@@ -288,7 +288,7 @@ export default function AdminCitiesPage() {
 
                     {/* Controls */}
                     <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                      <div className="flex items-center gap-2 text-xs text-[#8C7B70]">
+                      <div className="flex items-center gap-2 text-xs text-[#6E5F55]">
                         <span>Threshold:</span>
                         <input
                           type="number"

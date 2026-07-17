@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight, CheckCircle, Upload, Wallet, Users, Gift, Star, ArrowRight } from 'lucide-react'
+import logoDark from '../../../../public/logo-dark.png'
+import therapistHero from '../../../../public/therapist-hero.png'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TherapistFaq } from '@/components/therapist/register-faq'
 
-type City = { id: string; name: string; region: string; province: string }
+type City = { id: string; name: string; region: string; province: string | null }
 
 const SPECIALTIES_OPTIONS = [
   'Relaxation Massage',
@@ -265,7 +268,7 @@ export default function TherapistRegisterPage() {
         <div className="max-w-sm w-full text-center">
           <CheckCircle size={56} className="text-[#6B8C6E] mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-[#2C2420] mb-2">Application submitted!</h1>
-          <p className="text-[#8C7B70] mb-6">
+          <p className="text-[#6E5F55] mb-6">
             Thank you for applying to join Alaga Wellness. Our team will review your documents and get in touch within 3–5 business days.
           </p>
           <Button className="w-full" onClick={() => router.push('/')}>Back to home</Button>
@@ -284,11 +287,9 @@ export default function TherapistRegisterPage() {
 
           {/* Left: solid dark text column */}
           <div className="md:w-1/2 bg-[#2C2420] flex flex-col justify-center px-6 py-12 md:px-12 md:py-16">
-            <img
-              src="/logo-dark.png"
+            <Image
+              src={logoDark}
               alt="Alaga Wellness"
-              width={1839}
-              height={732}
               className="h-16 w-auto self-start object-contain mb-8"
             />
             <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4 text-white">
@@ -300,11 +301,15 @@ export default function TherapistRegisterPage() {
           </div>
 
           {/* Right: image column */}
-          <div className="md:w-1/2 h-72 md:h-auto md:min-h-[480px]">
-            <img
-              src="/therapist-hero.png"
+          <div className="md:w-1/2 h-72 md:h-auto md:min-h-[480px] relative">
+            <Image
+              src={therapistHero}
               alt="Alaga Wellness therapist"
-              className="w-full h-full object-cover object-center"
+              fill
+              priority
+              placeholder="blur"
+              sizes="(min-width: 768px) 50vw, 100vw"
+              className="object-cover object-center"
             />
           </div>
 
@@ -319,10 +324,10 @@ export default function TherapistRegisterPage() {
               <div className="w-10 h-10 rounded-xl bg-[#C4714A] flex items-center justify-center flex-shrink-0">
                 <Wallet size={18} className="text-white" />
               </div>
-              <h2 className="font-bold" style={{ color: '#C4714A' }}>You keep most of what you earn</h2>
+              <h2 className="font-bold" style={{ color: '#C4714A' }}>Keep 75% of every booking</h2>
             </div>
             <p className="text-sm text-[#C8BDB8] leading-relaxed">
-              You set your own price for every service. Most of what the client pays goes directly to you — Alaga only takes a small platform share to keep everything running. Full details are explained when you're approved and ready to set your rates.
+              You set your own price for every service, and 75% of every completed session goes straight to you — far more than most spas pay. Alaga's share covers bookings, cashless payments, and client support, so you can focus on your craft.
             </p>
           </div>
 
@@ -425,13 +430,13 @@ export default function TherapistRegisterPage() {
                   'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
                   i < step  && 'bg-[#C4714A] text-white',
                   i === step && 'bg-[#2C2420] text-white',
-                  i > step  && 'bg-[#EDE5DF] text-[#8C7B70]',
+                  i > step  && 'bg-[#EDE5DF] text-[#6E5F55]',
                 )}>
                   {i < step ? '✓' : i + 1}
                 </div>
                 <span className={cn(
                   'text-[10px] font-medium hidden sm:block',
-                  i === step ? 'text-[#2C2420]' : 'text-[#8C7B70]',
+                  i === step ? 'text-[#2C2420]' : 'text-[#6E5F55]',
                 )}>{label}</span>
               </div>
               {i < FORM_STEPS.length - 1 && (
@@ -454,6 +459,7 @@ export default function TherapistRegisterPage() {
                   type="text"
                   value={form.name}
                   onChange={e => patch({ name: e.target.value })}
+                  autoComplete="name"
                   placeholder="e.g. Maria Santos"
                   className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
                 />
@@ -466,10 +472,11 @@ export default function TherapistRegisterPage() {
                   type="email"
                   value={form.email}
                   onChange={e => patch({ email: e.target.value })}
+                  autoComplete="email"
                   placeholder="you@example.com"
                   className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
                 />
-                <p className="text-xs text-[#8C7B70] mt-1">You'll use this to log in to your therapist portal once approved.</p>
+                <p className="text-xs text-[#6E5F55] mt-1">You'll use this to log in to your therapist portal once approved.</p>
                 {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
               </div>
 
@@ -479,6 +486,8 @@ export default function TherapistRegisterPage() {
                   type="tel"
                   value={form.phone}
                   onChange={e => patch({ phone: e.target.value })}
+                  autoComplete="tel-national"
+                  inputMode="tel"
                   placeholder="09XX XXX XXXX"
                   className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
                 />
@@ -496,7 +505,7 @@ export default function TherapistRegisterPage() {
                         'flex-1 py-3 rounded-xl border-2 text-sm font-semibold capitalize transition-all',
                         form.gender === g
                           ? 'border-[#C4714A] bg-[#FFF7F3] text-[#C4714A]'
-                          : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#C4714A]',
+                          : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#C4714A]',
                       )}
                     >{g}</button>
                   ))}
@@ -515,7 +524,7 @@ export default function TherapistRegisterPage() {
                   {Object.entries(cityGroups).map(([region, regionCities]) => (
                     <optgroup key={region} label={region}>
                       {regionCities.map(c => (
-                        <option key={c.id} value={c.id}>{c.name} — {c.province}</option>
+                        <option key={c.id} value={c.id}>{c.name}{c.province ? ` — ${c.province}` : ''}</option>
                       ))}
                     </optgroup>
                   ))}
@@ -528,9 +537,9 @@ export default function TherapistRegisterPage() {
                 <div>
                   <label className="block text-sm font-semibold text-[#2C2420] mb-2">Barangay <span className="text-red-400">*</span></label>
                   {bgyLoading ? (
-                    <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#8C7B70]">Loading barangays…</div>
+                    <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#6E5F55]">Loading barangays…</div>
                   ) : barangays.length === 0 ? (
-                    <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#8C7B70]">No barangay data — enter it in your street address below.</div>
+                    <div className="border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm text-[#6E5F55]">No barangay data — enter it in your street address below.</div>
                   ) : (
                     <select
                       value={form.barangayPsgc}
@@ -554,6 +563,7 @@ export default function TherapistRegisterPage() {
                   type="text"
                   value={form.street}
                   onChange={e => patch({ street: e.target.value })}
+                  autoComplete="street-address"
                   placeholder="e.g. 123 Mabini St., Brgy. hall area"
                   className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors"
                 />
@@ -563,7 +573,7 @@ export default function TherapistRegisterPage() {
               {/* Referral code */}
               <div>
                 <label className="block text-sm font-semibold text-[#2C2420] mb-2">
-                  Referral code <span className="text-[#8C7B70] font-normal">(optional)</span>
+                  Referral code <span className="text-[#6E5F55] font-normal">(optional)</span>
                 </label>
                 <input
                   type="text"
@@ -619,7 +629,7 @@ export default function TherapistRegisterPage() {
               <div>
                 <label className="block text-sm font-semibold text-[#2C2420] mb-3">
                   Specialties <span className="text-red-400">*</span>
-                  <span className="text-[#8C7B70] font-normal ml-1">(select all that apply)</span>
+                  <span className="text-[#6E5F55] font-normal ml-1">(select all that apply)</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {SPECIALTIES_OPTIONS.map(s => (
@@ -630,7 +640,7 @@ export default function TherapistRegisterPage() {
                         'px-3 py-1.5 rounded-full text-sm border font-medium transition-all',
                         form.specialties.includes(s)
                           ? 'bg-[#C4714A] text-white border-[#C4714A]'
-                          : 'border-[#EDE5DF] text-[#8C7B70] hover:border-[#C4714A]',
+                          : 'border-[#EDE5DF] text-[#6E5F55] hover:border-[#C4714A]',
                       )}
                     >{s}</button>
                   ))}
@@ -640,7 +650,7 @@ export default function TherapistRegisterPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-[#2C2420] mb-2">
-                  Short bio <span className="text-[#8C7B70] font-normal">(optional)</span>
+                  Short bio <span className="text-[#6E5F55] font-normal">(optional)</span>
                 </label>
                 <textarea
                   value={form.bio}
@@ -649,7 +659,7 @@ export default function TherapistRegisterPage() {
                   rows={3}
                   className="w-full border border-[#EDE5DF] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#C4714A] transition-colors resize-none"
                 />
-                <p className="text-xs text-[#8C7B70] mt-1">This will be shown on your therapist card.</p>
+                <p className="text-xs text-[#6E5F55] mt-1">This will be shown on your therapist card.</p>
               </div>
             </>
           )}
@@ -658,7 +668,7 @@ export default function TherapistRegisterPage() {
           {step === 2 && (
             <>
               <h2 className="font-bold text-[#2C2420] text-lg">Upload documents</h2>
-              <p className="text-sm text-[#8C7B70] -mt-2">All documents are kept confidential and used for verification only.</p>
+              <p className="text-sm text-[#6E5F55] -mt-2">All documents are kept confidential and used for verification only.</p>
 
               {[
                 { key: 'nbiFile'   as const, label: 'NBI Clearance',    required: true,  hint: 'Upload a clear photo or scan. Must be valid (not expired).' },
@@ -669,15 +679,15 @@ export default function TherapistRegisterPage() {
                   <label className="block text-sm font-semibold text-[#2C2420] mb-1">
                     {label} {required && <span className="text-red-400">*</span>}
                   </label>
-                  <p className="text-xs text-[#8C7B70] mb-2">{hint}</p>
+                  <p className="text-xs text-[#6E5F55] mb-2">{hint}</p>
                   <label className={cn(
                     'flex items-center gap-3 border-2 border-dashed rounded-xl px-4 py-4 cursor-pointer transition-colors',
                     form[key]
                       ? 'border-[#6B8C6E] bg-[#EBF3EC]'
                       : 'border-[#EDE5DF] hover:border-[#C4714A]',
                   )}>
-                    <Upload size={18} className={form[key] ? 'text-[#6B8C6E]' : 'text-[#8C7B70]'} />
-                    <span className="text-sm text-[#8C7B70]">
+                    <Upload size={18} className={form[key] ? 'text-[#6B8C6E]' : 'text-[#6E5F55]'} />
+                    <span className="text-sm text-[#6E5F55]">
                       {form[key] ? (form[key] as File).name : 'Tap to upload (JPG, PNG, PDF)'}
                     </span>
                     <input
@@ -691,7 +701,7 @@ export default function TherapistRegisterPage() {
                 </div>
               ))}
 
-              <div className="bg-[#FBF6F0] rounded-xl p-4 text-xs text-[#8C7B70] leading-relaxed">
+              <div className="bg-[#FBF6F0] rounded-xl p-4 text-xs text-[#6E5F55] leading-relaxed">
                 By submitting, you agree to Alaga Wellness's therapist terms and consent to a background verification. Your documents will not be shared with third parties.
               </div>
             </>
@@ -726,7 +736,7 @@ export default function TherapistRegisterPage() {
           )}
         </div>
 
-        <p className="text-center text-xs text-[#8C7B70] mt-4">
+        <p className="text-center text-xs text-[#6E5F55] mt-4">
           Already applied?{' '}
           <a href="/therapist/login" className="text-[#C4714A] hover:underline">Log in here</a>
         </p>

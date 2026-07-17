@@ -138,10 +138,10 @@ export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
       <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 min-h-0">
         {loading ? (
           <div className="flex justify-center py-8">
-            <Loader2 size={20} className="animate-spin text-[#8C7B70]" />
+            <Loader2 size={20} className="animate-spin text-[#6E5F55]" />
           </div>
         ) : messages.length === 0 ? (
-          <p className="text-center text-sm text-[#8C7B70] py-8">
+          <p className="text-center text-sm text-[#6E5F55] py-8">
             No messages yet. Say hi!
           </p>
         ) : (
@@ -153,7 +153,7 @@ export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
                 className={cn('flex flex-col max-w-[80%]', isMine ? 'self-end items-end' : 'self-start items-start')}
               >
                 {!isMine && (
-                  <span className="text-[10px] text-[#8C7B70] mb-1 px-1">{otherLabel}</span>
+                  <span className="text-[10px] text-[#6E5F55] mb-1 px-1">{otherLabel}</span>
                 )}
                 <div className={cn(
                   'px-4 py-2.5 rounded-2xl text-sm leading-relaxed',
@@ -176,7 +176,7 @@ export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
       {/* Input */}
       {readonly ? (
         <div className="px-4 py-3 border-t border-[#EDE5DF] bg-[#FAFAFA]">
-          <p className="text-xs text-center text-[#8C7B70]">Chat is closed — session completed.</p>
+          <p className="text-xs text-center text-[#6E5F55]">Chat is closed — session completed.</p>
         </div>
       ) : (
         <div className="px-4 py-3 border-t border-[#EDE5DF] bg-white flex items-end gap-2">

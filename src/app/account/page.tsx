@@ -83,7 +83,7 @@ export default function AccountPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FBF6F0] flex items-center justify-center">
-        <p className="text-[#8C7B70] text-sm">Loading…</p>
+        <p className="text-[#6E5F55] text-sm">Loading…</p>
       </div>
     )
   }
@@ -123,10 +123,10 @@ export default function AccountPage() {
         ) : (
           // eslint-disable-next-line @next/next/no-html-link-for-pages -- intentional: plain <a> so the browser natively scrolls to the same-page hash target, which next/link does not reliably do.
           <a href="/#waitlist">
-            <div className="bg-[#C4714A] text-white rounded-2xl p-5 mb-8 flex items-center justify-between hover:bg-[#b36540] transition-colors">
+            <div className="bg-[#B05C33] text-white rounded-2xl p-5 mb-8 flex items-center justify-between hover:bg-[#A05938] transition-colors">
               <div>
-                <p className="font-bold text-base">Book a session</p>
-                <p className="text-sm text-[#F2D9CC] mt-0.5">Your details will be pre-filled.</p>
+                <p className="font-bold text-base">Join the waitlist</p>
+                <p className="text-sm text-[#F2D9CC] mt-0.5">We&rsquo;ll notify you when Alaga launches in your city.</p>
               </div>
               <ChevronRight size={20} />
             </div>
@@ -135,7 +135,7 @@ export default function AccountPage() {
 
         {upcoming.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">Upcoming</h2>
+            <h2 className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3">Upcoming</h2>
             <div className="flex flex-col gap-3">
               {upcoming.map(b => <BookingCard key={b.id} booking={b} />)}
             </div>
@@ -144,7 +144,7 @@ export default function AccountPage() {
 
         {past.length > 0 && (
           <section>
-            <h2 className="text-xs font-semibold text-[#8C7B70] uppercase tracking-wider mb-3">Past bookings</h2>
+            <h2 className="text-xs font-semibold text-[#6E5F55] uppercase tracking-wider mb-3">Past bookings</h2>
             <div className="flex flex-col gap-3">
               {past.map(b => <BookingCard key={b.id} booking={b} />)}
             </div>
@@ -152,7 +152,7 @@ export default function AccountPage() {
         )}
 
         {bookings.length === 0 && (
-          <div className="text-center py-16 text-[#8C7B70]">
+          <div className="text-center py-16 text-[#6E5F55]">
             <p className="font-semibold text-[#2C2420] mb-1">No bookings yet</p>
             <p className="text-sm">Your booking history will appear here.</p>
           </div>
@@ -175,12 +175,12 @@ function BookingCard({ booking }: { booking: Booking }) {
                 {STATUS_LABEL[booking.status]}
               </span>
             </div>
-            <p className="text-sm text-[#8C7B70]">
+            <p className="text-sm text-[#6E5F55]">
               {formatDate(booking.booking_date)} · {formatTime(booking.time_slot)}
             </p>
-            <p className="text-sm text-[#8C7B70] truncate mt-0.5">{booking.address}</p>
+            <p className="text-sm text-[#6E5F55] truncate mt-0.5">{booking.address}</p>
             {booking.therapists?.name && (
-              <p className="text-xs text-[#8C7B70] mt-0.5">Therapist: {booking.therapists.name}</p>
+              <p className="text-xs text-[#6E5F55] mt-0.5">Therapist: {booking.therapists.name}</p>
             )}
           </div>
           <div className="text-right flex-shrink-0">

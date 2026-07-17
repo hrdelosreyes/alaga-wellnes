@@ -10,6 +10,7 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://alagawellness.care'),
   title: 'Alaga Wellness — Wellness, delivered with care.',
   description:
     'Book verified wellness professionals for premium massage and home spa rituals. Safe, convenient, and designed for Filipino families.',
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     siteName: 'Alaga Wellness',
     locale: 'en_PH',
     type: 'website',
-    images: [{ url: '/logo.png', width: 2000, height: 2000, alt: 'Alaga Wellness' }],
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Alaga Wellness — wellness, delivered with care' }],
   },
 }
 

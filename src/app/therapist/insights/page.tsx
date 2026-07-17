@@ -24,9 +24,9 @@ type Insights = {
 function Stat({ label, value, sub, accent }: { label: string; value: string; sub?: React.ReactNode; accent?: string }) {
   return (
     <div className="bg-white rounded-2xl border border-[#EDE5DF] p-4">
-      <p className="text-[10px] text-[#8C7B70] uppercase tracking-wider font-semibold">{label}</p>
+      <p className="text-[10px] text-[#6E5F55] uppercase tracking-wider font-semibold">{label}</p>
       <p className={cn('text-2xl font-bold mt-1', accent ?? 'text-[#2C2420]')}>{value}</p>
-      {sub && <div className="text-[11px] text-[#8C7B70] mt-0.5">{sub}</div>}
+      {sub && <div className="text-[11px] text-[#6E5F55] mt-0.5">{sub}</div>}
     </div>
   )
 }
@@ -52,7 +52,7 @@ export default function TherapistInsightsPage() {
   if (!data) {
     return (
       <div className="min-h-screen bg-[#F7F2EE]"><TherapistNav />
-        <div className="max-w-3xl mx-auto px-4 py-10 text-center text-[#8C7B70]">Couldn&rsquo;t load insights.</div>
+        <div className="max-w-3xl mx-auto px-4 py-10 text-center text-[#6E5F55]">Couldn&rsquo;t load insights.</div>
       </div>
     )
   }
@@ -120,7 +120,7 @@ export default function TherapistInsightsPage() {
                 return (
                   <div key={s.id} className="flex items-center justify-between text-sm">
                     <span className="text-[#2C2420]">{s.name}</span>
-                    <span className="text-[#8C7B70]">
+                    <span className="text-[#6E5F55]">
                       <strong className="text-[#2C2420]">{ps?.count ?? 0}</strong> · {formatPrice(ps?.earned ?? 0)}
                     </span>
                   </div>
@@ -134,14 +134,14 @@ export default function TherapistInsightsPage() {
             <div className="grid grid-cols-2 gap-3 text-center">
               <div>
                 <p className="text-2xl font-bold text-[#2C2420]">{customers.unique}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-0.5">Unique customers</p>
+                <p className="text-[10px] text-[#6E5F55] mt-0.5">Unique customers</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-[#C4714A]">{customers.repeat}</p>
-                <p className="text-[10px] text-[#8C7B70] mt-0.5">Repeat customers</p>
+                <p className="text-[10px] text-[#6E5F55] mt-0.5">Repeat customers</p>
               </div>
             </div>
-            <p className="text-[10px] text-[#8C7B70] mt-3 text-center">Repeat customers are your most valuable — keep them happy!</p>
+            <p className="text-[10px] text-[#6E5F55] mt-3 text-center">Repeat customers are your most valuable — keep them happy!</p>
           </div>
         </section>
 
@@ -150,7 +150,7 @@ export default function TherapistInsightsPage() {
           <h2 className="text-sm font-bold text-[#2C2420] mb-3 flex items-center gap-1.5"><Star size={15} className="text-[#C9A84C]" /> Reviews &amp; ratings</h2>
 
           {reviews.count === 0 ? (
-            <p className="text-sm text-[#8C7B70]">No reviews yet. Complete sessions and ask clients to rate you!</p>
+            <p className="text-sm text-[#6E5F55]">No reviews yet. Complete sessions and ask clients to rate you!</p>
           ) : (
             <>
               <div className="flex items-center gap-6 mb-4">
@@ -161,17 +161,17 @@ export default function TherapistInsightsPage() {
                       <Star key={i} size={12} className={i <= Math.round(reviews.avg ?? 0) ? 'text-[#C9A84C]' : 'text-[#EDE5DF]'} fill={i <= Math.round(reviews.avg ?? 0) ? '#C9A84C' : 'none'} />
                     ))}
                   </div>
-                  <p className="text-[10px] text-[#8C7B70] mt-1">{reviews.count} review{reviews.count === 1 ? '' : 's'}</p>
+                  <p className="text-[10px] text-[#6E5F55] mt-1">{reviews.count} review{reviews.count === 1 ? '' : 's'}</p>
                 </div>
                 {/* Star bars */}
                 <div className="flex-1 flex flex-col gap-1">
                   {[5,4,3,2,1].map(star => (
                     <div key={star} className="flex items-center gap-2">
-                      <span className="text-[10px] text-[#8C7B70] w-3">{star}</span>
+                      <span className="text-[10px] text-[#6E5F55] w-3">{star}</span>
                       <div className="flex-1 h-2 bg-[#F2EBE6] rounded-full overflow-hidden">
                         <div className="h-full bg-[#C9A84C] rounded-full" style={{ width: `${((reviews.starCounts[star] ?? 0) / maxStar) * 100}%` }} />
                       </div>
-                      <span className="text-[10px] text-[#8C7B70] w-4 text-right">{reviews.starCounts[star] ?? 0}</span>
+                      <span className="text-[10px] text-[#6E5F55] w-4 text-right">{reviews.starCounts[star] ?? 0}</span>
                     </div>
                   ))}
                 </div>
@@ -193,7 +193,7 @@ export default function TherapistInsightsPage() {
                         <span className="flex items-center gap-0.5">
                           {[1,2,3,4,5].map(s => <Star key={s} size={11} className={s <= r.stars ? 'text-[#C9A84C]' : 'text-[#EDE5DF]'} fill={s <= r.stars ? '#C9A84C' : 'none'} />)}
                         </span>
-                        <span className="text-[10px] text-[#8C7B70]">{formatDate(r.created_at.slice(0,10))}</span>
+                        <span className="text-[10px] text-[#6E5F55]">{formatDate(r.created_at.slice(0,10))}</span>
                       </div>
                       <p className="text-[#5C4B45] leading-relaxed">&ldquo;{r.review_text}&rdquo;</p>
                     </div>
