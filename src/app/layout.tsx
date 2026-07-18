@@ -5,6 +5,7 @@ import { Navbar } from '@/components/layout/navbar'
 import { Footer } from '@/components/layout/footer'
 import { GeoCityProvider } from '@/components/geo/city-context'
 import { AuthRedirect } from '@/components/auth/auth-redirect'
+import { ConciergeWidget } from '@/components/concierge/concierge-widget'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AuthRedirect />
           <Navbar />
           <main className="flex-1">{children}</main>
+          <ConciergeWidget />
           <Footer />
         </GeoCityProvider>
       </body>

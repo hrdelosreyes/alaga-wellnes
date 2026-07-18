@@ -762,6 +762,7 @@ export default function TherapistDashboard() {
                             bookingId={booking.id}
                             senderRole="therapist"
                             readonly={booking.status === 'completed'}
+                            aiSuggest
                           />
                         </div>
                       )}

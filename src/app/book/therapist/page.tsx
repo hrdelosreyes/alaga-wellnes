@@ -218,6 +218,13 @@ export default function TherapistPage() {
                         </p>
                       )}
 
+                      {t.review_summary && (
+                        <p className="text-xs text-[#5C4B45] bg-[#FBF6F0] border border-[#F2EBE6] rounded-lg px-2.5 py-1.5 leading-relaxed mb-3">
+                          <span className="font-semibold text-[#C4714A]">What customers say: </span>
+                          {t.review_summary}
+                        </p>
+                      )}
+
                       <div className="flex flex-wrap items-center gap-1.5">
                         {t.specialties.slice(0, 3).map(s => (
                           <span key={s} className="text-xs bg-[#F2EBE6] text-[#6E5F55] px-2 py-0.5 rounded-full">

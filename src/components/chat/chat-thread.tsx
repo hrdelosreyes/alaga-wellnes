@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Send, Loader2 } from 'lucide-react'
+import { Send, Loader2, Sparkles, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type Message = {
@@ -17,6 +17,7 @@ type Props = {
   bookingId: string
   senderRole: 'customer' | 'therapist'
   readonly?: boolean
+  aiSuggest?: boolean  // show AI-suggested replies (therapist side)
 }
 
 function formatMsgTime(iso: string) {
@@ -27,11 +28,13 @@ function formatMsgTime(iso: string) {
   })
 }
 
-export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
+export function ChatThread({ bookingId, senderRole, readonly = false, aiSuggest = false }: Props) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input,    setInput]    = useState('')
   const [sending,  setSending]  = useState(false)
   const [loading,  setLoading]  = useState(true)
+  const [suggestions, setSuggestions] = useState<string[] | null>(null)
+  const [suggesting,  setSuggesting]  = useState(false)
   const bottomRef  = useRef<HTMLDivElement>(null)
   const inputRef   = useRef<HTMLTextAreaElement>(null)
 
@@ -115,10 +118,38 @@ export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
       setMessages(prev => prev.filter(m => m.id !== optimistic.id))
       setInput(body)
       console.error('Message send error:', error)
+    } else {
+      setSuggestions(null)
+      // Fire-and-forget safety screening — never blocks the chat
+      fetch('/api/moderate/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId, sender: senderRole, body }),
+      }).catch(() => {})
     }
 
     setSending(false)
     inputRef.current?.focus()
+  }
+
+  async function fetchSuggestions() {
+    if (suggesting) return
+    setSuggesting(true)
+    try {
+      const res = await fetch('/api/therapist/suggest-replies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId }),
+      })
+      const data = await res.json()
+      if (res.ok && Array.isArray(data.suggestions) && data.suggestions.length) {
+        setSuggestions(data.suggestions)
+      }
+    } catch {
+      // ignore — suggestions are best-effort
+    } finally {
+      setSuggesting(false)
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -128,7 +159,6 @@ export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
     }
   }
 
-  const otherRole = senderRole === 'customer' ? 'therapist' : 'customer'
   const otherLabel = senderRole === 'customer' ? 'Therapist' : 'Client'
 
   return (
@@ -179,7 +209,42 @@ export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
           <p className="text-xs text-center text-[#6E5F55]">Chat is closed — session completed.</p>
         </div>
       ) : (
-        <div className="px-4 py-3 border-t border-[#EDE5DF] bg-white flex items-end gap-2">
+        <>
+          {aiSuggest && suggestions && (
+            <div className="px-4 pt-2.5 pb-1 border-t border-[#EDE5DF] bg-white flex flex-wrap items-center gap-1.5">
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setInput(s); setSuggestions(null); inputRef.current?.focus() }}
+                  className="text-xs text-left text-[#5C4B45] bg-[#FBF6F0] border border-[#EDE5DF] rounded-full px-3 py-1.5 hover:border-[#C4714A] hover:text-[#C4714A] transition-colors"
+                >
+                  {s}
+                </button>
+              ))}
+              <button
+                onClick={() => setSuggestions(null)}
+                aria-label="Dismiss suggestions"
+                className="p-1 text-[#C8BDB8] hover:text-[#6E5F55] transition-colors"
+              >
+                <X size={13} />
+              </button>
+            </div>
+          )}
+        <div className={cn('px-4 py-3 bg-white flex items-end gap-2', (!aiSuggest || !suggestions) && 'border-t border-[#EDE5DF]')}>
+          {aiSuggest && (
+            <button
+              onClick={fetchSuggestions}
+              disabled={suggesting}
+              title="Suggest replies"
+              aria-label="Suggest replies"
+              className="w-9 h-9 rounded-xl border border-[#EDE5DF] text-[#C4714A] flex items-center justify-center flex-shrink-0 hover:border-[#C4714A] disabled:opacity-40 transition-colors"
+            >
+              {suggesting
+                ? <Loader2 size={15} className="animate-spin" />
+                : <Sparkles size={15} />
+              }
+            </button>
+          )}
           <textarea
             ref={inputRef}
             value={input}
@@ -201,6 +266,7 @@ export function ChatThread({ bookingId, senderRole, readonly = false }: Props) {
             }
           </button>
         </div>
+        </>
       )}
     </div>
   )
