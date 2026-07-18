@@ -1,7 +1,10 @@
+// Allow up to 60s — Claude calls can exceed Vercel's 10s default function limit
+export const maxDuration = 60
+
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServiceClient } from '@/lib/supabase/server'
-import { anthropic, AI_MODEL, messageText } from '@/lib/ai'
+import { getAnthropic, AI_MODEL, messageText } from '@/lib/ai'
 import { SERVICES, TRANSPORT_FEE } from '@/lib/constants'
 
 const MAX_MESSAGES     = 16
@@ -175,7 +178,7 @@ export async function POST(req: NextRequest) {
       ? `${SYSTEM_PROMPT}\n\nThe customer's detected city is ${cityName.trim().slice(0, 60)} (auto-detected; confirm with get_city_info before quoting prices).`
       : SYSTEM_PROMPT
 
-    let response = await anthropic.messages.create({
+    let response = await getAnthropic().messages.create({
       model: AI_MODEL,
       max_tokens: 600,
       system,
@@ -206,7 +209,7 @@ export async function POST(req: NextRequest) {
       history.push({ role: 'assistant', content: response.content })
       history.push({ role: 'user', content: toolResults })
 
-      response = await anthropic.messages.create({
+      response = await getAnthropic().messages.create({
         model: AI_MODEL,
         max_tokens: 600,
         system,

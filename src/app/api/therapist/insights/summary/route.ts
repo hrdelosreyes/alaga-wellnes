@@ -1,6 +1,9 @@
+// Allow up to 60s — Claude calls can exceed Vercel's 10s default function limit
+export const maxDuration = 60
+
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { anthropic, AI_MODEL, messageText } from '@/lib/ai'
+import { getAnthropic, AI_MODEL, messageText } from '@/lib/ai'
 import { SERVICES } from '@/lib/constants'
 
 // Turns the therapist's insights stats into a short plain-language coach note.
@@ -22,7 +25,7 @@ export async function POST(req: NextRequest) {
     const serviceNames = Object.fromEntries(SERVICES.map(s => [s.id, s.name]))
     const stats = JSON.stringify({ ...insights, serviceNames }).slice(0, 6000)
 
-    const message = await anthropic.messages.create({
+    const message = await getAnthropic().messages.create({
       model: AI_MODEL,
       max_tokens: 400,
       system: `You are a friendly business coach for home-service massage therapists on Alaga Wellness (Philippines). You are given a therapist's stats as JSON: earnings in PHP (their 75% take-home), session volume, acceptance/completion rates, per-service breakdown, repeat customers, and reviews.

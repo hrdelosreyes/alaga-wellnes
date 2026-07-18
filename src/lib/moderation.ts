@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { anthropic, AI_MODEL, messageText, parseJsonResponse } from '@/lib/ai'
+import { getAnthropic, AI_MODEL, messageText, parseJsonResponse } from '@/lib/ai'
 
 export type ModerationInput = {
   source: 'message' | 'review'
@@ -23,7 +23,7 @@ export async function moderateContent(svc: SupabaseClient, input: ModerationInpu
   if (!text) return
 
   try {
-    const message = await anthropic.messages.create({
+    const message = await getAnthropic().messages.create({
       model: AI_MODEL,
       max_tokens: 200,
       system: `You are a trust & safety classifier for Alaga Wellness, a Philippine home-service massage platform where vetted therapists visit customers' homes. Classify the given ${input.source === 'review' ? 'customer review' : 'chat message between customer and therapist'}.
