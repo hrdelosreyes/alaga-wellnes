@@ -1,6 +1,9 @@
+// Allow up to 60s — Claude calls can exceed Vercel's 10s default function limit
+export const maxDuration = 60
+
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { anthropic, AI_MODEL, messageText, parseJsonResponse } from '@/lib/ai'
+import { getAnthropic, AI_MODEL, messageText, parseJsonResponse } from '@/lib/ai'
 import { SERVICES, BOOKING_STATUSES } from '@/lib/constants'
 
 // Suggests short professional chat replies for a therapist's booking thread.
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
     const service = SERVICES.find(s => s.id === booking.service_id)
     const statusLabel = BOOKING_STATUSES[booking.status as keyof typeof BOOKING_STATUSES] ?? booking.status
 
-    const message = await anthropic.messages.create({
+    const message = await getAnthropic().messages.create({
       model: AI_MODEL,
       max_tokens: 300,
       system: `You suggest chat replies for a massage therapist messaging a client on Alaga Wellness (Philippine home-service massage). Given the booking context and conversation, propose 3 short replies the therapist could send next.

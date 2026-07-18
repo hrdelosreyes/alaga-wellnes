@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { anthropic, AI_MODEL, messageText } from '@/lib/ai'
+import { getAnthropic, AI_MODEL, messageText } from '@/lib/ai'
 
 const MIN_RATINGS = 3
 
@@ -23,7 +23,7 @@ export async function refreshReviewSummary(svc: SupabaseClient, therapistId: str
     const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([t]) => t)
     const texts = rs.filter(r => r.review_text).slice(0, 20).map(r => `${r.stars}★ "${r.review_text!.slice(0, 250)}"`)
 
-    const message = await anthropic.messages.create({
+    const message = await getAnthropic().messages.create({
       model: AI_MODEL,
       max_tokens: 150,
       system: `You summarize customer reviews of a home-service massage therapist into ONE short "What customers say" blurb (max 2 sentences, under 40 words) shown on their public profile.

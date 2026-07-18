@@ -1,3 +1,6 @@
+// Allow up to 60s — Claude calls can exceed Vercel's 10s default function limit
+export const maxDuration = 60
+
 import { NextRequest, NextResponse } from 'next/server'
 import { after } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
