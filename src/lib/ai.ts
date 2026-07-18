@@ -1,6 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk'
 
+// Customer-facing features (concierge, coach, suggested replies)
 export const AI_MODEL = 'claude-sonnet-4-6'
+
+// Background classification/summarization (moderation, review blurbs) —
+// Haiku is ~3x cheaper and plenty capable for these.
+export const AI_MODEL_FAST = 'claude-haiku-4-5'
 
 // Lazy singleton so a missing key surfaces as a clear, catchable error inside
 // route handlers (with a helpful log line) instead of crashing module load.
