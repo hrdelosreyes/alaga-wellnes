@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { formatPrice, formatDate } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
 import { TherapistNav } from '@/components/therapist/therapist-nav'
-import { Loader2, TrendingUp, TrendingDown, Star, Users } from 'lucide-react'
+import { Loader2, TrendingUp, TrendingDown, Star, Users, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type Insights = {
@@ -35,6 +35,8 @@ export default function TherapistInsightsPage() {
   const router = useRouter()
   const [data, setData]       = useState<Insights | null>(null)
   const [loading, setLoading] = useState(true)
+  const [coach, setCoach]             = useState<string | null>(null)
+  const [coachFailed, setCoachFailed] = useState(false)
 
   useEffect(() => {
     fetch('/api/therapist/insights')
@@ -45,6 +47,21 @@ export default function TherapistInsightsPage() {
       .then(d => { if (d) setData(d); setLoading(false) })
       .catch(() => setLoading(false))
   }, [router])
+
+  // Ask the AI coach for a plain-language read on the numbers
+  useEffect(() => {
+    if (!data) return
+    fetch('/api/therapist/insights/summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(d => { if (d?.summary) setCoach(d.summary); else setCoachFailed(true) })
+      .catch(() => setCoachFailed(true))
+  }, [data])
+
+  const coachLoading = !!data && !coach && !coachFailed
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-[#FBF6F0]"><Loader2 className="animate-spin text-[#C4714A]" size={32} /></div>
@@ -69,6 +86,22 @@ export default function TherapistInsightsPage() {
 
       <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col gap-6">
         <h1 className="text-2xl font-bold text-[#2C2420]">Business insights</h1>
+
+        {/* Alaga Coach */}
+        {(coachLoading || coach) && (
+          <section className="bg-gradient-to-br from-[#FFF7F3] to-white rounded-2xl border border-[#F2D9CC] p-5">
+            <h2 className="text-sm font-bold text-[#2C2420] mb-2 flex items-center gap-1.5">
+              <Sparkles size={15} className="text-[#C4714A]" /> Alaga Coach
+            </h2>
+            {coach ? (
+              <p className="text-sm text-[#5C4B45] leading-relaxed whitespace-pre-line">{coach}</p>
+            ) : (
+              <p className="text-sm text-[#6E5F55] flex items-center gap-2">
+                <Loader2 size={13} className="animate-spin" /> Reading your numbers…
+              </p>
+            )}
+          </section>
+        )}
 
         {/* Earnings */}
         <section>
