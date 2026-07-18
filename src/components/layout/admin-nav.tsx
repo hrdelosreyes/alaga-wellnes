@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
-  RefreshCw, MapPin, DollarSign, Users, UserPlus, ShieldCheck, Gift, Wallet,
+  RefreshCw, MapPin, DollarSign, Users, UserPlus, ShieldCheck, ShieldAlert, Gift, Wallet,
   LayoutDashboard, CalendarDays, Tag, Banknote, ClipboardList, Settings, ChevronDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -22,6 +22,7 @@ const GROUPS: Group[] = [
       { href: '/admin/bookings',   label: 'Bookings',   icon: CalendarDays },
       { href: '/admin/applicants', label: 'Applicants', icon: UserPlus, badgeKey: 'pendingApps' },
       { href: '/admin/therapists', label: 'Therapists', icon: Users },
+      { href: '/admin/safety',     label: 'Safety',     icon: ShieldAlert },
     ],
   },
   {

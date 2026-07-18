@@ -36,6 +36,7 @@ export interface Therapist {
   tesda_certified: boolean
   specialties: string[]
   bio: string | null
+  review_summary?: string | null
   created_at: string
 }
 

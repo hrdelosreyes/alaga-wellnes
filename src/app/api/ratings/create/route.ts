@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { after } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { moderateContent } from '@/lib/moderation'
+import { refreshReviewSummary } from '@/lib/review-summary'
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,7 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Already rated' }, { status: 409 })
     }
 
-    const { error } = await supabase
+    const { data: rating, error } = await supabase
       .from('ratings')
       .insert({
         booking_id:   bookingId,
@@ -46,11 +49,31 @@ export async function POST(req: NextRequest) {
         tags:         tags ?? [],
         review_text:  reviewText ?? null,
       })
+      .select('id')
+      .single()
 
     if (error) {
       console.error('Rating insert error:', error)
       return NextResponse.json({ error: 'Failed to save rating' }, { status: 500 })
     }
+
+    // After responding: screen the review text and refresh the therapist's
+    // public "What customers say" blurb. Both are best-effort.
+    after(async () => {
+      if (reviewText) {
+        await moderateContent(supabase, {
+          source:      'review',
+          text:        reviewText,
+          bookingId,
+          ratingId:    rating?.id ?? null,
+          therapistId: therapistId ?? null,
+          sender:      'customer',
+        })
+      }
+      if (therapistId) {
+        await refreshReviewSummary(supabase, therapistId)
+      }
+    })
 
     return NextResponse.json({ success: true })
   } catch (err) {
