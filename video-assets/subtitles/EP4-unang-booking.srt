@@ -1,0 +1,67 @@
+1
+00:00:00,000 --> 00:00:01,497
+May bagong booking na
+
+2
+00:00:01,547 --> 00:00:02,750
+na-assign sa iyo!
+
+3
+00:00:03,000 --> 00:00:05,215
+Tingnan ang service, oras, at lugar.
+
+4
+00:00:05,265 --> 00:00:07,165
+Kung kaya mo, i-tap ang Accept.
+
+5
+00:00:07,215 --> 00:00:09,555
+Kung hindi, Decline — ire-reassign ito
+
+6
+00:00:09,605 --> 00:00:10,750
+sa ibang therapist.
+
+7
+00:00:11,000 --> 00:00:13,021
+Kapag assigned na ang booking,
+
+8
+00:00:13,071 --> 00:00:15,093
+pwede mong kausapin ang client
+
+9
+00:00:15,143 --> 00:00:16,750
+sa chat para sa details.
+
+10
+00:00:17,000 --> 00:00:21,079
+Pumunta sa client sa tamang
+
+11
+00:00:21,129 --> 00:00:24,750
+oras, dala ang gamit mo.
+
+12
+00:00:25,000 --> 00:00:27,449
+Pagdating mo, i-tap ang Check In.
+
+13
+00:00:27,499 --> 00:00:30,327
+Pagkatapos ng session, i-tap ang Check
+
+14
+00:00:30,377 --> 00:00:32,750
+Out. Dito ma-credit ang kita mo.
+
+15
+00:00:33,000 --> 00:00:35,174
+Makikita mo agad sa
+
+16
+00:00:35,224 --> 00:00:37,750
+dashboard ang kita mo.
+
+17
+00:00:38,000 --> 00:00:39,750
+Susunod: paano ka mababayaran.

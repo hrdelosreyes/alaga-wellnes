@@ -1,0 +1,75 @@
+1
+00:00:00,000 --> 00:00:01,350
+Magkano ba talaga ang
+
+2
+00:00:01,400 --> 00:00:02,750
+kikitain mo sa Alaga?
+
+3
+00:00:03,000 --> 00:00:05,200
+Simple lang: 75% ng bawat completed
+
+4
+00:00:05,250 --> 00:00:07,579
+session ay sa'yo. Halimbawa, Relax na
+
+5
+00:00:07,629 --> 00:00:09,443
+₱505 — ₱379 ang take-home mo.
+
+6
+00:00:09,493 --> 00:00:11,371
+Ang 25% ay para sa operations,
+
+7
+00:00:11,421 --> 00:00:13,750
+booking system, payments, at support.
+
+8
+00:00:14,000 --> 00:00:17,739
+Sa dashboard mo makikita ang total
+
+9
+00:00:17,789 --> 00:00:21,750
+earned, paid out, at pending payout.
+
+10
+00:00:22,000 --> 00:00:24,372
+Pumunta sa Payout tab at
+
+11
+00:00:24,422 --> 00:00:26,896
+ilagay ang GCash, Maya, o
+
+12
+00:00:26,946 --> 00:00:29,924
+bank details mo — siguraduhing
+
+13
+00:00:29,974 --> 00:00:32,750
+tama ang pangalan at number.
+
+14
+00:00:33,000 --> 00:00:36,081
+Weekly ang payout. Ipapadala namin sa
+
+15
+00:00:36,131 --> 00:00:38,958
+account mo at may reference number
+
+16
+00:00:39,008 --> 00:00:41,750
+para makita mo sa Payout history.
+
+17
+00:00:42,000 --> 00:00:44,350
+Para sa mas maayos na batches,
+
+18
+00:00:44,400 --> 00:00:46,750
+ang suggested minimum ay ₱500.
+
+19
+00:00:47,000 --> 00:00:49,750
+Mag-apply na sa alagawellness.care.

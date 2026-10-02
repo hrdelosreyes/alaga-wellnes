@@ -1,0 +1,75 @@
+1
+00:00:00,000 --> 00:00:02,750
+Approved ka na! Ano ang susunod?
+
+2
+00:00:03,000 --> 00:00:04,828
+Buksan ang invite email at mag-set
+
+3
+00:00:04,878 --> 00:00:06,872
+ng password. Makikita mo ang maikling
+
+4
+00:00:06,922 --> 00:00:08,750
+intro sa kita, referral, at bonus.
+
+5
+00:00:09,000 --> 00:00:12,916
+Basahin ang quick intro — para
+
+6
+00:00:12,966 --> 00:00:16,750
+alam mo kung paano ka kikita.
+
+7
+00:00:17,000 --> 00:00:20,435
+Sa Availability, available ka araw-araw by
+
+8
+00:00:20,485 --> 00:00:23,007
+default. I-tap lang ang araw na
+
+9
+00:00:23,057 --> 00:00:24,750
+gusto mong i-day off.
+
+10
+00:00:25,000 --> 00:00:26,770
+Sa My Rates, ikaw ang
+
+11
+00:00:26,820 --> 00:00:28,937
+magtatakda ng presyo mo —
+
+12
+00:00:28,987 --> 00:00:30,583
+sa loob ng range na
+
+13
+00:00:30,633 --> 00:00:32,750
+itinakda para sa city mo.
+
+14
+00:00:33,000 --> 00:00:34,116
+At sa Service Area, i-tick
+
+15
+00:00:34,166 --> 00:00:35,193
+ang mga barangay na kaya
+
+16
+00:00:35,243 --> 00:00:36,718
+mong puntahan. Ire-review muna ito
+
+17
+00:00:36,768 --> 00:00:37,750
+ng admin bago mag-live.
+
+18
+00:00:38,000 --> 00:00:38,609
+Ayan — ready ka
+
+19
+00:00:38,659 --> 00:00:39,750
+nang tumanggap ng booking!
