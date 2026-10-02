@@ -49,7 +49,7 @@ Series: **"Paano Kumita sa Alaga"** · 6 episodes · FB Reels / IG Reels / TikTo
 | # | Time | Visual | On-screen text | Voiceover |
 |---|---|---|---|---|
 | 1 | 0–3s | On camera | "Mag-apply in 5 minutes" | "Mag-apply sa Alaga — five minutes lang, sa phone mo." |
-| 2 | 3–10s | alagawellness.care → "Become a Therapist" → form step 1 (Personal information) | "Step 1: Personal info" | "Buksan ang alagawellness.care at i-tap ang therapist registration. Una, ilagay ang personal info mo." |
+| 2 | 3–10s | alagawellness.care → "Join as Therapist" (top menu) → benefits page → Apply → form step 1 (Personal information) | "Step 1: Personal info" | "Buksan ang alagawellness.care at i-tap ang "Join as Therapist". Una, ilagay ang personal info mo." |
 | 3 | 10–16s | Step 2 (Professional background) | "Step 2: Karanasan" | "Pangalawa, ang professional background mo — experience at specialization." |
 | 4 | 16–27s | Step 3: Upload documents; highlight NBI + TESDA + photo | "Kailangan: NBI + TESDA + photo" | "Pangatlo, i-upload ang valid na NBI Clearance at TESDA certificate — kahit anong massage therapy NC — at clear na photo mo. Confidential ito, para lang sa verification." |
 | 5 | 27–32s | "Application submitted!" screen | "Review: 3–5 business days" | "I-submit — tapos hintayin ang review namin, 3 to 5 business days." |
@@ -69,9 +69,9 @@ Series: **"Paano Kumita sa Alaga"** · 6 episodes · FB Reels / IG Reels / TikTo
 | 1 | 0–3s | On camera | "Na-approve ka na! Ngayon?" | "Approved ka na! Ano ang susunod?" |
 | 2 | 3–9s | Invite email → Set password screen | "1. Mag-set ng password" | "Buksan ang invite email at mag-set ng password. Makikita mo ang maikling intro sa kita, referral, at bonus." |
 | 3 | 9–17s | Onboarding slides swiping fast | "Quick intro (30 seconds)" | "Basahin ang quick intro — para alam mo kung paano ka kikita." |
-| 4 | 17–25s | Settings → Availability, toggling days/hours | "2. Availability — ikaw ang pumipili" | "Sa Availability, ikaw ang pumipili ng araw at oras na gusto mong magtrabaho." |
-| 5 | 25–33s | My rates: sliders inside Min–Max band | "3. My rates — sa loob ng range ng city" | "Sa My Rates, ikaw ang magtatakda ng presyo mo — sa loob ng range na itinakda para sa city mo." |
-| 6 | 33–38s | Service area map/list | "4. Service area" | "At sa Service Area, piliin ang mga barangay na kaya mong puntahan." |
+| 4 | 17–25s | Settings → Availability: day list, tap a day to mark "Day off" | "3. Availability — i-tap ang day off" | "Sa Availability, available ka araw-araw by default. I-tap lang ang araw na gusto mong i-day off." |
+| 5 | 25–33s | My rates: sliders inside Min–Max band | "2. My rates — sa loob ng range ng city" | "Sa My Rates, ikaw ang magtatakda ng presyo mo — sa loob ng range na itinakda para sa city mo." |
+| 6 | 33–38s | Service area: tick barangays, search box; show yellow "pending admin approval" banner | "4. Service area — i-tick ang barangays (may approval)" | "At sa Service Area, i-tick ang mga barangay na kaya mong puntahan. Ire-review muna ito ng admin bago mag-live." |
 | 7 | 38–40s | End card | "Tapos ka na mag-setup!" | "Ayan — ready ka nang tumanggap ng booking!" |
 
 **Note:** the 3 tabs live under Settings in the therapist nav (Availability, My rates, Service area). Record on a demo account in a live/test city so the rate band shows.
@@ -84,11 +84,11 @@ Series: **"Paano Kumita sa Alaga"** · 6 episodes · FB Reels / IG Reels / TikTo
 
 | # | Time | Visual | On-screen text | Voiceover |
 |---|---|---|---|---|
-| 1 | 0–3s | On camera, phone buzzing | "May booking ka!" | "May bagong booking request ka!" |
-| 2 | 3–11s | Dashboard: new request card with service, time, address area | "I-check ang details" | "Tingnan ang service, oras, at lugar. Kung kaya mo, i-accept." |
-| 3 | 11–17s | Tap Accept; confirmation state; chat thread with client | "Accept → i-chat ang client" | "Pagka-accept, pwede mong kausapin ang client sa chat para sa details." |
+| 1 | 0–3s | On camera, phone buzzing | "May booking ka!" | "May bagong booking na na-assign sa iyo!" |
+| 2 | 3–11s | Dashboard: newly assigned booking card with service, time, area; Accept / Decline buttons | "Accept o Decline" | "Tingnan ang service, oras, at lugar. Kung kaya mo, i-tap ang Accept. Kung hindi, Decline — ire-reassign ito sa ibang therapist." |
+| 3 | 11–17s | Tap Accept; open the chat toggle on the booking card | "Accept → i-chat ang client" | "Kapag assigned na ang booking, pwede mong kausapin ang client sa chat para sa details." |
 | 4 | 17–25s | B-roll: therapist traveling / arriving with kit (stock or filmed) | "Pumunta sa client" | "Pumunta sa client sa tamang oras, dala ang gamit mo." |
-| 5 | 25–33s | After-session: tap "Check out" on dashboard | "Mag-check out pagkatapos ng session" | "Pagkatapos ng session, pindutin ang Check Out. Dito mo ma-credit ang kita mo." |
+| 5 | 25–33s | Tap "Check in" on arrival, then "Check out" after the session | "Check in pagdating · Check out pagkatapos" | "Pagdating mo, i-tap ang Check In. Pagkatapos ng session, i-tap ang Check Out. Dito ma-credit ang kita mo." |
 | 6 | 33–38s | Earnings card updates | "✔ Naka-credit na" | "Makikita mo agad sa dashboard ang kita mo." |
 | 7 | 38–40s | End card | | "Susunod: paano ka mababayaran." |
 
@@ -104,8 +104,8 @@ Series: **"Paano Kumita sa Alaga"** · 6 episodes · FB Reels / IG Reels / TikTo
 |---|---|---|---|---|
 | 1 | 0–3s | On camera | "Magkano ba talaga ang kita ko?" | "Magkano ba talaga ang kikitain mo sa Alaga?" |
 | 2 | 3–14s | Animated graphic: ₱505 bar splits into **75% (₱379)** and 25% | "₱505 session → ₱379 sa'yo" | "Simple lang: 75% ng bawat completed session ay sa'yo. Halimbawa, Relax na ₱505 — ₱379 ang take-home mo. Ang 25% ay para sa operations, booking system, payments, at support." |
-| 3 | 14–22s | Dashboard earnings card: Total earned / Paid out / Pending | "Earned · Paid out · Pending" | "Sa dashboard mo makikita ang total earned, paid out, at pending balance." |
-| 4 | 22–33s | Payout tab: choose GCash/Maya/Bank, enter number + account name | "Ilagay ang GCash / Maya / Bank mo" | "Pumunta sa Payout tab at ilagay ang GCash, Maya, o bank details mo — siguraduhing tama ang pangalan at number." |
+| 3 | 14–22s | Dashboard earnings card: Total earned / Paid out / Pending | "Total earned · Paid out · Pending payout" | "Sa dashboard mo makikita ang total earned, paid out, at pending payout." |
+| 4 | 22–33s | Payout tab: choose GCash/Maya/Bank, enter number + account name, tap "Save payout details" | "Ilagay ang GCash / Maya / Bank mo" | "Pumunta sa Payout tab at ilagay ang GCash, Maya, o bank details mo — siguraduhing tama ang pangalan at number." |
 | 5 | 33–42s | Calendar graphic: "Weekly" + payout history list with reference no. | "Weekly payout · may reference number" | "Weekly ang payout. Ipapadala namin sa account mo at may reference number para makita mo sa Payout history." |
 | 6 | 42–47s | Small text card | "Suggested minimum payout: ₱500" | "Para sa mas maayos na batches, ang suggested minimum ay ₱500." |
 | 7 | 47–50s | End card + disclaimer | "Hindi garantisadong kita." | "Mag-apply na sa alagawellness.care." |
@@ -121,7 +121,7 @@ Series: **"Paano Kumita sa Alaga"** · 6 episodes · FB Reels / IG Reels / TikTo
 | # | Time | Visual | On-screen text | Voiceover |
 |---|---|---|---|---|
 | 1 | 0–3s | On camera | "Pwede kang kumita kahit hindi ka naka-duty" | "Alam mo bang pwede kang kumita kahit hindi ka naka-duty?" |
-| 2 | 3–18s | Referral screen/code; animated chain: You → Friend A → Friend B | "Referral: 5% sa bawat level (2 levels)" | "Una, referral. Mag-refer ng kapwa therapist gamit ang code mo. Kapag nag-complete sila ng bookings, kikita ka ng 5% — at 5% din mula sa kanilang mga referral, hanggang 2 levels, sa unang 100 bookings nila." |
+| 2 | 3–18s | Dashboard referral card (code + shareable link); animated chain: You → Friend A → Friend B | "Referral: 5% sa bawat level (2 levels)" | "Una, referral. Mag-refer ng kapwa therapist gamit ang code mo. Kapag nag-complete sila ng bookings, kikita ka ng 5% — at 5% din mula sa kanilang mga referral, hanggang 2 levels, sa unang 100 bookings nila." |
 | 3 | 18–33s | Bonus onboarding slide; progress bar "12 / 15 bookings" | "Quarterly Bonus: 15+ bookings/quarter" | "Pangalawa, ang Quarterly Alaga Bonus. May bonus pool kada quarter. Kapag naka-15 or higit pang completed bookings ka sa quarter, may share ka sa pool." |
 | 4 | 33–40s | Disclaimer card (hold 3s) | "Up to / kung qualified. Hindi garantisadong kita." | "Tandaan: depende ito sa bookings at sa pag-qualify mo — hindi ito garantisado." |
 | 5 | 40–45s | End card | "alagawellness.care" | "Mag-apply na — link sa bio." |
@@ -147,3 +147,11 @@ Series: **"Paano Kumita sa Alaga"** · 6 episodes · FB Reels / IG Reels / TikTo
 | 4–6 | EP 3, 4, 6 | Spaced 2–3 days apart |
 
 Each episode: post natively to FB Reels, IG Reels, and TikTok (no watermarked re-uploads), with the caption + hashtags above.
+
+---
+
+## Verification log (checked against the app code, Oct 2026)
+
+Verified in source: menu/button names, booking flow (Accept/Decline → Check in → Check out), availability (day-off model), service-area approval, payout methods and button text, referral card on the dashboard, onboarding order, registration steps. Public site: top-menu link is "Join as Therapist"; footer link is "Become a Therapist".
+
+Not verified on the live logged-in app (needs a demo therapist account): exact on-screen appearance, live rate bands, and the "Check in/Check out" visibility per booking status. Re-confirm during recording.
