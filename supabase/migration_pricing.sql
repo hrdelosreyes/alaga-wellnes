@@ -40,28 +40,29 @@ create policy "Therapist rates writable"          on therapist_rates for all   u
 -- SEED: rate bands by pricing tier
 --
 -- Rates reflect a 30% reduction from the original research-based bands
--- (applied June 2026).
+-- (applied June 2026); city minimums then lowered a further 20%,
+-- rounded to the nearest P5 (applied October 2026); base rates then lowered 20%, rounded to the nearest P5.
 --
 -- Tier 1 — NCR (all 16 cities)
---   Relax-60:   base 629,  min 525,  max 840
---   Recovery-90:base 909,  min 735,  max 1190
---   Hilot-75:   base 699,  min 595,  max 910
+--   Relax-60:   base 505,  min 420,  max 840
+--   Recovery-90:base 725,  min 590,  max 1190
+--   Hilot-75:   base 560,  min 475,  max 910
 --
 -- Tier 2 — HUC cities outside NCR (Cebu, Davao, Zamboanga, CDO,
 --           Bacolod, Gen Santos, Lapu-Lapu, Mandaue, Antipolo…)
---   Relax-60:   base 524,  min 420,  max 700
---   Recovery-90:base 769,  min 595,  max 980
---   Hilot-75:   base 594,  min 490,  max 770
+--   Relax-60:   base 420,  min 335,  max 700
+--   Recovery-90:base 615,  min 475,  max 980
+--   Hilot-75:   base 475,  min 390,  max 770
 --
 -- Tier 3 — ICC cities (independent component cities, mid-market)
---   Relax-60:   base 454,  min 350,  max 595
---   Recovery-90:base 664,  min 490,  max 840
---   Hilot-75:   base 524,  min 420,  max 665
+--   Relax-60:   base 365,  min 280,  max 595
+--   Recovery-90:base 530,  min 390,  max 840
+--   Hilot-75:   base 420,  min 335,  max 665
 --
 -- Tier 4 — CC cities (component cities, provincial market)
---   Relax-60:   base 384,  min 280,  max 490
---   Recovery-90:base 559,  min 406,  max 700
---   Hilot-75:   base 454,  min 350,  max 560
+--   Relax-60:   base 305,  min 225,  max 490
+--   Recovery-90:base 445,  min 325,  max 700
+--   Hilot-75:   base 365,  min 280,  max 560
 -- ============================================================
 
 -- Helper: insert all 3 services for a city using a sub-select on city name
@@ -75,9 +76,9 @@ begin
   -- ── TIER 1: NCR ─────────────────────────────────────────
   for r in select id from cities where region = 'NCR' loop
     insert into city_service_rates (city_id, service_id, base_rate, min_rate, max_rate) values
-      (r.id, 'relax-60',    629,  525,   840),
-      (r.id, 'recovery-90', 909,  735,  1190),
-      (r.id, 'hilot-75',    699,  595,   910)
+      (r.id, 'relax-60',    505,  420,   840),
+      (r.id, 'recovery-90', 725,  590,  1190),
+      (r.id, 'hilot-75',    560,  475,   910)
     on conflict (city_id, service_id) do update
       set base_rate = excluded.base_rate, min_rate = excluded.min_rate, max_rate = excluded.max_rate, updated_at = now();
   end loop;
@@ -92,9 +93,9 @@ begin
     where city_class = 'HUC' and region != 'NCR'
   loop
     insert into city_service_rates (city_id, service_id, base_rate, min_rate, max_rate) values
-      (r.id, 'relax-60',    524,  420,  700),
-      (r.id, 'recovery-90', 769,  595,  980),
-      (r.id, 'hilot-75',    594,  490,  770)
+      (r.id, 'relax-60',    420,  335,  700),
+      (r.id, 'recovery-90', 615,  475,  980),
+      (r.id, 'hilot-75',    475,  390,  770)
     on conflict (city_id, service_id) do update
       set base_rate = excluded.base_rate, min_rate = excluded.min_rate, max_rate = excluded.max_rate, updated_at = now();
   end loop;
@@ -102,9 +103,9 @@ begin
   -- ── TIER 3: ICC cities ───────────────────────────────────
   for r in select id from cities where city_class = 'ICC' loop
     insert into city_service_rates (city_id, service_id, base_rate, min_rate, max_rate) values
-      (r.id, 'relax-60',    454,  350,  595),
-      (r.id, 'recovery-90', 664,  490,  840),
-      (r.id, 'hilot-75',    524,  420,  665)
+      (r.id, 'relax-60',    365,  280,  595),
+      (r.id, 'recovery-90', 530,  390,  840),
+      (r.id, 'hilot-75',    420,  335,  665)
     on conflict (city_id, service_id) do update
       set base_rate = excluded.base_rate, min_rate = excluded.min_rate, max_rate = excluded.max_rate, updated_at = now();
   end loop;
@@ -112,9 +113,9 @@ begin
   -- ── TIER 4: CC cities ────────────────────────────────────
   for r in select id from cities where city_class = 'CC' loop
     insert into city_service_rates (city_id, service_id, base_rate, min_rate, max_rate) values
-      (r.id, 'relax-60',    384,  280,  490),
-      (r.id, 'recovery-90', 559,  406,  700),
-      (r.id, 'hilot-75',    454,  350,  560)
+      (r.id, 'relax-60',    305,  225,  490),
+      (r.id, 'recovery-90', 445,  325,  700),
+      (r.id, 'hilot-75',    365,  280,  560)
     on conflict (city_id, service_id) do update
       set base_rate = excluded.base_rate, min_rate = excluded.min_rate, max_rate = excluded.max_rate, updated_at = now();
   end loop;

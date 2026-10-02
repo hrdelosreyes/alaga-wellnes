@@ -35,7 +35,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: 'Magkano ang kikitain ko per session?',
-        a: 'You set your own rates within Alaga’s service range — from ₱629 for Alaga Relax (60 min) up to ₱909 for Alaga Recovery (90 min). The more sessions you complete, the more you earn. Many active therapists complete 3–5 sessions a day.',
+        a: 'You set your own rates within Alaga’s service range — from ₱505 for Alaga Relax (60 min) up to ₱725 for Alaga Recovery (90 min). The more sessions you complete, the more you earn. Many active therapists complete 3–5 sessions a day.',
       },
       {
         q: 'Ilang porsyento ang napupunta sa akin?',
