@@ -9,7 +9,7 @@ import { useBooking } from '@/lib/booking-context'
 import { TIME_SLOTS, SERVICES } from '@/lib/constants'
 import { formatTime, cn } from '@/lib/utils'
 import { addDays, format, startOfToday, isToday } from 'date-fns'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 
 const DAYS_SHOWN = 14
 const LEAD_HOURS  = 2  // must be at least this many hours ahead
@@ -66,29 +66,29 @@ export default function SchedulePage() {
   async function fetchSlotCounts(date: string) {
     setCountsLoading(true)
     setSlotCounts({})
-    const supabase = createClient()
+    const db = createClient()
 
     // Opt-out model: therapists are available by default. We only exclude
     // dates they've explicitly BLOCKED (is_blocked = true = day off).
     const [{ data: blocked }, { data: therapists }, { data: bookings }, { data: barangayTherapists }] = await Promise.all([
-      supabase
+      db
         .from('therapist_availability')
         .select('therapist_id')
         .eq('date', date)
         .eq('is_blocked', true),
-      supabase
+      db
         .from('therapists')
         .select('id')
         .eq('is_active', true),
       // Existing confirmed bookings on this date (to exclude booked slots)
-      supabase
+      db
         .from('bookings')
         .select('therapist_id, time_slot, service_id')
         .eq('booking_date', date)
         .in('status', ['confirmed', 'assigned', 'en_route', 'checked_in']),
       // Filter by barangay service area if customer selected one
       draft.barangayPsgc
-        ? supabase
+        ? db
             .from('therapist_barangays')
             .select('therapist_id')
             .eq('barangay_psgc', draft.barangayPsgc)
@@ -98,7 +98,7 @@ export default function SchedulePage() {
 
     // A therapist is bookable for the service if they're priceable: either they
     // set their own rate, OR the city has a base rate (fallback price).
-    const { data: serviceRates } = await supabase
+    const { data: serviceRates } = await db
       .from('therapist_rates')
       .select('therapist_id')
       .eq('service_id', draft.serviceId)
@@ -106,7 +106,7 @@ export default function SchedulePage() {
 
     let cityBaseExists = false
     if (draft.cityId) {
-      const { data: cr } = await supabase
+      const { data: cr } = await db
         .from('city_service_rates')
         .select('base_rate')
         .eq('city_id', draft.cityId)

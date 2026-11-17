@@ -1,11 +1,11 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { DbClient } from '@/lib/db/server'
 import { getAnthropic, AI_MODEL_FAST, messageText } from '@/lib/ai'
 
 const MIN_RATINGS = 3
 
 // Regenerates the therapist's "What customers say" blurb from their ratings.
 // Best-effort: throws nothing, blocks nothing.
-export async function refreshReviewSummary(svc: SupabaseClient, therapistId: string): Promise<void> {
+export async function refreshReviewSummary(svc: DbClient, therapistId: string): Promise<void> {
   try {
     const { data: ratings } = await svc
       .from('ratings')

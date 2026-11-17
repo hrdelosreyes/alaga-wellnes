@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/db/server'
 
 // GET — the therapist's profile: editable fields, read-only (admin-controlled)
 // fields, and a short-lived signed URL for their photo (private bucket).

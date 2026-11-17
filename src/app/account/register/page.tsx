@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff } from 'lucide-react'
 import { useGeoCity } from '@/components/geo/city-context'
@@ -49,12 +49,12 @@ function RegisterPage() {
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
+    const db = createClient()
 
     // Create auth user. The customer profile is created automatically by a DB
     // trigger from this metadata (works even when there's no session yet because
     // email confirmation is required).
-    const { data, error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await db.auth.signUp({
       email,
       password,
       options: {

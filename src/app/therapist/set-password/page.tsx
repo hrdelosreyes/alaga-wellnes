@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 
 export default function SetPasswordPage() {
@@ -13,67 +13,28 @@ export default function SetPasswordPage() {
   const [error,     setError]     = useState<string | null>(null)
   const [ready,     setReady]     = useState(false)
   const [linkError, setLinkError] = useState<string | null>(null)
-  const readyRef = useRef(false)
 
   useEffect(() => {
-    const supabase = createClient()
     let cancelled = false
 
-    function markReady() {
-      readyRef.current = true
-      if (!cancelled) setReady(true)
-    }
+    // The invite email links to /auth/callback, which verifies the one-time
+    // token, signs the therapist in and redirects here. If the link was bad,
+    // the callback appends ?error_description=… instead.
+    const linkErr = new URLSearchParams(window.location.search).get('error_description')
 
-    async function establishSession() {
-      // Invite/recovery links sent via the admin API (service-role, triggered
-      // server-side) come back as an implicit-flow hash (#access_token=...),
-      // not a PKCE ?code= — there's no client that generated a PKCE verifier.
-      // Our browser client defaults to PKCE and won't auto-process that hash,
-      // so parse it and establish the session manually.
-      const rawHash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
-      const params = new URLSearchParams(rawHash)
-      const accessToken  = params.get('access_token')
-      const refreshToken = params.get('refresh_token')
-      const hashError     = params.get('error_description') || params.get('error')
-
-      if (hashError) {
-        if (!cancelled) setLinkError(decodeURIComponent(hashError.replace(/\+/g, ' ')))
+    async function check() {
+      if (linkErr) {
+        setLinkError(`${linkErr}. Please ask the admin to resend your invite.`)
         return
       }
-
-      if (accessToken && refreshToken) {
-        const { error: setErr } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-        // setSession only validates the token's local shape, not that it's a
-        // genuine, unexpired session — confirm with a server round-trip.
-        if (!setErr) {
-          const { data: { user }, error: getErr } = await supabase.auth.getUser()
-          if (user && !getErr) { markReady(); return }
-        }
-      }
-
-      // Fall back to a session that may already exist (e.g. a PKCE ?code= was
-      // already exchanged elsewhere on this page load).
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) markReady()
+      const { data: { user } } = await createClient().auth.getUser()
+      if (cancelled) return
+      if (user) setReady(true)
+      else setLinkError('This link is invalid or has expired. Please ask the admin to resend your invite.')
     }
+    check()
 
-    establishSession()
-
-    // Also listen in case the event fires after mount.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
-        markReady()
-      }
-    })
-
-    // Don't spin forever if the link is invalid/expired and nothing above fires.
-    const timeout = setTimeout(() => {
-      if (!cancelled && !readyRef.current) {
-        setLinkError(prev => prev ?? 'This link is invalid or has expired. Please ask the admin to resend your invite.')
-      }
-    }, 8000)
-
-    return () => { cancelled = true; subscription.unsubscribe(); clearTimeout(timeout) }
+    return () => { cancelled = true }
   }, [])
 
   async function handleSubmit() {
@@ -83,8 +44,8 @@ export default function SetPasswordPage() {
     if (password !== confirm) { setError('Passwords do not match.'); return }
 
     setLoading(true)
-    const supabase = createClient()
-    const { error } = await supabase.auth.updateUser({ password })
+    const db = createClient()
+    const { error } = await db.auth.updateUser({ password })
     if (error) {
       setError(error.message)
       setLoading(false)

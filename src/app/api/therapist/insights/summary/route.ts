@@ -2,7 +2,7 @@
 export const maxDuration = 60
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/db/server'
 import { getAnthropic, AI_MODEL, messageText } from '@/lib/ai'
 import { SERVICES } from '@/lib/constants'
 

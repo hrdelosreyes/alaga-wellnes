@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 import { TherapistNav } from '@/components/therapist/therapist-nav'
 import { cn } from '@/lib/utils'
@@ -34,11 +34,11 @@ function TherapistRatesPage() {
   useEffect(() => { init() }, [])
 
   async function init() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const db = createClient()
+    const { data: { user } } = await db.auth.getUser()
     if (!user) { router.replace('/therapist/login'); return }
 
-    const { data: t } = await supabase
+    const { data: t } = await db
       .from('therapists')
       .select('id, city_id')
       .eq('email', user.email)
@@ -50,8 +50,8 @@ function TherapistRatesPage() {
 
     // Load city bands + therapist's current rates in parallel
     const [{ data: bandData }, { data: rateData }] = await Promise.all([
-      supabase.from('city_service_rates').select('*').eq('city_id', t.city_id),
-      supabase.from('therapist_rates').select('*').eq('therapist_id', t.id),
+      db.from('city_service_rates').select('*').eq('city_id', t.city_id),
+      db.from('therapist_rates').select('*').eq('therapist_id', t.id),
     ])
 
     const bandMap: Record<ServiceId, Band> = {} as Record<ServiceId, Band>
@@ -72,14 +72,14 @@ function TherapistRatesPage() {
   async function save() {
     if (!therapistId) return
     setSaving(true)
-    const supabase = createClient()
+    const db = createClient()
     const rows = SERVICES.map(s => ({
       therapist_id: therapistId,
       service_id:   s.id,
       rate:         rates[s.id],
       updated_at:   new Date().toISOString(),
     }))
-    await supabase.from('therapist_rates').upsert(rows, { onConflict: 'therapist_id,service_id' })
+    await db.from('therapist_rates').upsert(rows, { onConflict: 'therapist_id,service_id' })
     setSaving(false)
     if (nextUrl) {
       router.push(nextUrl)

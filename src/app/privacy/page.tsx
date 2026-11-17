@@ -52,7 +52,7 @@ export default function PrivacyPage() {
             We share your data only as needed to provide the service: with your assigned Therapist (to
             fulfill the booking), and with trusted third-party processors such as our payment provider
             (HitPay), email provider (Resend), and hosting/database providers
-            (Vercel, Supabase). We do not sell your personal data.
+            (Vercel, Neon). We do not sell your personal data.
           </p>
         </section>
 

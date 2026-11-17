@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 
 // Public read of a single booking by its UUID (the UUID is the access token).
 // Used by the customer confirmation + rating pages so the `bookings` table can
@@ -8,8 +8,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
 
-  const supabase = await createServiceClient()
-  const { data, error } = await supabase
+  const db = await createServiceClient()
+  const { data, error } = await db
     .from('bookings')
     .select('*, therapists(name, phone)')
     .eq('id', id)

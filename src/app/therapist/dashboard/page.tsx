@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
 import { MapPin, Calendar, Clock, CheckCircle2, Loader2, MessageCircle, ChevronDown, Gift, Check, X, Bell, BellOff } from 'lucide-react'
@@ -158,39 +158,23 @@ export default function TherapistDashboard() {
 
   useEffect(() => { init() }, [])
 
-  // Poll for new bookings every 25s while the dashboard is open (fallback).
+  // Poll for new bookings every 10s while the dashboard is open.
   useEffect(() => {
     if (!therapist) return
     therapistIdRef.current = therapist.id
     const interval = setInterval(() => {
       if (therapistIdRef.current) loadBookings(therapistIdRef.current)
-    }, 25000)
+    }, 10000)
     return () => clearInterval(interval)
   }, [therapist])
 
-  // Realtime: react instantly to any change on this therapist's bookings
-  // (new assignment / payment confirmed) — loadBookings detects & chimes.
-  useEffect(() => {
-    if (!therapist) return
-    const supabase = createClient()
-    const channel = supabase
-      .channel(`therapist-bookings-${therapist.id}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'bookings', filter: `therapist_id=eq.${therapist.id}` },
-        () => loadBookings(therapist.id),
-      )
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [therapist])
-
   async function init() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const db = createClient()
+    const { data: { user } } = await db.auth.getUser()
     if (!user) { router.replace('/therapist/login'); return }
 
     // Look up therapist by email (auth accounts are email-based)
-    const { data: t } = await supabase
+    const { data: t } = await db
       .from('therapists')
       .select('id, name, zone, rating_avg, total_bookings, referral_code')
       .eq('email', user.email)
@@ -200,7 +184,7 @@ export default function TherapistDashboard() {
 
     // After approval, require therapist to complete onboarding (rates + service area)
     // Check if they have at least one barangay set
-    const { count } = await supabase
+    const { count } = await db
       .from('therapist_barangays')
       .select('therapist_id', { count: 'exact', head: true })
       .eq('therapist_id', t.id)
@@ -214,11 +198,11 @@ export default function TherapistDashboard() {
 
     // Fetch referral earnings + referees count
     const [{ data: commissions }, { count: refCount }] = await Promise.all([
-      supabase
+      db
         .from('referral_commissions')
         .select('amount, status')
         .eq('beneficiary_id', t.id),
-      supabase
+      db
         .from('therapists')
         .select('id', { count: 'exact', head: true })
         .eq('referred_by_id', t.id),
@@ -232,14 +216,14 @@ export default function TherapistDashboard() {
     const quarter = currentQuarter()
     const { start, end } = quarterDateRange(quarter)
     const [{ count: qBookings }, { data: bonusPayout }] = await Promise.all([
-      supabase
+      db
         .from('bookings')
         .select('id', { count: 'exact', head: true })
         .eq('therapist_id', t.id)
         .eq('status', 'completed')
         .gte('booking_date', start)
         .lte('booking_date', end),
-      supabase
+      db
         .from('alaga_bonus_payouts')
         .select('pool_share')
         .eq('therapist_id', t.id)
@@ -254,8 +238,8 @@ export default function TherapistDashboard() {
 
     // Booking earnings: take-home is 75% of each completed session's subtotal.
     const [{ data: completed }, { data: payouts }] = await Promise.all([
-      supabase.from('bookings').select('subtotal, booking_date').eq('therapist_id', t.id).eq('status', 'completed'),
-      supabase.from('payout_records').select('amount, status').eq('therapist_id', t.id),
+      db.from('bookings').select('subtotal, booking_date').eq('therapist_id', t.id).eq('status', 'completed'),
+      db.from('payout_records').select('amount, status').eq('therapist_id', t.id),
     ])
     const takeHome = (sub: number | null) => Math.round((sub ?? 0) * THERAPIST_PAYOUT_RATE)
     const earned   = (completed ?? []).reduce((s, b) => s + takeHome(b.subtotal), 0)
@@ -269,10 +253,10 @@ export default function TherapistDashboard() {
   }
 
   async function loadBookings(therapistId: string) {
-    const supabase = createClient()
+    const db = createClient()
     const today    = new Date().toISOString().slice(0, 10)
 
-    const { data } = await supabase
+    const { data } = await db
       .from('bookings')
       .select('id, service_id, booking_date, time_slot, address, unit_notes, customer_name, customer_phone, customer_notes, status, total, subtotal')
       .eq('therapist_id', therapistId)
@@ -310,10 +294,10 @@ export default function TherapistDashboard() {
         body: JSON.stringify({ bookingId }),
       })
     } else {
-      const supabase = createClient()
+      const db = createClient()
       const update: Record<string, unknown> = { status: nextStatus }
       if (nextStatus === 'checked_in') update.checked_in_at = new Date().toISOString()
-      await supabase.from('bookings').update(update).eq('id', bookingId)
+      await db.from('bookings').update(update).eq('id', bookingId)
     }
 
     setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: nextStatus } : b))

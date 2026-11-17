@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { AdminNav } from '@/components/layout/admin-nav'
 import { RefreshCw, Rocket, Users, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -83,11 +83,11 @@ export default function AdminCitiesPage() {
 
   async function load() {
     setLoading(true)
-    const supabase = createClient()
+    const db = createClient()
 
     const [{ data: cityData }, { data: countData }, waitlistRes] = await Promise.all([
-      supabase.from('cities').select('*').order('region').order('name'),
-      supabase.from('therapists')
+      db.from('cities').select('*').order('region').order('name'),
+      db.from('therapists')
         .select('city_id')
         .eq('application_status', 'approved')
         .eq('is_active', true),
@@ -107,16 +107,16 @@ export default function AdminCitiesPage() {
   }
 
   async function updateThreshold(cityId: string, threshold: number) {
-    const supabase = createClient()
-    await supabase.from('cities').update({ therapist_threshold: threshold }).eq('id', cityId)
+    const db = createClient()
+    await db.from('cities').update({ therapist_threshold: threshold }).eq('id', cityId)
     setCities(prev => prev.map(c => c.id === cityId ? { ...c, therapist_threshold: threshold } : c))
   }
 
   async function toggleLive(city: CityRow) {
     setLaunching(city.id)
-    const supabase  = createClient()
+    const db  = createClient()
     const goingLive = !city.is_customer_live
-    await supabase
+    await db
       .from('cities')
       .update({
         is_customer_live: goingLive,

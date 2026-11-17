@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { AdminNav } from '@/components/layout/admin-nav'
 import { RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -53,10 +53,10 @@ export default function AdminPricingPage() {
 
   async function load() {
     setLoading(true)
-    const supabase = createClient()
+    const db = createClient()
     const [{ data: cityData }, { data: rateData }] = await Promise.all([
-      supabase.from('cities').select('id, name, region, city_class').order('region').order('name'),
-      supabase.from('city_service_rates').select('*'),
+      db.from('cities').select('id, name, region, city_class').order('region').order('name'),
+      db.from('city_service_rates').select('*'),
     ])
 
     const rateMap: Record<string, Record<ServiceId, RateRow>> = {}
@@ -91,8 +91,8 @@ export default function AdminPricingPage() {
     const rate = city?.rates[svcId]
     if (!rate) return
     setSaving(`${cityId}-${svcId}`)
-    const supabase = createClient()
-    await supabase
+    const db = createClient()
+    await db
       .from('city_service_rates')
       .upsert({
         city_id:    cityId,

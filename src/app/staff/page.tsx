@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 import { generateReferralCode } from '@/lib/referral'
 import { SERVICES } from '@/lib/constants'
@@ -138,35 +138,35 @@ export default function StaffPage() {
 
   useEffect(() => {
     async function init() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const db = createClient()
+      const { data: { user } } = await db.auth.getUser()
       if (!user) { router.replace('/admin/login'); return }
 
-      const { data: roleRow } = await supabase.from('user_roles').select('role').eq('user_id', user.id).single()
+      const { data: roleRow } = await db.from('user_roles').select('role').eq('user_id', user.id).single()
       if (!roleRow || (roleRow.role !== 'staff' && roleRow.role !== 'admin')) {
         router.replace('/admin/login'); return
       }
 
       setStaffEmail(user.email ?? '')
-      const { data: cityData } = await supabase.from('cities').select('id, name, region').order('name')
+      const { data: cityData } = await db.from('cities').select('id, name, region').order('name')
       setCities(cityData ?? [])
       setLoading(false)
-      fetchApplicants(supabase, 'pending')
-      fetchBookings(supabase)
-      fetchTherapists(supabase)
+      fetchApplicants(db, 'pending')
+      fetchBookings(db)
+      fetchTherapists(db)
     }
     init()
   }, [router])
 
   useEffect(() => {
-    const supabase = createClient()
-    fetchApplicants(supabase, appFilter)
+    const db = createClient()
+    fetchApplicants(db, appFilter)
   }, [appFilter])
 
   // ── Data fetchers ────────────────────────────────────────────────────────────
 
-  async function fetchBookings(supabase = createClient()) {
-    const { data } = await supabase
+  async function fetchBookings(db = createClient()) {
+    const { data } = await db
       .from('bookings')
       .select('id, service_id, booking_date, time_slot, address, status, total, therapists(name)')
       .order('booking_date', { ascending: false })
@@ -174,8 +174,8 @@ export default function StaffPage() {
     setBookings((data ?? []) as unknown as BookingRow[])
   }
 
-  async function fetchApplicants(supabase = createClient(), status = appFilter) {
-    const { data } = await supabase
+  async function fetchApplicants(db = createClient(), status = appFilter) {
+    const { data } = await db
       .from('therapists')
       .select('*, cities(name, region), nbi_extracted, tesda_extracted')
       .eq('application_status', status)
@@ -183,8 +183,8 @@ export default function StaffPage() {
     setApplicants((data ?? []) as Applicant[])
   }
 
-  async function fetchTherapists(supabase = createClient()) {
-    const { data } = await supabase
+  async function fetchTherapists(db = createClient()) {
+    const { data } = await db
       .from('therapists')
       .select('id, name, phone, is_active, nbi_cleared, tesda_certified, rating_avg, total_bookings, years_experience, specialties, bio, created_at, cities(id, name, region)')
       .eq('application_status', 'approved')
@@ -193,8 +193,8 @@ export default function StaffPage() {
   }
 
   async function refresh() {
-    const supabase = createClient()
-    await Promise.all([fetchBookings(supabase), fetchApplicants(supabase), fetchTherapists(supabase)])
+    const db = createClient()
+    await Promise.all([fetchBookings(db), fetchApplicants(db), fetchTherapists(db)])
   }
 
   // ── Applicant actions ────────────────────────────────────────────────────────
@@ -204,11 +204,11 @@ export default function StaffPage() {
     setExpandedApp(a.id)
     if (docUrls[a.id]) return
 
-    const supabase = createClient()
+    const db = createClient()
     const urls: { nbi?: string; tesda?: string; photo?: string } = {}
     async function signed(path: string | null) {
       if (!path) return undefined
-      const { data } = await supabase.storage.from('therapist-docs').createSignedUrl(path, 300)
+      const { data } = await db.storage.from('therapist-docs').createSignedUrl(path, 300)
       return data?.signedUrl
     }
     const [nbi, tesda, photo] = await Promise.all([signed(a.nbi_url), signed(a.tesda_url), signed(a.photo_url)])
@@ -220,19 +220,19 @@ export default function StaffPage() {
 
   async function updateAppStatus(id: string, status: 'approved' | 'rejected') {
     setUpdatingApp(id)
-    const supabase = createClient()
+    const db = createClient()
     const applicant = applicants.find(a => a.id === id)
     let referralCode: string | undefined
     if (status === 'approved' && applicant) {
       let code = generateReferralCode(applicant.name)
       for (let i = 0; i < 5; i++) {
-        const { data } = await supabase.from('therapists').select('id').eq('referral_code', code).maybeSingle()
+        const { data } = await db.from('therapists').select('id').eq('referral_code', code).maybeSingle()
         if (!data) break
         code = generateReferralCode(applicant.name)
       }
       referralCode = code
     }
-    await supabase.from('therapists').update({
+    await db.from('therapists').update({
       application_status: status,
       is_active:          status === 'approved',
       nbi_cleared:        status === 'approved',

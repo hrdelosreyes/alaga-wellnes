@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { formatPrice } from '@/lib/utils'
 import { AdminNav } from '@/components/layout/admin-nav'
 import { cn } from '@/lib/utils'

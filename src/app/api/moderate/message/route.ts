@@ -3,7 +3,7 @@ export const maxDuration = 60
 
 import { NextRequest, NextResponse } from 'next/server'
 import { after } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 import { moderateContent } from '@/lib/moderation'
 
 // Screens a just-sent chat message for safety issues. Runs after the response

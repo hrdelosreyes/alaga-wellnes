@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff } from 'lucide-react'
 import { useGeoCity } from '@/components/geo/city-context'
@@ -31,8 +31,8 @@ function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const db = createClient()
+    const { error } = await db.auth.signInWithPassword({ email, password })
     if (error) {
       setError('Incorrect email or password.')
       setLoading(false)

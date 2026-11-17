@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { formatPrice } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { AdminNav } from '@/components/layout/admin-nav'
@@ -29,8 +29,8 @@ export default function AdminBonusPage() {
 
   async function fetchCurrent() {
     setLoading(true)
-    const supabase = createClient()
-    const { data } = await supabase
+    const db = createClient()
+    const { data } = await db
       .from('alaga_bonus_pool')
       .select('therapist_id, amount, therapists(name)')
       .eq('quarter', quarter)
@@ -54,8 +54,8 @@ export default function AdminBonusPage() {
 
   async function fetchPayouts() {
     setLoading(true)
-    const supabase = createClient()
-    const { data } = await supabase
+    const db = createClient()
+    const { data } = await db
       .from('alaga_bonus_payouts')
       .select('*, therapists(name)')
       .order('quarter', { ascending: false })
@@ -67,8 +67,8 @@ export default function AdminBonusPage() {
   async function runCalculation() {
     setCalculating(true)
     setCalcResults(null)
-    const supabase = createClient()
-    const results  = await calculateQuarterlyPayouts(supabase, quarter)
+    const db = createClient()
+    const results  = await calculateQuarterlyPayouts(db, quarter)
     setCalcResults(results.map(r => ({ name: r.name, share: r.share, bookingCount: r.bookingCount })))
     setCalculating(false)
     fetchPayouts()
@@ -76,8 +76,8 @@ export default function AdminBonusPage() {
 
   async function markAllPaid(q: string) {
     setMarking(true)
-    const supabase = createClient()
-    await supabase
+    const db = createClient()
+    await db
       .from('alaga_bonus_payouts')
       .update({ status: 'paid', paid_at: new Date().toISOString() })
       .eq('quarter', q)

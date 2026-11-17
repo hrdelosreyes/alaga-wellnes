@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 import { SERVICES } from '@/lib/constants'
 
 const TRAVEL_BUFFER = 30 // minutes between sessions for the same therapist
@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const supabase = await createServiceClient()
+    const db = await createServiceClient()
 
     // Server-side: validate submitted price is within the city's allowed band
     if (cityId && subtotal) {
-      const { data: band } = await supabase
+      const { data: band } = await db
         .from('city_service_rates')
         .select('min_rate, max_rate')
         .eq('city_id', cityId)
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     // Double-booking guard: if a specific therapist was chosen, ensure they
     // aren't already booked (with a travel buffer) at the requested time.
     if (therapistId) {
-      const { data: existing } = await supabase
+      const { data: existing } = await db
         .from('bookings')
         .select('time_slot, service_id')
         .eq('therapist_id', therapistId)
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create booking record
-    const { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await db
       .from('bookings')
       .insert({
         customer_id:              customerId ?? null,
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
     const hitpay = await hitpayRes.json()
 
     // Store payment request ID on booking
-    await supabase
+    await db
       .from('bookings')
       .update({ hitpay_payment_request_id: hitpay.id })
       .eq('id', booking.id)

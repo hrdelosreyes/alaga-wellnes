@@ -6,7 +6,7 @@ import { ChevronLeft, MapPin } from 'lucide-react'
 import { ProgressBar } from '@/components/booking/progress-bar'
 import { Button } from '@/components/ui/button'
 import { useBooking } from '@/lib/booking-context'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { useGeoCity } from '@/components/geo/city-context'
 
 type City      = { id: string; name: string; region: string; province: string | null }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { formatPrice, formatDate, formatTime } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
 import { ChevronDown, Users } from 'lucide-react'
@@ -56,10 +56,10 @@ export default function AdminBookingsPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const db = createClient()
+      const { data: { user } } = await db.auth.getUser()
       if (!user) { router.replace('/admin/login'); return }
-      const { data: roleRow } = await supabase.from('user_roles').select('role').eq('user_id', user.id).single()
+      const { data: roleRow } = await db.from('user_roles').select('role').eq('user_id', user.id).single()
       if (roleRow?.role !== 'admin') { router.replace('/admin/login'); return }
       fetchBookings()
     }
@@ -68,14 +68,14 @@ export default function AdminBookingsPage() {
 
   async function fetchBookings() {
     setLoading(true)
-    const supabase = createClient()
+    const db = createClient()
     const [{ data }, { count }] = await Promise.all([
-      supabase
+      db
         .from('bookings')
         .select('*, therapists(name)')
         .order('booking_date', { ascending: false })
         .order('time_slot',    { ascending: false }),
-      supabase
+      db
         .from('therapists')
         .select('id', { count: 'exact', head: true })
         .eq('application_status', 'pending'),
@@ -95,8 +95,8 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({ bookingId }),
       })
     } else {
-      const supabase = createClient()
-      await supabase.from('bookings').update({ status }).eq('id', bookingId)
+      const db = createClient()
+      await db.from('bookings').update({ status }).eq('id', bookingId)
     }
     setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b))
     setUpdating(null)

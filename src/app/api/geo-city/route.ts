@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db/server'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -43,10 +43,10 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const supabase = await createClient()
+  const db = await createClient()
 
   // Fetch ALL cities (live and not live)
-  const { data: allCities } = await supabase
+  const { data: allCities } = await db
     .from('cities')
     .select('id, name, region, is_customer_live')
     .order('name')
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
   // First try to match against a live city
   const liveMatch = matchCity(liveCities)
   if (liveMatch) {
-    const { data: pricing } = await supabase
+    const { data: pricing } = await db
       .from('city_service_rates')
       .select('service_id, price_min:min_rate, price_max:max_rate')
       .eq('city_id', liveMatch.id)
@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ city: null, isLive: false, pricing: [], allLiveCities: [] })
   }
 
-  const { data: pricing } = await supabase
+  const { data: pricing } = await db
     .from('city_service_rates')
     .select('service_id, price_min:min_rate, price_max:max_rate')
     .eq('city_id', fallback.id)

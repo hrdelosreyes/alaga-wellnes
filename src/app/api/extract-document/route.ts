@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
@@ -37,10 +37,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid document type' }, { status: 400 })
     }
 
-    const supabase = await createServiceClient()
+    const db = await createServiceClient()
 
     // Generate a signed URL so Claude can read the image
-    const { data: signedData, error: signedError } = await supabase.storage
+    const { data: signedData, error: signedError } = await db.storage
       .from('therapist-docs')
       .createSignedUrl(storagePath, 120) // 2-minute window for Claude to fetch
 
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     // Save to therapist row
     const column = documentType === 'nbi' ? 'nbi_extracted' : 'tesda_extracted'
-    await supabase
+    await db
       .from('therapists')
       .update({ [column]: extracted })
       .eq('id', therapistId)

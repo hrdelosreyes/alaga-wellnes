@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/db/server'
 
 // Therapist blocks/unblocks a date (day off). Opt-out model: a blocked row
 // = day off; no row = available by default. Writes via service role after

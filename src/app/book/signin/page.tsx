@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { ProgressBar } from '@/components/booking/progress-bar'
 import { Button } from '@/components/ui/button'
 import { UserCircle, LogIn } from 'lucide-react'

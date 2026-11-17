@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { useBooking } from '@/lib/booking-context'
 import { SERVICES, TRANSPORT_FEE } from '@/lib/constants'
 import { formatPrice, formatDate, formatTime } from '@/lib/utils'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 
 export default function ReviewPage() {
   const router = useRouter()
@@ -26,10 +26,10 @@ export default function ReviewPage() {
 
   async function resolvePrice() {
     setPriceLoading(true)
-    const supabase = createClient()
+    const db = createClient()
     if (draft.therapistId) {
       // Use the specific therapist's rate
-      const { data } = await supabase
+      const { data } = await db
         .from('therapist_rates')
         .select('rate')
         .eq('therapist_id', draft.therapistId)
@@ -38,7 +38,7 @@ export default function ReviewPage() {
       setSubtotal(data?.rate ?? null)
     } else {
       // Use city base rate for best_available
-      const { data } = await supabase
+      const { data } = await db
         .from('city_service_rates')
         .select('base_rate')
         .eq('city_id', draft.cityId)

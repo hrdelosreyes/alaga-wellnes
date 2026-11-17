@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import type { DbClient } from '@/lib/db/server'
 
 const COMMISSION_RATE  = 0.05  // 5%
 const BOOKING_LIMIT    = 100   // commissions stop after source therapist's 100th booking
@@ -15,13 +15,13 @@ export function generateReferralCode(name: string): string {
  * Walks up to 2 levels of the referral chain and creates commission rows.
  */
 export async function createReferralCommissions(
-  supabase: SupabaseClient,
+  db: DbClient,
   bookingId: string,
   therapistId: string,
   subtotal: number,
 ) {
   // Count how many completed bookings this therapist has (including this one)
-  const { count: therapistBookingCount } = await supabase
+  const { count: therapistBookingCount } = await db
     .from('bookings')
     .select('id', { count: 'exact', head: true })
     .eq('therapist_id', therapistId)
@@ -31,7 +31,7 @@ export async function createReferralCommissions(
   if (count > BOOKING_LIMIT) return  // referral window has closed
 
   // Fetch level-1 referrer (the person who directly referred this therapist)
-  const { data: therapist } = await supabase
+  const { data: therapist } = await db
     .from('therapists')
     .select('referred_by_id')
     .eq('id', therapistId)
@@ -43,7 +43,7 @@ export async function createReferralCommissions(
   const amount   = Math.round(subtotal * COMMISSION_RATE)
 
   // Level-1 commission
-  await supabase.from('referral_commissions').upsert({
+  await db.from('referral_commissions').upsert({
     booking_id:          bookingId,
     source_therapist_id: therapistId,
     beneficiary_id:      level1Id,
@@ -52,7 +52,7 @@ export async function createReferralCommissions(
   }, { onConflict: 'booking_id,beneficiary_id', ignoreDuplicates: true })
 
   // Level-2: the referrer's referrer
-  const { data: level1Therapist } = await supabase
+  const { data: level1Therapist } = await db
     .from('therapists')
     .select('referred_by_id')
     .eq('id', level1Id)
@@ -61,7 +61,7 @@ export async function createReferralCommissions(
   if (!level1Therapist?.referred_by_id) return
 
   const level2Id = level1Therapist.referred_by_id
-  await supabase.from('referral_commissions').upsert({
+  await db.from('referral_commissions').upsert({
     booking_id:          bookingId,
     source_therapist_id: therapistId,
     beneficiary_id:      level2Id,

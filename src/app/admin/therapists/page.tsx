@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
@@ -82,14 +82,14 @@ export default function AdminTherapistsPage() {
 
   async function fetchAll() {
     setLoading(true)
-    const supabase = createClient()
+    const db = createClient()
     const [{ data: t }, { data: c }] = await Promise.all([
-      supabase
+      db
         .from('therapists')
         .select(`*, cities(id, name, region)`)
         .eq('application_status', 'approved')
         .order('name'),
-      supabase
+      db
         .from('cities')
         .select('id, name, region')
         .order('region').order('name'),
@@ -101,9 +101,9 @@ export default function AdminTherapistsPage() {
 
   async function toggleActive(therapist: Therapist) {
     setToggling(therapist.id)
-    const supabase = createClient()
+    const db = createClient()
     const newActive = !therapist.is_active
-    await supabase
+    await db
       .from('therapists')
       .update({ is_active: newActive })
       .eq('id', therapist.id)
@@ -129,11 +129,11 @@ export default function AdminTherapistsPage() {
     })
     // Load all barangays for the city + current approved selections
     const cityName = t.cities?.name ?? ''
-    const supabase = createClient()
+    const db = createClient()
     const [{ data: allBgy }, { data: current }] = await Promise.all([
-      supabase.from('barangays').select('psgc_code, name')
+      db.from('barangays').select('psgc_code, name')
         .in('city_name', [cityName, `City of ${cityName}`]).order('name'),
-      supabase.from('therapist_barangays').select('barangay_psgc, status')
+      db.from('therapist_barangays').select('barangay_psgc, status')
         .eq('therapist_id', t.id),
     ])
     setSaAllBarangays((allBgy ?? []) as { psgc_code: string; name: string }[])
@@ -144,8 +144,8 @@ export default function AdminTherapistsPage() {
   async function saveEdit(therapistId: string) {
     if (!editState) return
     setSaving(true)
-    const supabase = createClient()
-    const { error: updateError } = await supabase
+    const db = createClient()
+    const { error: updateError } = await db
       .from('therapists')
       .update({
         name:             editState.name.trim(),
@@ -165,7 +165,7 @@ export default function AdminTherapistsPage() {
 
     if (updateError) { setSaving(false); return }
 
-    const { data } = await supabase
+    const { data } = await db
       .from('therapists')
       .select('*, cities(id, name, region)')
       .eq('id', therapistId)
@@ -176,9 +176,9 @@ export default function AdminTherapistsPage() {
     }
 
     // Save barangays
-    await supabase.from('therapist_barangays').delete().eq('therapist_id', therapistId)
+    await db.from('therapist_barangays').delete().eq('therapist_id', therapistId)
     if (saSelected.size > 0) {
-      await supabase.from('therapist_barangays').insert(
+      await db.from('therapist_barangays').insert(
         Array.from(saSelected).map(psgc => ({ therapist_id: therapistId, barangay_psgc: psgc, status: 'approved' }))
       )
     }
@@ -227,11 +227,11 @@ export default function AdminTherapistsPage() {
 
   async function startSaEdit(therapist: Therapist) {
     const cityName = therapist.cities?.name ?? ''
-    const supabase = createClient()
+    const db = createClient()
     const [{ data: allBgy }, { data: current }] = await Promise.all([
-      supabase.from('barangays').select('psgc_code, name')
+      db.from('barangays').select('psgc_code, name')
         .in('city_name', [cityName, `City of ${cityName}`]).order('name'),
-      supabase.from('therapist_barangays').select('barangay_psgc, status')
+      db.from('therapist_barangays').select('barangay_psgc, status')
         .eq('therapist_id', therapist.id),
     ])
     setSaAllBarangays((allBgy ?? []) as { psgc_code: string; name: string }[])
@@ -242,11 +242,11 @@ export default function AdminTherapistsPage() {
 
   async function saveSaEdit(therapistId: string) {
     setSaSaving(true)
-    const supabase = createClient()
+    const db = createClient()
     // Delete all existing rows then re-insert selected as approved
-    await supabase.from('therapist_barangays').delete().eq('therapist_id', therapistId)
+    await db.from('therapist_barangays').delete().eq('therapist_id', therapistId)
     if (saSelected.size > 0) {
-      await supabase.from('therapist_barangays').insert(
+      await db.from('therapist_barangays').insert(
         Array.from(saSelected).map(psgc => ({ therapist_id: therapistId, barangay_psgc: psgc, status: 'approved' }))
       )
     }

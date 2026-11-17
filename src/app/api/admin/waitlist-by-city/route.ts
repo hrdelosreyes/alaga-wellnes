@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/db/server'
 
 export async function GET() {
   const authed = await createClient()

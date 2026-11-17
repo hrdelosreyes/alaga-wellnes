@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,9 +9,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email or phone is required.' }, { status: 400 })
     }
 
-    const supabase = await createServiceClient()
+    const db = await createServiceClient()
 
-    const { error } = await supabase.from('waitlist').insert({
+    const { error } = await db.from('waitlist').insert({
       email:  email?.trim().toLowerCase() || null,
       phone:  phone?.trim() || null,
       city:   city?.trim() || null,

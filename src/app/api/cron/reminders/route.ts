@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 import { sendEmail, emailBookingReminder } from '@/lib/email'
 import { formatDate, formatTime } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
@@ -28,9 +28,9 @@ export async function GET(req: NextRequest) {
     phTomorrow.setUTCDate(phTomorrow.getUTCDate() + 1)
     const tomorrow = phTomorrow.toISOString().slice(0, 10)
 
-    const supabase = await createServiceClient()
+    const db = await createServiceClient()
 
-    const { data: bookings, error } = await supabase
+    const { data: bookings, error } = await db
       .from('bookings')
       .select('id, booking_date, time_slot, address, service_id, customer_name, customer_email, reminder_sent_at, therapists(name)')
       .in('booking_date', [today, tomorrow])
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       })
       const ok = await sendEmail({ to: b.customer_email as string, subject, html })
       if (ok) {
-        await supabase
+        await db
           .from('bookings')
           .update({ reminder_sent_at: new Date().toISOString() })
           .eq('id', b.id)

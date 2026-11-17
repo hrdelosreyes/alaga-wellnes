@@ -3,7 +3,7 @@ export const maxDuration = 60
 
 import { NextRequest, NextResponse } from 'next/server'
 import { after } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 import { moderateContent } from '@/lib/moderation'
 import { refreshReviewSummary } from '@/lib/review-summary'
 
@@ -15,10 +15,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid rating data' }, { status: 400 })
     }
 
-    const supabase = await createServiceClient()
+    const db = await createServiceClient()
 
     // Verify booking exists and is completed
-    const { data: booking } = await supabase
+    const { data: booking } = await db
       .from('bookings')
       .select('id, status, customer_id')
       .eq('id', bookingId)
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Prevent duplicate ratings
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('ratings')
       .select('id')
       .eq('booking_id', bookingId)
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Already rated' }, { status: 409 })
     }
 
-    const { data: rating, error } = await supabase
+    const { data: rating, error } = await db
       .from('ratings')
       .insert({
         booking_id:   bookingId,
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     // public "What customers say" blurb. Both are best-effort.
     after(async () => {
       if (reviewText) {
-        await moderateContent(supabase, {
+        await moderateContent(db, {
           source:      'review',
           text:        reviewText,
           bookingId,
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         })
       }
       if (therapistId) {
-        await refreshReviewSummary(supabase, therapistId)
+        await refreshReviewSummary(db, therapistId)
       }
     })
 

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { useGeoCity } from '@/components/geo/city-context'
 import logo from '../../../public/logo.png'
 
@@ -15,10 +15,10 @@ export function Navbar() {
   const { isLive } = useGeoCity()
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
+    const db = createClient()
+    db.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
-      const { data } = await supabase
+      const { data } = await db
         .from('customers')
         .select('name')
         .eq('id', user.id)
@@ -26,7 +26,7 @@ export function Navbar() {
       if (data) setCustomerName(data.name.split(' ')[0]) // first name only
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = db.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') setCustomerName(null)
     })
     return () => subscription.unsubscribe()
@@ -59,8 +59,8 @@ export function Navbar() {
               </Link>
               <button
                 onClick={async () => {
-                  const supabase = (await import('@/lib/supabase/client')).createClient()
-                  await supabase.auth.signOut()
+                  const db = (await import('@/lib/db/client')).createClient()
+                  await db.auth.signOut()
                   setCustomerName(null)
                 }}
                 className="text-sm text-[#6E5F55] hover:text-[#2C2420] transition-colors"
@@ -107,8 +107,8 @@ export function Navbar() {
               <Link href="/account" onClick={() => setOpen(false)} className="text-sm font-medium text-[#2C2420]">My bookings</Link>
               <button
                 onClick={async () => {
-                  const supabase = (await import('@/lib/supabase/client')).createClient()
-                  await supabase.auth.signOut()
+                  const db = (await import('@/lib/db/client')).createClient()
+                  await db.auth.signOut()
                   setCustomerName(null)
                   setOpen(false)
                 }}

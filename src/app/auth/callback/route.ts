@@ -1,25 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { type EmailOtpType } from '@supabase/supabase-js'
+import { AuthError, consumeOneTimeToken, safeNext, setSessionCookie } from '@/lib/auth/server'
+
+// Landing endpoint for emailed links (password reset, therapist invite,
+// signup confirmation): /auth/callback?token=…&next=/path
+// Consumes the one-time token, signs the user in, and redirects to `next`.
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const code       = searchParams.get('code')
-  const tokenHash  = searchParams.get('token_hash')
-  const type       = searchParams.get('type') as EmailOtpType | null
-  const next       = searchParams.get('next') ?? '/therapist/dashboard'
+  const token = searchParams.get('token')
+  const next  = safeNext(searchParams.get('next'), '/')
 
-  const supabase = await createClient()
+  if (!token) return NextResponse.redirect(new URL('/', req.url))
 
-  if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) return NextResponse.redirect(new URL(next, req.url))
+  try {
+    const { user } = await consumeOneTimeToken(token)
+    await setSessionCookie(user)
+    return NextResponse.redirect(new URL(next, req.url))
+  } catch (e) {
+    const msg = e instanceof AuthError ? e.message : 'Something went wrong verifying your link'
+    const dest = new URL(next, req.url)
+    dest.searchParams.set('error_description', msg)
+    return NextResponse.redirect(dest)
   }
-
-  if (tokenHash && type) {
-    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
-    if (!error) return NextResponse.redirect(new URL(next, req.url))
-  }
-
-  return NextResponse.redirect(new URL('/', req.url))
 }

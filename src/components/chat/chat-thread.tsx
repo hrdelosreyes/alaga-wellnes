@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Send, Loader2, Sparkles, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -39,7 +39,7 @@ export function ChatThread({ bookingId, senderRole, readonly = false, aiSuggest 
   const inputRef   = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    const supabase = createClient()
+    const db = createClient()
 
     // Merge authoritative server messages with any still-pending optimistic
     // ones (matched by sender+body so we don't drop or duplicate them).
@@ -50,7 +50,7 @@ export function ChatThread({ bookingId, senderRole, readonly = false, aiSuggest 
     }
 
     async function refetch(first = false) {
-      const { data } = await supabase
+      const { data } = await db
         .from('messages')
         .select('*')
         .eq('booking_id', bookingId)
@@ -62,28 +62,10 @@ export function ChatThread({ bookingId, senderRole, readonly = false, aiSuggest 
 
     refetch(true)
 
-    // Realtime (instant when the table is in the realtime publication).
-    const channel = supabase
-      .channel(`chat-${bookingId}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages', filter: `booking_id=eq.${bookingId}` },
-        (payload) => {
-          const incoming = payload.new as Message
-          setMessages(prev => {
-            if (prev.find(m => m.id === incoming.id)) return prev
-            // Replace a matching optimistic copy (our own just-sent message)
-            const withoutOpt = prev.filter(m => !(m.id.startsWith('opt-') && m.sender === incoming.sender && m.body === incoming.body))
-            return [...withoutOpt, incoming]
-          })
-        }
-      )
-      .subscribe()
+    // Poll for new messages (Neon has no realtime channel like Supabase did).
+    const interval = setInterval(() => refetch(false), 3000)
 
-    // Polling fallback — guarantees updates even if realtime isn't enabled.
-    const interval = setInterval(() => refetch(false), 4000)
-
-    return () => { supabase.removeChannel(channel); clearInterval(interval) }
+    return () => { clearInterval(interval) }
   }, [bookingId])
 
   // Scroll to bottom on new messages
@@ -108,8 +90,8 @@ export function ChatThread({ bookingId, senderRole, readonly = false, aiSuggest 
     }
     setMessages(prev => [...prev, optimistic])
 
-    const supabase = createClient()
-    const { error } = await supabase
+    const db = createClient()
+    const { error } = await db
       .from('messages')
       .insert({ booking_id: bookingId, sender: senderRole, body })
 

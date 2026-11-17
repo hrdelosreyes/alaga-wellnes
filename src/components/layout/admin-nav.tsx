@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import {
   RefreshCw, MapPin, DollarSign, Users, UserPlus, ShieldCheck, ShieldAlert, Gift, Wallet,
   LayoutDashboard, CalendarDays, Tag, Banknote, ClipboardList, Settings, ChevronDown,

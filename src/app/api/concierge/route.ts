@@ -3,7 +3,7 @@ export const maxDuration = 60
 
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 import { getAnthropic, AI_MODEL, messageText } from '@/lib/ai'
 import { SERVICES, TRANSPORT_FEE } from '@/lib/constants'
 

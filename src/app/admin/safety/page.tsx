@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { AdminNav } from '@/components/layout/admin-nav'
 import { Loader2, ShieldAlert, Check, X, MessageCircle, Star } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -46,10 +46,10 @@ export default function AdminSafetyPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const db = createClient()
+      const { data: { user } } = await db.auth.getUser()
       if (!user) { router.replace('/admin/login'); return }
-      const { data: roleRow } = await supabase.from('user_roles').select('role').eq('user_id', user.id).single()
+      const { data: roleRow } = await db.from('user_roles').select('role').eq('user_id', user.id).single()
       if (roleRow?.role !== 'admin' && roleRow?.role !== 'staff') { router.replace('/admin/login') }
     }
     checkAuth()

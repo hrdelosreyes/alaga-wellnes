@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { ChevronLeft, ChevronRight, CheckCircle, Upload, Wallet, Users, Gift, Star, ArrowRight } from 'lucide-react'
 import logoDark from '../../../../public/logo-dark.png'
 import therapistHero from '../../../../public/therapist-hero.png'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TherapistFaq } from '@/components/therapist/register-faq'
@@ -172,12 +172,12 @@ export default function TherapistRegisterPage() {
     setLoading(true)
 
     try {
-      const supabase = createClient()
+      const db = createClient()
 
       async function uploadFile(file: File, folder: string): Promise<string> {
         const ext  = file.name.split('.').pop()
         const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-        const { error } = await supabase.storage.from('therapist-docs').upload(path, file)
+        const { error } = await db.storage.from('therapist-docs').upload(path, file)
         if (error) throw error
         return path
       }
@@ -190,7 +190,7 @@ export default function TherapistRegisterPage() {
 
       const phone = form.phone.replace(/\s/g, '').replace(/^0/, '+63')
 
-      const { error } = await supabase.from('therapists').insert({
+      const { error } = await db.from('therapists').insert({
         name:               form.name.trim(),
         email:              form.email.trim().toLowerCase(),
         phone,
@@ -228,7 +228,7 @@ export default function TherapistRegisterPage() {
         throw error
       }
 
-      const { data: therapistRow } = await supabase
+      const { data: therapistRow } = await db
         .from('therapists')
         .select('id')
         .eq('phone', phone)

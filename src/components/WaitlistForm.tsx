@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowRight, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { useGeoCity } from '@/components/geo/city-context'
 
 type City = { id: string; name: string; region: string; province: string | null }

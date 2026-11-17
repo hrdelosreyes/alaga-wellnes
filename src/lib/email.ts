@@ -201,3 +201,42 @@ export function emailBookingReminder(d: {
     ),
   }
 }
+
+// ── Account emails (replace Supabase Auth's built-in emails) ─────
+export function emailPasswordReset(d: { link: string }) {
+  return {
+    subject: 'Reset your Alaga Wellness password',
+    html: shell(
+      'Reset your password',
+      `<p style="margin:0 0 12px;">We received a request to reset your password. This link expires in 1 hour and can be used once.</p>
+       <p style="margin:0;">If you didn't ask for this, you can ignore this email.</p>`,
+      'Choose a new password',
+      d.link,
+    ),
+  }
+}
+
+export function emailTherapistInvite(d: { name?: string | null; link: string }) {
+  return {
+    subject: "You're approved — set up your Alaga Wellness therapist account",
+    html: shell(
+      `Welcome to Alaga${d.name ? `, ${d.name.split(' ')[0]}` : ''}!`,
+      `<p style="margin:0 0 12px;">Your therapist application has been approved. Set a password to open your therapist portal.</p>
+       <p style="margin:0;">This link expires in 7 days.</p>`,
+      'Set my password',
+      d.link,
+    ),
+  }
+}
+
+export function emailConfirmSignup(d: { link: string }) {
+  return {
+    subject: 'Confirm your Alaga Wellness account',
+    html: shell(
+      'Confirm your email',
+      `<p style="margin:0;">Tap the button below to confirm your email address and finish creating your account.</p>`,
+      'Confirm email',
+      d.link,
+    ),
+  }
+}

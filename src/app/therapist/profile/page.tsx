@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 import { TherapistNav } from '@/components/therapist/therapist-nav'
 import { cn } from '@/lib/utils'
@@ -65,10 +65,10 @@ export default function TherapistProfilePage() {
     setError(null)
     setUploading(true)
     try {
-      const supabase = createClient()
+      const db = createClient()
       const ext  = file.name.split('.').pop()
       const path = `photos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { error: upErr } = await supabase.storage.from('therapist-docs').upload(path, file)
+      const { error: upErr } = await db.storage.from('therapist-docs').upload(path, file)
       if (upErr) throw upErr
       setPhotoPath(path)
       // Preview the local file immediately

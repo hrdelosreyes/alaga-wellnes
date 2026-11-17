@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/db/server'
+import { createOneTimeToken, createUser, findUserByEmail, verifyLink } from '@/lib/auth/server'
+import { sendEmail, emailTherapistInvite } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   const authed = await createClient()
@@ -18,51 +20,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\/$/, '')
-    const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY!
-    const redirectTo  = `${process.env.NEXT_PUBLIC_APP_URL}/therapist/set-password`
-
-    // GoTrue reads redirect_to from the QUERY STRING, not the JSON body — it's
-    // silently ignored (falls back to the Site URL) if only passed in the body.
-    const redirectQuery = `redirect_to=${encodeURIComponent(redirectTo)}`
-
-    // Try invite first; if user already exists, send a password reset instead
-    const inviteRes = await fetch(`${supabaseUrl}/auth/v1/invite?${redirectQuery}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': serviceKey,
-        'Authorization': `Bearer ${serviceKey}`,
-      },
-      body: JSON.stringify({
-        email,
-        data: { therapistId, name },
-        redirect_to: redirectTo,
-      }),
+    // Create the therapist's login (no password yet) if it doesn't exist,
+    // then email a one-time link that signs them in on /therapist/set-password.
+    // Existing accounts get the same kind of link, which works as a reset.
+    let account = await findUserByEmail(email)
+    if (!account) {
+      account = await createUser({ email, password: null, metadata: { therapistId, name }, confirmed: false })
+    }
+    const token = await createOneTimeToken(account.id, 'invite', 60 * 60 * 24 * 7)
+    const sent  = await sendEmail({
+      to: account.email ?? email,
+      ...emailTherapistInvite({ name, link: verifyLink(token, '/therapist/set-password') }),
     })
-
-    const inviteBody = await inviteRes.json()
-
-    if (!inviteRes.ok) {
-      // User already exists — send a password reset link instead
-      if (inviteRes.status === 422) {
-        const resetRes = await fetch(`${supabaseUrl}/auth/v1/recover?${redirectQuery}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': serviceKey,
-            'Authorization': `Bearer ${serviceKey}`,
-          },
-          body: JSON.stringify({ email, redirect_to: redirectTo }),
-        })
-        if (!resetRes.ok) {
-          const resetBody = await resetRes.json()
-          return NextResponse.json({ error: resetBody.msg ?? 'Failed to send reset email', code: resetRes.status }, { status: 500 })
-        }
-      } else {
-        console.error('invite error:', inviteRes.status, JSON.stringify(inviteBody))
-        return NextResponse.json({ error: inviteBody.msg ?? inviteBody.message ?? 'Invite failed', code: inviteRes.status }, { status: 500 })
-      }
+    if (!sent) {
+      return NextResponse.json({ error: 'Could not send the invite email. Check RESEND_API_KEY.' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })

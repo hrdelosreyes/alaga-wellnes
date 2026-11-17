@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHmac } from 'crypto'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/db/server'
 import { sendEmail, emailBookingConfirmed } from '@/lib/email'
 import { formatDate, formatTime, formatPrice } from '@/lib/utils'
 import { SERVICES } from '@/lib/constants'
@@ -38,13 +38,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing reference_number' }, { status: 400 })
     }
 
-    const supabase = await createServiceClient()
+    const db = await createServiceClient()
 
     if (status === 'completed') {
       // Idempotency: both the per-request and dashboard webhooks fire (plus
       // HitPay retries). Only process the first time — otherwise we'd send
       // duplicate confirmation emails.
-      const { data: booking } = await supabase
+      const { data: booking } = await db
         .from('bookings')
         .select('id, payment_status, booking_date, time_slot, address, service_id, total, customer_name, customer_email')
         .eq('id', referenceNumber)
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true }) // unknown or already processed
       }
 
-      await supabase
+      await db
         .from('bookings')
         .update({
           payment_status:    'paid',
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       }
 
     } else if (status === 'failed') {
-      await supabase
+      await db
         .from('bookings')
         .update({ payment_status: 'pending', status: 'pending_payment' })
         .eq('id', referenceNumber)

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { formatPrice, formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { AdminNav } from '@/components/layout/admin-nav'
@@ -38,8 +38,8 @@ export default function AdminCommissionsPage() {
 
   async function fetchAll() {
     setLoading(true)
-    const supabase = createClient()
-    const { data } = await supabase
+    const db = createClient()
+    const { data } = await db
       .from('referral_commissions')
       .select(`
         id, level, amount, status, created_at, paid_at,
@@ -70,8 +70,8 @@ export default function AdminCommissionsPage() {
 
   async function markPaid(ids: string[]) {
     setMarking('batch')
-    const supabase = createClient()
-    await supabase
+    const db = createClient()
+    await db
       .from('referral_commissions')
       .update({ status: 'paid', paid_at: new Date().toISOString() })
       .in('id', ids)

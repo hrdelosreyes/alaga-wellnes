@@ -1,4 +1,4 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { DbClient } from '@/lib/db/server'
 import { getAnthropic, AI_MODEL_FAST, messageText, parseJsonResponse } from '@/lib/ai'
 
 export type ModerationInput = {
@@ -18,7 +18,7 @@ type Verdict = {
 
 // Classifies a chat message or review and records a moderation flag when it
 // finds a problem. Best-effort: throws nothing, blocks nothing.
-export async function moderateContent(svc: SupabaseClient, input: ModerationInput): Promise<void> {
+export async function moderateContent(svc: DbClient, input: ModerationInput): Promise<void> {
   const text = input.text?.trim()
   if (!text) return
 

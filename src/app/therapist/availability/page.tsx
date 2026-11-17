@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { TherapistNav } from '@/components/therapist/therapist-nav'
 import { Loader2, Check, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -34,18 +34,18 @@ export default function TherapistAvailabilityPage() {
   useEffect(() => { init() }, [])
 
   async function init() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const db = createClient()
+    const { data: { user } } = await db.auth.getUser()
     if (!user) { router.replace('/therapist/login'); return }
 
-    const { data: t } = await supabase
+    const { data: t } = await db
       .from('therapists')
       .select('id')
       .eq('email', user.email)
       .maybeSingle()
     if (!t) { router.replace('/therapist/login'); return }
 
-    const { data: rows } = await supabase
+    const { data: rows } = await db
       .from('therapist_availability')
       .select('date, is_blocked')
       .eq('therapist_id', t.id)

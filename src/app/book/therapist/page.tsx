@@ -6,7 +6,7 @@ import { ChevronLeft, Star, ShieldCheck, CalendarX } from 'lucide-react'
 import { ProgressBar } from '@/components/booking/progress-bar'
 import { Button } from '@/components/ui/button'
 import { useBooking } from '@/lib/booking-context'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { cn } from '@/lib/utils'
 import type { Therapist, GenderPreference, TherapistSelectionMode } from '@/types'
 
@@ -29,11 +29,11 @@ export default function TherapistPage() {
 
   async function loadTherapists() {
     setLoading(true)
-    const supabase = createClient()
+    const db = createClient()
 
     // Opt-out model: therapists are available by default; only those who
     // BLOCKED this date (is_blocked = true) are excluded.
-    const { data: blocked } = await supabase
+    const { data: blocked } = await db
       .from('therapist_availability')
       .select('therapist_id')
       .eq('date', draft.date)
@@ -43,7 +43,7 @@ export default function TherapistPage() {
     // If the customer selected a barangay, restrict to therapists who serve it
     let barangayIds: Set<string> | null = null
     if (draft.barangayPsgc) {
-      const { data: serviceArea } = await supabase
+      const { data: serviceArea } = await db
         .from('therapist_barangays')
         .select('therapist_id')
         .eq('barangay_psgc', draft.barangayPsgc)
@@ -52,7 +52,7 @@ export default function TherapistPage() {
     }
 
     // Load active therapists, then apply barangay + not-blocked filters in JS
-    const { data: activeList } = await supabase
+    const { data: activeList } = await db
       .from('therapists')
       .select('*')
       .eq('is_active', true)
@@ -71,14 +71,14 @@ export default function TherapistPage() {
 
     const [{ data: rateData }, { data: cityRate }] = await Promise.all([
       // Each therapist's rate for the selected service
-      supabase
+      db
         .from('therapist_rates')
         .select('therapist_id, rate')
         .eq('service_id', draft.serviceId)
         .in('therapist_id', eligibleIds),
       // City base rate (shown on Best Available card)
       draft.cityId
-        ? supabase
+        ? db
             .from('city_service_rates')
             .select('base_rate')
             .eq('city_id', draft.cityId)

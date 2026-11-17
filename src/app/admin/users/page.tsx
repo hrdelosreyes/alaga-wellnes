@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { AdminNav } from '@/components/layout/admin-nav'
 import { UserPlus, Trash2, Users, ShieldCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -29,10 +29,10 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const db = createClient()
+      const { data: { user } } = await db.auth.getUser()
       if (!user) { router.replace('/admin/login'); return }
-      const { data: roleRow } = await supabase.from('user_roles').select('role').eq('user_id', user.id).single()
+      const { data: roleRow } = await db.from('user_roles').select('role').eq('user_id', user.id).single()
       if (roleRow?.role !== 'admin') { router.replace('/admin/login'); return }
       fetchUsers()
     }
@@ -86,8 +86,8 @@ export default function AdminUsersPage() {
   }
 
   async function changeRole(userId: string, role: 'admin' | 'staff') {
-    const supabase = createClient()
-    await supabase.from('user_roles').update({ role }).eq('user_id', userId)
+    const db = createClient()
+    await db.from('user_roles').update({ role }).eq('user_id', userId)
     setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, role } : u))
   }
 

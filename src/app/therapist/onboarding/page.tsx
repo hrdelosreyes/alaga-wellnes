@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, MapPin, DollarSign, Wallet, Users, Gift, ChevronRight } from 'lucide-react'
 
@@ -16,11 +16,11 @@ export default function TherapistOnboardingPage() {
 
   useEffect(() => {
     async function init() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const db = createClient()
+      const { data: { user } } = await db.auth.getUser()
       if (!user) { router.replace('/therapist/login'); return }
 
-      const { data: t } = await supabase
+      const { data: t } = await db
         .from('therapists')
         .select('id, name, application_status, city_id, cities(name)')
         .eq('email', user.email)
@@ -31,7 +31,7 @@ export default function TherapistOnboardingPage() {
         return
       }
 
-      const { count } = await supabase
+      const { count } = await db
         .from('therapist_barangays')
         .select('therapist_id', { count: 'exact', head: true })
         .eq('therapist_id', t.id)
@@ -54,8 +54,8 @@ export default function TherapistOnboardingPage() {
       let cityReady = false
       if (t.city_id) {
         const [{ count: rateCount }, { count: bgyCount }] = await Promise.all([
-          supabase.from('city_service_rates').select('city_id', { count: 'exact', head: true }).eq('city_id', t.city_id),
-          supabase.from('barangays').select('psgc_code', { count: 'exact', head: true }).in('city_name', [cName, `City of ${cName}`]),
+          db.from('city_service_rates').select('city_id', { count: 'exact', head: true }).eq('city_id', t.city_id),
+          db.from('barangays').select('psgc_code', { count: 'exact', head: true }).in('city_name', [cName, `City of ${cName}`]),
         ])
         cityReady = (rateCount ?? 0) > 0 && (bgyCount ?? 0) > 0
       }

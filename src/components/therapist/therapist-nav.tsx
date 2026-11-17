@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import {
   LayoutDashboard, Wallet, MapPin, CalendarDays, BarChart3, Banknote,
   UserCircle, History, Settings, ChevronDown, LogOut,

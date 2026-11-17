@@ -1,8 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Stack
+
+Next.js on **Vercel**, Postgres on **Neon**, files on **Vercel Blob**, email via Resend.
+Migrated from Supabase — see [MIGRATION-SUPABASE-TO-NEON.md](./MIGRATION-SUPABASE-TO-NEON.md).
+
 ## Getting Started
 
-First, run the development server:
+Copy `.env.example` to `.env.local` and fill it in (`vercel env pull .env.local`
+works once the project is linked). Then run the development server:
 
 ```bash
 npm run dev

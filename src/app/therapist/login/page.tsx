@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 
 export default function TherapistLoginPage() {
@@ -17,8 +17,8 @@ export default function TherapistLoginPage() {
     if (!email || !password) { setError('Please enter your email and password.'); return }
 
     setLoading(true)
-    const supabase = createClient()
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const db = createClient()
+    const { data, error } = await db.auth.signInWithPassword({ email, password })
 
     if (error) {
       setError('Invalid email or password.')
@@ -27,21 +27,21 @@ export default function TherapistLoginPage() {
     }
 
     // Verify this account belongs to an approved therapist
-    const { data: therapist } = await supabase
+    const { data: therapist } = await db
       .from('therapists')
       .select('id, application_status')
       .eq('email', data.user.email)
       .single()
 
     if (!therapist) {
-      await supabase.auth.signOut()
+      await db.auth.signOut()
       setError('No therapist account found for this email.')
       setLoading(false)
       return
     }
 
     if (therapist.application_status !== 'approved') {
-      await supabase.auth.signOut()
+      await db.auth.signOut()
       setError('Your application is still under review.')
       setLoading(false)
       return

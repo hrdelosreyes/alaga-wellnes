@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff } from 'lucide-react'
 
@@ -22,8 +22,8 @@ export default function ResetPasswordPage() {
     if (password !== confirm) { setError('Passwords do not match.'); return }
 
     setLoading(true)
-    const supabase = createClient()
-    const { error } = await supabase.auth.updateUser({ password })
+    const db = createClient()
+    const { error } = await db.auth.updateUser({ password })
     if (error) { setError(error.message); setLoading(false); return }
     setDone(true)
     setTimeout(() => router.push('/account/login'), 3000)

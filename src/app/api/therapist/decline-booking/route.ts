@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/db/server'
 
 // Therapist declines a booking → unassign so admin can reassign. Server-side
 // (service role) because it nulls therapist_id, which a scoped RLS update

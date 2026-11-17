@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { SERVICES } from '@/lib/constants'
 import { formatPrice, formatDate, formatTime } from '@/lib/utils'
 import { cn } from '@/lib/utils'
@@ -53,13 +53,13 @@ export default function AccountPage() {
   useEffect(() => { init() }, [])
 
   async function init() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const db = createClient()
+    const { data: { user } } = await db.auth.getUser()
     if (!user) { router.replace('/account/login'); return }
 
     const [{ data: profile }, { data: bks }] = await Promise.all([
-      supabase.from('customers').select('*').eq('id', user.id).maybeSingle(),
-      supabase
+      db.from('customers').select('*').eq('id', user.id).maybeSingle(),
+      db
         .from('bookings')
         .select('id, service_id, booking_date, time_slot, address, status, total, therapists(name)')
         .eq('customer_id', user.id)
@@ -74,8 +74,8 @@ export default function AccountPage() {
   }
 
   async function signOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    const db = createClient()
+    await db.auth.signOut()
     router.push('/')
     router.refresh()
   }

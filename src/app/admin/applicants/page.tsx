@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { generateReferralCode } from '@/lib/referral'
 import { cn } from '@/lib/utils'
 import { ShieldCheck, FileText, ChevronDown, ChevronUp, ExternalLink, RefreshCw, CheckCircle, XCircle } from 'lucide-react'
@@ -65,8 +65,8 @@ export default function AdminApplicantsPage() {
 
   async function fetchApplicants() {
     setLoading(true)
-    const supabase = createClient()
-    const { data } = await supabase
+    const db = createClient()
+    const { data } = await db
       .from('therapists')
       .select('*, cities(name, region), nbi_extracted, tesda_extracted')
       .eq('application_status', filter)
@@ -82,12 +82,12 @@ export default function AdminApplicantsPage() {
 
     // Generate signed URLs for docs if not already loaded
     if (docUrls[id]) return
-    const supabase = createClient()
+    const db = createClient()
     const urls: { nbi?: string; tesda?: string; photo?: string } = {}
 
     async function signed(path: string | null): Promise<string | undefined> {
       if (!path) return undefined
-      const { data } = await supabase.storage
+      const { data } = await db.storage
         .from('therapist-docs')
         .createSignedUrl(path, 300) // 5-minute expiry
       return data?.signedUrl
@@ -106,7 +106,7 @@ export default function AdminApplicantsPage() {
 
   async function updateStatus(id: string, status: 'approved' | 'rejected') {
     setUpdating(id)
-    const supabase = createClient()
+    const db = createClient()
     const applicant = applicants.find(a => a.id === id)
 
     // Generate a unique referral code on approval
@@ -115,7 +115,7 @@ export default function AdminApplicantsPage() {
       let code = generateReferralCode(applicant.name)
       // Ensure uniqueness (retry up to 5 times)
       for (let i = 0; i < 5; i++) {
-        const { data } = await supabase
+        const { data } = await db
           .from('therapists').select('id').eq('referral_code', code).maybeSingle()
         if (!data) break
         code = generateReferralCode(applicant.name)
@@ -123,7 +123,7 @@ export default function AdminApplicantsPage() {
       referralCode = code
     }
 
-    const { data: updated, error } = await supabase
+    const { data: updated, error } = await db
       .from('therapists')
       .update({
         application_status: status,

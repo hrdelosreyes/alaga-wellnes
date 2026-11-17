@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Star, ShieldCheck, Clock, CheckCircle, ArrowRight, Sparkles, Heart, Zap, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/db/server'
 import type { Therapist } from '@/types'
 import WaitlistForm from '@/components/WaitlistForm'
 import { ServicesSection } from '@/components/home/services-section'
@@ -16,8 +16,8 @@ import howItWorksBg from '../../public/how-it-works-bg.png'
 import heroBanner from '../../public/hero-massage-2.png'
 
 async function getTopTherapists(): Promise<Therapist[]> {
-  const supabase = await createClient()
-  const { data } = await supabase
+  const db = await createClient()
+  const { data } = await db
     .from('therapists')
     .select('*')
     .eq('is_active', true)
@@ -29,8 +29,8 @@ async function getTopTherapists(): Promise<Therapist[]> {
 }
 
 async function getHasLiveCities(): Promise<boolean> {
-  const supabase = await createClient()
-  const { count } = await supabase
+  const db = await createClient()
+  const { count } = await db
     .from('cities')
     .select('id', { count: 'exact', head: true })
     .eq('is_customer_live', true)

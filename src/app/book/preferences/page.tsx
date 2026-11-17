@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { ProgressBar } from '@/components/booking/progress-bar'
 import { Button } from '@/components/ui/button'
 import { useBooking } from '@/lib/booking-context'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 
 export default function PreferencesPage() {
   const router = useRouter()
@@ -29,8 +29,8 @@ export default function PreferencesPage() {
       if (!user) return
       // Prefill email from the signed-in account
       if (!draft.customerEmail && user.email) setEmail(user.email)
-      const supabase = createClient()
-      const { data: profile } = await supabase
+      const db = createClient()
+      const { data: profile } = await db
         .from('customers')
         .select('id, name, phone')
         .eq('id', user.id)

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 
 export default function AdminLoginPage() {
@@ -17,8 +17,8 @@ export default function AdminLoginPage() {
     if (!email || !password) { setError('Please enter your email and password.'); return }
 
     setLoading(true)
-    const supabase = createClient()
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    const db = createClient()
+    const { data, error: signInError } = await db.auth.signInWithPassword({ email, password })
 
     if (signInError) {
       setError('Invalid email or password.')
@@ -27,14 +27,14 @@ export default function AdminLoginPage() {
     }
 
     // Check role
-    const { data: roleRow } = await supabase
+    const { data: roleRow } = await db
       .from('user_roles')
       .select('role')
       .eq('user_id', data.user.id)
       .single()
 
     if (!roleRow) {
-      await supabase.auth.signOut()
+      await db.auth.signOut()
       setError('You do not have access to this portal.')
       setLoading(false)
       return
@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
     } else if (roleRow.role === 'staff') {
       router.push('/staff')
     } else {
-      await supabase.auth.signOut()
+      await db.auth.signOut()
       setError('You do not have access to this portal.')
       setLoading(false)
     }

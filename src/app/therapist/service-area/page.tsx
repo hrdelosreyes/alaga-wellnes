@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, Loader2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/db/client'
 import { Button } from '@/components/ui/button'
 import { TherapistNav } from '@/components/therapist/therapist-nav'
 
@@ -27,11 +27,11 @@ function ServiceAreaPage() {
   useEffect(() => { init() }, [])
 
   async function init() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const db = createClient()
+    const { data: { user } } = await db.auth.getUser()
     if (!user) { router.replace('/therapist/login'); return }
 
-    const { data: t } = await supabase
+    const { data: t } = await db
       .from('therapists')
       .select('id, city_id, cities(name)')
       .eq('email', user.email)
@@ -46,8 +46,8 @@ function ServiceAreaPage() {
 
     // Load barangays for this city + therapist's current selections in parallel
     const [{ data: bgyData }, { data: selData }] = await Promise.all([
-      supabase.from('barangays').select('psgc_code, name').in('city_name', [name, `City of ${name}`]).order('name'),
-      supabase.from('therapist_barangays').select('barangay_psgc, status').eq('therapist_id', t.id),
+      db.from('barangays').select('psgc_code, name').in('city_name', [name, `City of ${name}`]).order('name'),
+      db.from('therapist_barangays').select('barangay_psgc, status').eq('therapist_id', t.id),
     ])
 
     setBarangays((bgyData ?? []) as Barangay[])
@@ -59,10 +59,10 @@ function ServiceAreaPage() {
   async function save() {
     if (!therapistId) return
     setSaving(true)
-    const supabase = createClient()
+    const db = createClient()
 
     // Replace all existing rows for this therapist
-    await supabase.from('therapist_barangays').delete().eq('therapist_id', therapistId)
+    await db.from('therapist_barangays').delete().eq('therapist_id', therapistId)
 
     if (selected.size > 0) {
       const rows = Array.from(selected).map(psgc => ({
@@ -70,7 +70,7 @@ function ServiceAreaPage() {
         barangay_psgc: psgc,
         status:        'pending',
       }))
-      await supabase.from('therapist_barangays').insert(rows)
+      await db.from('therapist_barangays').insert(rows)
     }
     setPendingPsgcs(new Set(selected))
 

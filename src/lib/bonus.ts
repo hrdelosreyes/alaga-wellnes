@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import type { DbClient } from '@/lib/db/server'
 
 export const BONUS_RATE              = 0.05   // 5% of subtotal into the pool
 export const BONUS_MIN_BOOKINGS      = 15     // minimum bookings per quarter to qualify
@@ -30,7 +30,7 @@ export function quarterDateRange(quarter: string): { start: string; end: string 
  * Called alongside createReferralCommissions when a booking is marked completed.
  */
 export async function recordBonusContribution(
-  supabase: SupabaseClient,
+  db: DbClient,
   bookingId: string,
   therapistId: string,
   subtotal: number,
@@ -38,7 +38,7 @@ export async function recordBonusContribution(
   const amount  = Math.round(subtotal * BONUS_RATE)
   const quarter = currentQuarter()
 
-  await supabase.from('alaga_bonus_pool').upsert({
+  await db.from('alaga_bonus_pool').upsert({
     booking_id:   bookingId,
     therapist_id: therapistId,
     amount,
@@ -52,11 +52,11 @@ export async function recordBonusContribution(
  * Only therapists with >= BONUS_MIN_BOOKINGS that quarter qualify.
  */
 export async function calculateQuarterlyPayouts(
-  supabase: SupabaseClient,
+  db: DbClient,
   quarter: string,
 ): Promise<{ therapistId: string; name: string; bookingCount: number; share: number }[]> {
   // Total pool for the quarter
-  const { data: pool } = await supabase
+  const { data: pool } = await db
     .from('alaga_bonus_pool')
     .select('amount, therapist_id')
     .eq('quarter', quarter)
@@ -83,7 +83,7 @@ export async function calculateQuarterlyPayouts(
   const totalQualifiedBookings = qualified.reduce((s, q) => s + q.count, 0)
 
   // Fetch therapist names
-  const { data: therapists } = await supabase
+  const { data: therapists } = await db
     .from('therapists')
     .select('id, name')
     .in('id', qualified.map(q => q.therapistId))
@@ -95,7 +95,7 @@ export async function calculateQuarterlyPayouts(
   for (const q of qualified) {
     const share = Math.floor(totalPool * (q.count / totalQualifiedBookings))
 
-    await supabase.from('alaga_bonus_payouts').upsert({
+    await db.from('alaga_bonus_payouts').upsert({
       therapist_id:  q.therapistId,
       quarter,
       booking_count: q.count,

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/db/server'
 import { THERAPIST_PAYOUT_RATE } from '@/lib/bonus'
 
 // PH-local date (UTC+8) offset by `days`, as YYYY-MM-DD.
