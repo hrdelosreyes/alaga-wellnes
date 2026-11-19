@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/footer'
 import { GeoCityProvider } from '@/components/geo/city-context'
 import { AuthRedirect } from '@/components/auth/auth-redirect'
 import { ConciergeWidget } from '@/components/concierge/concierge-widget'
+import { Analytics } from '@vercel/analytics/next'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ConciergeWidget />
           <Footer />
         </GeoCityProvider>
+        <Analytics />
       </body>
     </html>
   )
